@@ -38,11 +38,17 @@ set_global_assignment -name ON_CHIP_BITSTREAM_DECOMPRESSION OFF
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
 set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "AS INPUT TRI-STATED"
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
-set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
-set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
-set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_COLOR 14622752 -section_id Top
 set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
 set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name VHDL_FILE ../mmu/src/mmu.vhd
+set_global_assignment -name VHDL_FILE ../if/src/if.vhd
+set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
+set_global_assignment -name VHDL_FILE ../id/src/id.vhd
+set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
+set_global_assignment -name VHDL_FILE ../wb/src/wb.vhd
+set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
+set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
