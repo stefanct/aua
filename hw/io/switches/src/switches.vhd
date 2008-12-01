@@ -21,7 +21,7 @@
     architecture sat1 of switches is
     begin
 
-		rd_data <= (others => 'Z');
+		rd_data <= (others => 'Z'); -- TODO: das gehoert unbedingt mit einem mux gemacht
 		rdy_cnt <= (others => 'Z');
 
     end sat1;

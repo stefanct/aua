@@ -198,6 +198,9 @@
     	port map(clk, reset, idex_opcode, idex_dest, idex_opa, idex_opb, exwb_opcode, exwb_dest, exwb_result, exmmu_address, exmmu_wr_data, exmmu_rd, exmmu_wr, exmmu_rd_data, exmmu_rdy_cnt);
     cmp_wb: wb
     	port map(reset, exwb_opcode, exwb_dest, exwb_result, wbid_dest, wbid_result);
-    cmp_switches: switches
+
+	
+	--IO devices below
+	cmp_switches: switches
     	port map(clk, reset, mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt);
     end sat1;
