@@ -40,6 +40,7 @@
     architecture sat1 of id is
 		component reg is
 			port (
+				clock	: in std_logic;
 				reset	: in std_logic;
 				rega	: in reg_t;
 				regb	: in reg_t;
@@ -71,7 +72,7 @@
 	
 	begin
 		cmp_reg : reg
-			port map(reset, async_rega, async_regb, regr, valr, vala, valb);
+			port map(clk, reset, async_rega, async_regb, regr, valr, vala, valb);
 		opcode_nxt <= opcode;
 		dest_nxt <= dest;
 --		opb_nxt <= (others => '0');
