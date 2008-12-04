@@ -2,17 +2,19 @@
     use ieee.std_logic_1164.all;
     use ieee.numeric_std.all;
 
-    entity reg is
+	use work.aua_types.all;
+
+	entity reg is
 		port (
 			reset	: in std_logic;
-			rega	: in std_logic_vector(4 downto 0);
-			regb	: in std_logic_vector(4 downto 0);
+			rega	: in reg_t;
+			regb	: in reg_t;
 
-			regr	: in std_logic_vector(4 downto 0);
-			valr	: in std_logic_vector(15 downto 0);
+			regr	: in reg_t;
+			valr	: in word_t;
 
-			vala	: out std_logic_vector(15 downto 0);
-			valb	: out std_logic_vector(15 downto 0)
+			vala	: out word_t;
+			valb	: out word_t
 		);
     end reg;
 
@@ -23,5 +25,7 @@
 --		signal state 		: state_type;
 --		signal sc_adr	: std_logic_vector(0 downto 0);
     begin
+		vala <= (others => '0');
+		valb <= (others => '0');
 
     end sat1;

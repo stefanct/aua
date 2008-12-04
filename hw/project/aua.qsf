@@ -37,12 +37,13 @@ set_global_assignment -name GENERATE_RBF_FILE ON
 set_global_assignment -name ON_CHIP_BITSTREAM_DECOMPRESSION OFF
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
 set_global_assignment -name RESERVE_ASDO_AFTER_CONFIGURATION "AS INPUT TRI-STATED"
-set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
 set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
 set_global_assignment -name PARTITION_COLOR 14622752 -section_id Top
 set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
 set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
+set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
+set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
 set_global_assignment -name VHDL_FILE ../mmu/src/mmu.vhd
 set_global_assignment -name VHDL_FILE ../if/src/if.vhd
 set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
@@ -52,3 +53,45 @@ set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
 set_global_assignment -name VHDL_FILE ../wb/src/wb.vhd
 set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
+set_location_assignment PIN_AE23 -to led_pins[0]
+set_location_assignment PIN_AF23 -to led_pins[1]
+set_location_assignment PIN_AB21 -to led_pins[2]
+set_location_assignment PIN_AC22 -to led_pins[3]
+set_location_assignment PIN_AD22 -to led_pins[4]
+set_location_assignment PIN_AD23 -to led_pins[5]
+set_location_assignment PIN_AD21 -to led_pins[6]
+set_location_assignment PIN_AC21 -to led_pins[7]
+set_location_assignment PIN_AA14 -to led_pins[8]
+set_location_assignment PIN_Y13 -to led_pins[9]
+set_location_assignment PIN_AA13 -to led_pins[10]
+set_location_assignment PIN_AC14 -to led_pins[11]
+set_location_assignment PIN_AD15 -to led_pins[12]
+set_location_assignment PIN_AE15 -to led_pins[13]
+set_location_assignment PIN_AF13 -to led_pins[14]
+set_location_assignment PIN_AE13 -to led_pins[15]
+set_location_assignment PIN_N25 -to switch_pins[0]
+set_location_assignment PIN_N26 -to switch_pins[1]
+set_location_assignment PIN_P25 -to switch_pins[2]
+set_location_assignment PIN_AE14 -to switch_pins[3]
+set_location_assignment PIN_AF14 -to switch_pins[4]
+set_location_assignment PIN_AD13 -to switch_pins[5]
+set_location_assignment PIN_AC13 -to switch_pins[6]
+set_location_assignment PIN_C13 -to switch_pins[7]
+set_location_assignment PIN_B13 -to switch_pins[8]
+set_location_assignment PIN_A13 -to switch_pins[9]
+set_location_assignment PIN_N1 -to switch_pins[10]
+set_location_assignment PIN_P1 -to switch_pins[11]
+set_location_assignment PIN_P2 -to switch_pins[12]
+set_location_assignment PIN_T7 -to switch_pins[13]
+set_location_assignment PIN_U3 -to switch_pins[14]
+set_location_assignment PIN_U4 -to switch_pins[15]
+set_location_assignment PIN_G26 -to reset_pin
+set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim (VHDL)"
+set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS NOT_USED -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH if -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_NAME if -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME if1 -section_id if
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME ent_if -section_id if
+set_global_assignment -name SIMULATION_MODE "TIMING USING FAST TIMING MODEL"
+set_global_assignment -name EDA_TEST_BENCH_FILE ../if/sim/tb.vhd -section_id if

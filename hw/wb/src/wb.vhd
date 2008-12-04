@@ -2,15 +2,17 @@
     use ieee.std_logic_1164.all;
     use ieee.numeric_std.all;
 
-    entity wb is
+	use work.aua_types.all;
+
+	entity wb is
 		port (
 			reset	: in std_logic;
-			opcode	: in std_logic_vector(5 downto 0);
-			dest	: in std_logic_vector(4 downto 0);
-			result	: in std_logic_vector(15 downto 0);
+			opcode	: in opcode_t;
+			dest	: in reg_t;
+			result	: in word_t;
 
-			dest_out	: out std_logic_vector(4 downto 0);
-			result_out	: out std_logic_vector(15 downto 0)
+			dest_out	: out reg_t;
+			result_out	: out word_t
 		);
     end wb;
 
