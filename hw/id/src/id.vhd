@@ -67,25 +67,30 @@
 		signal vala			: word_t;
 		signal valb			: word_t;
 		
-		signal imm_done		: word_t;
 		signal regb_done	: word_t;
+		signal opb_override	: std_logic;
+		signal opb_branch	: word_t;
 	
 	begin
 		cmp_reg : reg
 			port map(clk, reset, async_rega, async_regb, regr, valr, vala, valb);
-		opcode_nxt <= opcode;
-		dest_nxt <= dest;
---		opb_nxt <= (others => '0');
+
 		pc_nxt <= std_logic_vector(unsigned(pc) + unsigned(opb_nxt));
 
 
 		-- branch?
-		branch: process (opcode,opa_nxt)
+		branch: process (opcode,opa_nxt,pc,dest)
 			variable inv : std_ulogic;
 			variable brinstr : std_ulogic;
 		begin
 			inv := '0';
 			brinstr := '0';
+
+			opcode_nxt <= opcode;
+			dest_nxt <= dest;
+			opb_branch <= pc;
+			opb_override <= '0';
+			
 			if opcode(5 downto 3)="010" then
 				inv := opcode(2);
 				brinstr := '1';
@@ -94,9 +99,9 @@
 				brinstr := '1';
 			elsif opcode = "001101" then
 				inv := '0'; -- jmpl, schedule mov r31, pc!
---					opcode_nxt <= "111011";
---					opb_nxt <= pc;
---					dest_nxt <= "11111";
+					opcode_nxt <= "111011";
+					opb_override <= '1';
+					dest_nxt <= "11111";
 				brinstr := '1';
 			end if;
 			
@@ -108,7 +113,7 @@
 		end process;
 
 		-- sign extend, expand and mux with regb
-		extend: process (opcode,imm,regb_done)
+		extend: process (opcode,imm,regb_done,opb_branch,opb_override)
 		begin
 			if opcode(5 downto 3)="000" or opcode(5 downto 2) ="1100" or opcode(5 downto 0) ="111010" then
 				--expand whole imm (alu has to take care if thats "too much")
@@ -117,6 +122,8 @@
 			elsif opcode(5 downto 4)="01" then
 				--sign extend imm(6 downto 0)
 				opb_nxt <= (15 downto 8 => imm(7)) & imm;
+			elsif opb_override='1' then
+				opb_nxt <= opb_branch;
 			else
 				opb_nxt <= regb_done;
 			end if;

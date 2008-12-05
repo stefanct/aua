@@ -66,6 +66,12 @@ begin
 		process(clk, reset)
 		begin
 			if reset = '1' then
+				opcode <= (others => '0');
+				dest <= (others => '0');
+				rega <= (others => '0');
+				regb <= (others => '0');
+				imm <= (others => '0');
+				pc <= (others => '0');
 			elsif rising_edge(clk) then
 				opcode <= opcode_nxt;
 				dest <= dest_nxt;
