@@ -117,11 +117,11 @@
 		begin
 			if opcode(5 downto 3)="000" or opcode(5 downto 2) ="1100" or opcode(5 downto 0) ="111010" then
 				--expand whole imm (alu has to take care if thats "too much")
-				opb_nxt <= (15 downto 8 => '0') & imm;
+				opb_nxt <= (15 downto 7 => '0') & imm(6 downto 0);
 
 			elsif opcode(5 downto 4)="01" then
 				--sign extend imm(6 downto 0)
-				opb_nxt <= (15 downto 8 => imm(7)) & imm;
+				opb_nxt <= (15 downto 7 => imm(6)) & imm(6 downto 0);
 			elsif opb_override='1' then
 				opb_nxt <= opb_branch;
 			else
