@@ -22,11 +22,10 @@
 
 			-- SimpCon interface to MMU
 			address		: out word_t;
-			wr_data		: out word_t;
+			data		: inout word_t;
 			rd			: out std_logic;
 			wr			: out std_logic;
-			rd_data		: in word_t;
-			rdy_cnt		: in unsigned(1 downto 0)
+			done		: in std_logic
 		);
     end ex;
 
@@ -57,7 +56,7 @@
 		result_nxt <= result_alu;
 		
 		address <= (others => '0');
-		wr_data <= result_nxt;
+		data <= result_nxt;
 		rd <= '0';
 		wr <= '1';
 
