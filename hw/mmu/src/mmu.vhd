@@ -19,10 +19,11 @@
 
 			-- interface to EX stage
 			ex_address	: in word_t;
-			ex_data		: inout word_t;
-			ex_rd		: in std_logic;
-			ex_wr		: in std_logic;
-			ex_done		: out std_logic;
+			ex_rd_data	: in word_t;
+			ex_wr_data	: out word_t;
+			enable		: in std_logic;
+			mmu_opcode	: in std_logic_vector(1 downto 0);
+			ex_valid	: out std_logic;
 			
 			-- SimpCon interface to IO devices
 			io_address	: out std_logic_vector(31 downto 0);

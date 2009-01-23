@@ -20,12 +20,13 @@
 			dest_out	: out reg_t;
 			result		: out word_t;
 
-			-- SimpCon interface to MMU
+			-- interface to MMU
 			address		: out word_t;
-			data		: inout word_t;
-			rd			: out std_logic;
-			wr			: out std_logic;
-			done		: in std_logic
+			result_mmu	: in word_t;
+			wr_data		: out word_t;
+			enable		: out std_logic;
+			mmu_opcode	: out std_logic_vector(1 downto 0);
+			valid		: in std_logic
 		);
     end ex;
 
@@ -53,14 +54,21 @@
 
 		opcode_nxt <= (others => '0');
 		dest_nxt <= (others => '0');
-		result_nxt <= result_alu;
-		
-		address <= (others => '0');
-		data <= result_nxt;
-		rd <= '0';
-		wr <= '1';
+	
+		address <= opb;
+		wr_data <= opa;
 
-		process(clk, reset)
+		mmu_opcode <= opcode(1 downto 0);
+
+		if opcode(5 downto 2) = "1111" then
+			enable <= '1';
+			result_nxt <= result_mmu;
+		else
+			enable <= '0';
+			result_nxt <= result_alu;
+		end if;
+
+	process(clk, reset)
 		begin
 			if reset = '1' then
 			elsif rising_edge(clk) then
@@ -69,5 +77,14 @@
 				result <= result_nxt;
 			end if;
 		end process;
+
+--	ldst: process(clk, reset, opcode, opa, opb)
+--		begin
+--			if reset = '1' then
+--			elsif rising_edge(clk) then
+--			end if;
+--		end process;
+
+		
 
     end sat1;
