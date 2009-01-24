@@ -290,7 +290,8 @@ int main(int argc, char** argv) {
 	string file_in = argv[optind];
 	string file_out = argv[optind+1];
 	string file_precomp = file_out + ".pre";
-	string file_rom = file_out + ".rom";
+	//string file_rom = file_out + ".rom";
+	string file_rom = "../hw/src/mmu/rom.vhd";
 
 	precompile(file_in, file_precomp);
 	compile(file_precomp, file_out);
