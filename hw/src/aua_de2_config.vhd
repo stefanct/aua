@@ -15,8 +15,18 @@ package aua_config is
 
 	constant irq_cnt : natural := 1;
 
+
 end aua_config;
 
 package body aua_config is
-
 end aua_config;
+
+use WORK.all;
+
+configuration MUX2_specified_CFG of aua is
+	for sat1
+		for cmp_icache : instr_cache
+		  use entity work.instr_cache(cache_null);
+	    end for;
+    end for;
+end MUX2_specified_CFG;

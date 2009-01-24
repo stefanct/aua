@@ -41,16 +41,6 @@ set_global_assignment -name PARTITION_COLOR 14622752 -section_id Top
 set_global_assignment -name LL_ROOT_REGION ON -section_id "Root Region"
 set_global_assignment -name LL_MEMBER_STATE LOCKED -section_id "Root Region"
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
-set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
-set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
-set_global_assignment -name VHDL_FILE ../mmu/src/mmu.vhd
-set_global_assignment -name VHDL_FILE ../if/src/if.vhd
-set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
-set_global_assignment -name VHDL_FILE ../id/src/id.vhd
-set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
-set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
-set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
-set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
 set_location_assignment PIN_AE23 -to led_pins[0]
 set_location_assignment PIN_AF23 -to led_pins[1]
 set_location_assignment PIN_AB21 -to led_pins[2]
@@ -93,7 +83,19 @@ set_global_assignment -name EDA_DESIGN_INSTANCE_NAME if1 -section_id if
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME ent_if -section_id if
 set_global_assignment -name SIMULATION_MODE "TIMING USING FAST TIMING MODEL"
 set_global_assignment -name EDA_TEST_BENCH_FILE ../if/sim/tb.vhd -section_id if
-set_global_assignment -name QIP_FILE ../reg/src/ram.qip
 set_global_assignment -name FMAX_REQUIREMENT "50 MHz"
 set_global_assignment -name USE_CONFIGURATION_DEVICE ON
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name VHDL_FILE ../caches/src/cache_null.vhd
+set_global_assignment -name VHDL_FILE ../caches/src/cache_ent.vhd
+set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
+set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
+set_global_assignment -name VHDL_FILE ../mmu/src/mmu.vhd
+set_global_assignment -name VHDL_FILE ../if/src/if.vhd
+set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
+set_global_assignment -name VHDL_FILE ../id/src/id.vhd
+set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
+set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
+set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
+set_global_assignment -name QIP_FILE ../reg/src/ram.qip
