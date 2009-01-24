@@ -16,7 +16,6 @@
 			opb		: in word_t;
 			
 			-- pipeline register outputs
-			opcode_out	: out opcode_t;
 			dest_out	: out reg_t;
 			result		: out word_t;
 
@@ -54,7 +53,6 @@
 		cmp_alu: alu
 			port map(clk, reset, opcode, opa, opb, alu_result);
 
-		opcode_nxt <= (others => '0');
 		dest_nxt <= (others => '0');
 	
 
@@ -79,7 +77,6 @@
 		begin
 			if reset = '1' then
 			elsif rising_edge(clk) then
-				opcode_out <= opcode_nxt;
 				dest_out <= dest_nxt;
 				result <= result_nxt;
 			end if;

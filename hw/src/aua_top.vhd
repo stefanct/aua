@@ -96,7 +96,6 @@
 			opb		: in word_t;
 			
 			-- pipeline register outputs
-			opcode_out	: out opcode_t;
 			dest_out	: out reg_t;
 			result		: out word_t;
 
@@ -110,18 +109,6 @@
 			
 			-- pipeline interlock
 			ex_locks	: out std_ulogic
-			);
-		end component;
-
-		component wb is
-			port (
-				reset	: in std_logic;
-				opcode	: in opcode_t;
-				dest	: in reg_t;
-				result	: in word_t;
-
-				dest_out	: out reg_t;
-				result_out	: out word_t
 			);
 		end component;
 
@@ -205,18 +192,13 @@
 		signal ifmmu_addr	: word_t;
 		signal ifmmu_data	: word_t;
 		signal ifmmu_valid	: std_logic;
-		-- ID/EX
+		-- ID/EX and EX/ID (for WB)
 		signal idex_opcode	: opcode_t;
 		signal idex_dest	: reg_t;
 		signal idex_opa		: word_t;
 		signal idex_opb		: word_t;
-		-- EX/WB
-		signal exwb_opcode	: opcode_t;
-		signal exwb_dest	: reg_t;
-		signal exwb_result	: word_t;
-		-- WB/ID
-		signal wbid_dest	: reg_t;
-		signal wbid_result	: word_t;
+		signal exid_dest	: reg_t;
+		signal exid_result	: word_t;
 		-- EX/MMU
 		signal exmmu_address	: word_t;
 		signal exmmu_result_mmu	: word_t;
@@ -253,11 +235,9 @@
     cmp_if: ent_if
     	port map(clk, reset, ifid_opcode, ifid_dest, ifid_pc, ifid_rega, ifid_regb, ifid_imm, ifid_async_rega, ifid_async_regb, idif_pc, idif_branch, ifmmu_addr, ifmmu_data);
     cmp_id: id
-    	port map(clk, reset, ifid_opcode, ifid_dest, ifid_pc, ifid_rega, ifid_regb, ifid_imm, ifid_async_rega, ifid_async_regb, wbid_dest, wbid_result, idex_opcode, idex_dest, idex_opa, idex_opb, idif_pc, idif_branch);
+    	port map(clk, reset, ifid_opcode, ifid_dest, ifid_pc, ifid_rega, ifid_regb, ifid_imm, ifid_async_rega, ifid_async_regb, exid_dest, exid_result, idex_opcode, idex_dest, idex_opa, idex_opb, idif_pc, idif_branch);
     cmp_ex: ex
-    	port map(clk, reset, idex_opcode, idex_dest, idex_opa, idex_opb, exwb_opcode, exwb_dest, exwb_result, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid);
-    cmp_wb: wb
-    	port map(reset, exwb_opcode, exwb_dest, exwb_result, wbid_dest, wbid_result);
+    	port map(clk, reset, idex_opcode, idex_dest, idex_opa, idex_opb, exid_dest, exid_result, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid);
 
 	
 	--IO devices below

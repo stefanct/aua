@@ -53,11 +53,6 @@
 			);
 		end component;
 
-
---        constant CLK_FREQ : integer := 50000000; -- 20M for cycore; 50M for de2
---		type state_type		is (st_init, st_wait, st_rdst, st_rdcmd, st_flood_adr, st_flood);
---		signal state 		: state_type;
---		signal sc_adr	: std_logic_vector(0 downto 0);
 		signal opcode_nxt	: opcode_t;
 		signal dest_nxt		: reg_t;
 		signal opa_nxt		: word_t;
