@@ -46,9 +46,23 @@ end mmu;
 
 architecture sat1 of mmu is
 --	constant io_devs_name : io_devs := ("bla", "blu");
-begin
-	instr_data <= (others => '0');
 
+	component rom is
+		port (
+			clk     : in std_logic;
+			address	: in word_t;
+			q		: out word_t
+		);
+	end component;
+
+	signal rom_addr	: word_t;
+	signal rom_q	: word_t;
+
+begin
+    
+    cmp_rom: rom
+	port map(clk, instr_addr, rom_q);
+    
 	ex_wr_data <= (others => '0');
 	
 	io_address <= (others => '0');
@@ -56,7 +70,7 @@ begin
 
 	-- Speicher 16bit Adressen
 	-- 0* --> SRAM
-	process(instr_addr, ex_enable)
+	process(instr_addr, ex_enable, ex_opcode)
 	begin
 		sram_addr <= (others => '0');
 		sram_dq <= (others => 'Z'); -- tri-state, 'Z' unless writing to SRAM
@@ -65,41 +79,35 @@ begin
 		sram_ub <= '0';
 		sram_lb <= '0';
 		sram_ce <= '0';
+		
+		instr_data <= (others => '0');
+
+		rom_addr <= (others => '0');
+		
 		instr_valid <= '0';
+		ex_valid <= '0';
 		
 		-- ueber die MMU laufen instruction fetch und EX - EX hat Vorrang, erst dann werden Instructions geholt
-		if(ex_enable = '1') then
-			null;
-		else
+		if(ex_enable = '1') then -- ex will was
+			if(ex_opcode(1) = '1') then -- load
+				if(instr_addr(15) = '0') then -- SRAM
+					sram_addr(13 downto 0) <= instr_addr(14 downto 1);
+				else
+				    null; -- TODO: store
+				end if;
+			else -- store
+			end if;
+		else -- ex will nichts, instruction fetchen
 			if (instr_addr(15) = '0') then -- SRAM
 				 sram_addr(13 downto 0) <= instr_addr(14 downto 1); -- SRAM word, instr byte => shift
 				 instr_valid <= '1'; -- ACHTUNG!!! Stirbt wenn clk_freq > 50MHz
-			else
-				null;
+			else -- nicht SRAM
+				if(instr_addr(14 downto 12) = "000") then
+				    instr_data <= rom_q;
+				    instr_valid <= '1';
+				end if;
 			end if; -- TODO: else fuer Simpcon Devices
 		end if;
-	end process;
-
-	process(clk, reset)
-	begin
-
-		if (reset='1') then
-			--ex_data(15 downto 0) <= (others => '0');
-			ex_valid <= '0';
-
-		elsif rising_edge(clk) then
-			io_rd <= '0';
-			io_wr <= '0';
-			ex_valid <= '0';	-- no wait states
-			if ex_opcode(1) = '1' then
-					--ex_data(15 downto 0) <= io_rd_data(15 downto 0) ;
-					io_rd <= '1';
-			else
-					--io_wr_data(15 downto 0) <= ex_data(15 downto 0);
-					io_wr <= '1';
-			end if;
-		end if;
-
 	end process;
 
 

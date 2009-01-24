@@ -58,7 +58,8 @@ begin
 	process(reset, pc, pc_in, branch, instr_valid)
 	begin
 		if reset = '1' then
-			pc_nxt <= (others => '0');
+			--pc_nxt <= (others => '0');
+			pc_nxt <= "1000000000000000"; -- direkt in ROM
 		elsif instr_valid /= '1' then
 			pc_nxt <= pc;
 		else
