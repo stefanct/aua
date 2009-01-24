@@ -49,7 +49,6 @@ set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
 set_global_assignment -name VHDL_FILE ../id/src/id.vhd
 set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
 set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
-set_global_assignment -name VHDL_FILE ../wb/src/wb.vhd
 set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
 set_location_assignment PIN_AE23 -to led_pins[0]
