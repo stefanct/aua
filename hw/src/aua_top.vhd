@@ -102,10 +102,10 @@ architecture sat1 of aua is
 
 		-- interface to MMU
 		mmu_address		: out word_t;
-		mmu_result	: in word_t;
+		mmu_result		: in word_t;
 		mmu_wr_data		: out word_t;
 		mmu_enable		: out std_logic;
-		mmu_opcode	: out std_logic_vector(1 downto 0);
+		mmu_opcode		: out std_logic_vector(1 downto 0);
 		mmu_valid		: in std_logic;
 		
 		-- pipeline interlock
