@@ -1,5 +1,6 @@
 _start:
 
+	jmp $9		-- brez 0, $9
 	ldi $2, 5	-- 0x00a2
 	jmpl $5		-- 0x34a0
 	brez $4, $7	-- 0x38e4

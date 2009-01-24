@@ -1,25 +1,21 @@
 #include <iostream>
 #include <map>
+#include <vector>
 
 #include <assert.h>
 
 #include <boost/lexical_cast.hpp>
 #include <boost/regex.hpp>
 
-#define INSTR_CONFIG "resources/instructions.conf"
-
-#define NUM_REGS 32
+#include "as.h"
+#include "pseudo.h"
 
 using namespace std;
 using namespace boost;
 
-struct instruction {
-	int opcode;
-	string type;
-};
-
-map<string, instruction> instructions;
-map<string, int> labels;
+std::map<std::string, instruction> instructions;
+std::map<std::string, int> labels;
+std::vector<loc> lines_prec;
 
 void usage() {
 	cerr << "Usage: as [-r] input.as output" << endl;
@@ -55,31 +51,12 @@ void loadInstructions() {
 					<< "\", ignoring. " << endl;
 		}
 	}
+	fclose(file);
 }
 
-void findLabels(FILE* file) {
-	char line[1024];
-	regex reg_label("(\\w+)\\:\\s*");
-	regex reg_empty("\\s*");
-
-	cmatch tokens;
-	int cnt = 0;
-	while (fgets(line, 1024, file) != NULL) {
-		removeComment(line);
-		if (regex_match(line, tokens, reg_label)) {
-			string label;
-			label.assign(tokens[1].first, tokens[1].second);
-			labels[label] = cnt;
-		} else {
-			if (!regex_match(line, tokens, reg_empty)) {
-				cnt += 2;
-			}
-		}
-	}
-}
-
-void compile(FILE* in, FILE* out, bool create_rom) {
-	fseek(in, 0, SEEK_SET);
+void precompile(const string& filename, const string& file_precomp) {
+	FILE* in = fopen(filename.c_str(), "r");
+	FILE* out = fopen(file_precomp.c_str(), "w+");
 	char line[1024];
 
 	regex reg_empty("\\s*");
@@ -88,9 +65,10 @@ void compile(FILE* in, FILE* out, bool create_rom) {
 	regex reg_instr2("\\s*(\\w+)\\s+([\\$\\w]+)\\s*,\\s*([\\$\\w]+)\\s*"); /* 1 Parameter */
 
 	cmatch tokens;
-
+	int cnt = 0;
 	while (fgets(line, 1024, in) != NULL) {
 		removeComment(line);
+		cout << "--------------\n\nPrecompiling: " << line << endl;
 		string instr;
 		string fields[3];
 		int type_len = 0;
@@ -108,17 +86,62 @@ void compile(FILE* in, FILE* out, bool create_rom) {
 		for (int i = 0; i <= type_len; i++) {
 			fields[i].assign(tokens[i + 1].first, tokens[i + 1].second);
 		}
-		type_len *= 3;
 
-		instr.assign(tokens[1].first, tokens[1].second);
-		instruction i = instructions[instr];
+		bool copy_line = true;
+		if (regex_match(line, tokens, reg_label)) {
+			string label;
+			label.assign(tokens[1].first, tokens[1].second);
+			labels[label] = cnt;
+		} else {
+			if (regex_match(line, tokens, reg_empty)) {
+				copy_line = false;
+			}
+			else{
+				cnt += 2;
+			}
+		}
+		if(copy_line){
+			loc l;
+			l.instr = fields[0];
+			for(int i=1; i<=type_len; i++){
+				cout << "Adding l.params: i: " << i << ", fields[i]: " << fields[i] << endl;
+				l.params.push_back(fields[i]);
+			}
+			vector<loc> locs;
+			replace_pseudo_instructions(locs, l);
+			for(int i=0; i<locs.size(); i++){
+				lines_prec.push_back(locs[i]);
+			}
+		}
+	}
+	fclose(in);
+	fclose(out);
+}
+
+void compile(const string& file_in, const string& file_out) {
+	FILE* in = fopen(file_in.c_str(), "r");
+	FILE* out = fopen(file_out.c_str(), "w+");
+	fseek(in, 0, SEEK_SET);
+	char line[1024];
+
+	vector<loc>::iterator iter = lines_prec.begin();
+	for(; iter!=lines_prec.end(); iter++){
+		loc& l = *iter;
+		cout << "l.instr: " << l.instr << endl;
+		instruction i = instructions[l.instr];
+		int type_len = l.params.size()*3;
+		cout << "l.params.size(): " << l.params.size() << endl;
+		cout << "type_len: " << type_len << ", i.type.length: " << i.type.length() << endl;
 		assert(type_len == i.type.length());
 
 		int bin_code = i.opcode << 10;
 		int bit_cnt = 0;
-		int field_cnt = 1;
+		int field_cnt = 0;
 
 		for (int cnt = 0; cnt < type_len; cnt += 3) {
+			cout << "foo" << endl;
+			cout << "field_cnt: " << field_cnt << endl;
+			cout << "l.params[field_cnt][" << field_cnt << "]: " << l.params[field_cnt][0] << endl;
 			char tmp[2] = { 0, 0 };
 			tmp[0] = i.type[cnt + 1];
 			int cur_field_pos = strtol(tmp, NULL, 16);
@@ -129,13 +152,13 @@ void compile(FILE* in, FILE* out, bool create_rom) {
 				int imm = 0;
 				bool valid = true;
 				try {
-					imm = lexical_cast<int> (fields[field_cnt]);
+					imm = lexical_cast<int> (l.params[field_cnt]);
 				} catch (bad_lexical_cast& e) {
 					valid = false;
 				}
 				if (!valid) {
 					map<string, int>::iterator iter = labels.find(
-							fields[field_cnt]);
+							l.params[field_cnt]);
 					if (iter != labels.end()) {
 						imm = iter->second;
 					}
@@ -145,9 +168,10 @@ void compile(FILE* in, FILE* out, bool create_rom) {
 				break;
 			}
 			case 'r':
-				if (fields[field_cnt][0] == '$') {
-					int reg_num = strtol(fields[field_cnt].c_str() + 1, NULL,
+				if (l.params[field_cnt][0] == '$') {
+					int reg_num = strtol(l.params[field_cnt].c_str() + 1, NULL,
 					10);
+					cout << "reg_num: " << reg_num << endl;
 					assert(cur_field_len<=5);
 					assert(reg_num>=0);
 					assert(reg_num<(1<<cur_field_len));
@@ -163,10 +187,15 @@ void compile(FILE* in, FILE* out, bool create_rom) {
 		char *p = (char*) &bin_code;
 		fwrite(p + 1, 1, 1, out);
 		fwrite(p, 1, 1, out);
+		cout << "-----------------------" << endl << endl;
 	}
+	fclose(in);
+	fclose(out);
 }
 
-void gen_rom(FILE* in, FILE* out) {
+void gen_rom(string file_in, string file_out) {
+	FILE* in = fopen(file_in.c_str(), "r");
+	FILE* out = fopen(file_out.c_str(), "w+");
 	string header = "";
 	header+= "-- ROM file, generated\n"\
 	"\n"\
@@ -221,16 +250,18 @@ void gen_rom(FILE* in, FILE* out) {
 		}
 		line_out += "\";\n";
 		fwrite(line_out.c_str(), line_out.length(), 1, out);
+		addr+=2;
 	}
 
-	string footer = "\t\twhen others => data <= \"00000000\";\n"\
+	string footer = "\t\twhen others => data <= \"0000000000000000\";\n"\
 		"\tend case;\n"\
 		"end process;\n"\
 		"\n"\
 		"end rtl;\n";
 
 	fwrite(footer.c_str(), footer.length(), 1, out);
-
+	fclose(in);
+	fclose(out);
 }
 
 int main(int argc, char** argv) {
@@ -254,25 +285,16 @@ int main(int argc, char** argv) {
 	}
 
 	loadInstructions();
+	load_pseudo_instructions();
 
-	FILE* file_in = fopen(argv[optind], "r");
-	FILE* file_out = fopen(argv[optind + 1], "w+");
-	FILE* file_rom = NULL;
-	if (create_rom) {
-		string rom(argv[optind + 1]);
-		rom += ".rom";
-		file_rom = fopen(rom.c_str(), "w+");
-	}
+	string file_in = argv[optind];
+	string file_out = argv[optind+1];
+	string file_precomp = file_out + ".pre";
+	string file_rom = file_out + ".rom";
 
-	findLabels(file_in);
-	compile(file_in, file_out, create_rom);
+	precompile(file_in, file_precomp);
+	compile(file_precomp, file_out);
 	if (create_rom) {
 		gen_rom(file_out, file_rom);
-	}
-
-	fclose(file_in);
-	fclose(file_out);
-	if (create_rom) {
-		fclose(file_rom);
 	}
 }
