@@ -28,7 +28,7 @@ end process;
 
 q <= data;
 
-process(areg) begin
+process(address) begin
 
 	case address is
 		when "1000000000000000" => data <= "0011100100100000";
