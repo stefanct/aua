@@ -21,12 +21,15 @@
 			result		: out word_t;
 
 			-- interface to MMU
-			address		: out word_t;
-			result_mmu	: in word_t;
-			wr_data		: out word_t;
-			enable		: out std_logic;
+			mmu_address		: out word_t;
+			mmu_result	: in word_t;
+			mmu_wr_data		: out word_t;
+			mmu_enable		: out std_logic;
 			mmu_opcode	: out std_logic_vector(1 downto 0);
-			valid		: in std_logic
+			mmu_valid		: in std_logic;
+			
+			-- pipeline interlock
+			ex_locks	: out std_ulogic
 		);
     end ex;
 
@@ -45,30 +48,34 @@
 		signal opcode_nxt	: opcode_t;
 		signal dest_nxt		: reg_t;
 		signal result_nxt	: word_t;
-
-		signal result_alu	: word_t;
+		signal alu_result	: word_t;
 
 	begin
 		cmp_alu: alu
-    	port map(clk, reset, opcode, opa, opb, result_alu);
+			port map(clk, reset, opcode, opa, opb, alu_result);
 
 		opcode_nxt <= (others => '0');
 		dest_nxt <= (others => '0');
 	
-		address <= opb;
-		wr_data <= opa;
 
-		mmu_opcode <= opcode(1 downto 0);
+	ldst_n_mux: process(opcode, opa, opb, mmu_result, mmu_valid, alu_result)
+		begin
+			mmu_address <= opb;
+			mmu_wr_data <= opa;
+			mmu_opcode <= opcode(1 downto 0);
 
-		if opcode(5 downto 2) = "1111" then
-			enable <= '1';
-			result_nxt <= result_mmu;
-		else
-			enable <= '0';
-			result_nxt <= result_alu;
-		end if;
+	   		if opcode(5 downto 2) = "1111" then
+				mmu_enable <= '1';
+				ex_locks <= not mmu_valid;
+				result_nxt <= mmu_result;
+			else
+				mmu_enable <= '0';
+				ex_locks <= '0';
+				result_nxt <= alu_result;
+			end if;
+		end process;
 
-	process(clk, reset)
+	sync: process(clk, reset)
 		begin
 			if reset = '1' then
 			elsif rising_edge(clk) then

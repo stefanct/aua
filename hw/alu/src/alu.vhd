@@ -15,18 +15,20 @@
 		);
     end alu;
 
-    architecture sat1 of alu is
-	begin
+	architecture sat1 of alu is
+
 		signal V: bit;
 		signal C: bit;
-		--constant max_value;
-		--constant min_value;
+		constant max_value : integer := 2**word_t'length - 1;
+		constant min_value : integer := -2**(word_t'length-1); --so irgendwas halt... falls dus ueberhaupt brauchst
+
+	begin
 		
 		process(opcode, opa, opb)
 			variable tmp: word_t;
+		begin
 			V <= '0';
 			C <= '0';
-		begin
 			case opcode(5 downto 0) is
 				when "001101" => -- jmpl
 					result <= x"0000";
@@ -72,12 +74,18 @@
 				when "101011" => -- not
 					result <= not opa;
 				when "101100" => -- neg
-					if opa(15) = '1' then -- - to +
-						opa <= not (opa - 1);
-					else -- + to -
-						opa <= not (opa + 1);
-					end if;
+--					if opa(15) = '1' then -- - to +
+--						opa <= not (opa - 1);
+--					else -- + to -
+--						opa <= not (opa + 1);
+--					end if;
+					-- ich glaub auf opa schreiben is ka gute idee!
+					-- ich glaub du willst da eher sowas wie:
+					result <= not opa(15)&opa(14 downto 0);
+					-- oda?
 				when "101101" => -- asr --?
+					-- fuer die ganzen shifts braucht ma kein tmp,
+					-- wenn man & benutzt wie ich oben beim neg
 					tmp(15) := opa(15);
 					tmp(14 downto 0) := opa(15 downto 1);
 					result <= tmp;
@@ -90,39 +98,51 @@
 					tmp(15) := '0';
 					result <= tmp;
 				when "110000" => -- lsli
-					result <= opa sll unsigned(opb(3 downto 0));
+-- geht ned
+--					result <=  sll(opa, unsigned(opb(3 downto 0)));
+-- auch ned... shifts broken
+--					result <= std_logic_vector( unsigned(opa) sll unsigned(opb(3 downto 0)));
 				when "110001" => -- lsri
-					result <= opa srl unsigned(opb(3 downto 0));
+--					result <= opa srl unsigned(opb(3 downto 0));
 				when "110010" => -- scb
 					if opb(4) = '1' then -- set bit
-						opa(unsigned(opb(3 downto 0)) <= (others => '1');';
+						-- auf opa schreiben is ka gute idee
+--						opa(unsigned(opb(3 downto 0)) <= (others => '1'));
 						result <= opa;
 					else -- clear bit
-						opa(unsigned(opb(3 downto 0)) <= '0';
+						-- auf opa schreiben is ka gute idee
+--						opa(unsigned(opb(3 downto 0)) <= (others => '1'));
 						result <= opa;
 					end if;
 				when "110011" => -- roti
-					if opb(4) = '0' then -- rotl
-						result <= opa rol unsigned(opb(3 downto 0));
-					else -- rotr
-						result <= opa ror unsigned(opb(3 downto 0));
-					end if;
-				when "110100" => -- cmpv
-					result <= 1 when V = '1' else '0';
+--				rol broken
+--					if opb(4) = '0' then -- rotl
+--						result <= opa rol unsigned(opb(3 downto 0));
+--					else -- rotr
+--						result <= opa ror unsigned(opb(3 downto 0));
+--					end if;
+--				when "110100" => -- cmpv
+--					result <= x"0001" when V = '1' else x"0000";
 				when "110101" => -- cmplt
-					result <= '1' when signed(opa) < signed(obb) else '0';
+--					result <= x"0001" when signed(opa) < signed(obb) else x"0000";
 				when "110110" => -- cmpltu
-					result <= '1' when opa < opb else '0';
+--					result <= x"0001" when opa < opb else x"0000";
 				when "110111" => -- cmplte
-					result <= '1' when signed(opa) <= signed(obb) else '0';
+--					result <= x"0001" when signed(opa) <= signed(obb) else x"0000";
 				when "111000" => -- cmplteu
-					result <= '1' when opa <= opb else '0';
-				when "111001" => -- cmpe
-					result <= '1' when opa = opb else '0';
-				when "111010" => -- cmpei
-					tmp(15 downto 5) := (others => '0');
-					tmp(4 downto 0) := opb(4 downto 0);
-					result <= '1' when unsigned(opa) = unsigned(tmp) else '0';
+					-- warum compiled das when scheissdrex ned da ueberall?
+--					result <= x"0001" when (opa <= opb) else x"0000";
+					if opa <= opb then
+						result <= x"0001";
+					else
+						result <= x"0000";
+					end if;
+--				when "111001" => -- cmpe
+--					result <= x"0001" when opa = opb else x"0000";
+--				when "111010" => -- cmpei
+--					tmp(15 downto 5) := (others => '0');
+--					tmp(4 downto 0) := opb(4 downto 0);
+--					result <= x"0001" when unsigned(opa) = unsigned(tmp) else x"0000";
 				when "111011" => -- mov
 					result <= opb;
 				when "111100" => -- ld
@@ -159,9 +179,9 @@
 				when "011011" => -- addi
 					result <= NULL;
 				when "011100" => -- muli
-				when "011100" => -- muli
-				when "011100" => -- muli
-				when "011100" => -- muli
+				when "011101" => -- muli
+				when "011110" => -- muli
+				when "011111" => -- muli
 					result <= NULL;
 				when others =>
 					result <= x"0000";

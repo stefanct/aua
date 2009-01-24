@@ -19,10 +19,10 @@
 
 			-- interface to EX stage
 			ex_address	: in word_t;
-			ex_rd_data	: in word_t;
 			ex_wr_data	: out word_t;
-			enable		: in std_logic;
-			mmu_opcode	: in std_logic_vector(1 downto 0);
+			ex_rd_data	: in word_t;
+			ex_enable	: in std_logic;
+			ex_opcode	: in std_logic_vector(1 downto 0);
 			ex_valid	: out std_logic;
 			
 			-- SimpCon interface to IO devices
@@ -54,7 +54,7 @@
 
 		-- Speicher 16bit Adressen
 		-- 0* --> SRAM
-		process(instr_addr)
+		process(instr_addr, ex_enable)
 		begin
 		    sram_addr <= (others => '0');
 		    sram_dq <= (others => 'Z'); -- tri-state, 'Z' unless writing to SRAM
@@ -66,9 +66,7 @@
 		    instr_valid <= '0';
 		    
 		    -- ueber die MMU laufen instruction fetch und EX - EX hat Vorrang, erst dann werden Instructions geholt
-		    if(ex_rd = '1') then
-		        null;
-			elsif(ex_wr = '1') then
+		    if(ex_enable = '1') then
 		    	null;
 		    else
 		        if (instr_addr(15) = '0') then -- SRAM
@@ -76,7 +74,7 @@
    			         instr_valid <= '1'; -- ACHTUNG!!! Stirbt wenn clk_freq > 50MHz
    			    else
    			        null;
-	 		    end if; -- TODO: else für Simpcon Devices
+	 		    end if; -- TODO: else fuer Simpcon Devices
 	 		end if;
 		end process;
 
@@ -85,18 +83,16 @@
 
 			if (reset='1') then
 				--ex_data(15 downto 0) <= (others => '0');
-				ex_done <= '0';
+				ex_valid <= '0';
 
 			elsif rising_edge(clk) then
 				io_rd <= '0';
 				io_wr <= '0';
-				ex_done <= '0';	-- no wait states
-				if ex_rd = '1' then
+				ex_valid <= '0';	-- no wait states
+				if ex_opcode(1) = '1' then
 						--ex_data(15 downto 0) <= io_rd_data(15 downto 0) ;
 						io_rd <= '1';
-				end if;
-
-				if ex_wr = '1' then
+				else
 						--io_wr_data(15 downto 0) <= ex_data(15 downto 0);
 						io_wr <= '1';
 				end if;
