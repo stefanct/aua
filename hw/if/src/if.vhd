@@ -25,7 +25,7 @@ entity ent_if is
 		pc_in		: in word_t;
 		branch		: in std_logic;
 
-		-- mmu
+		-- cache
 		instr_addr	: out word_t;
 		instr_valid	: in std_logic;
 		instr_data	: in word_t
@@ -41,7 +41,7 @@ architecture sat1 of ent_if is
 	signal imm_nxt		: std_logic_vector(7 downto 0);
 
 	signal pc		: word_t;
-	signal pc_nxt	: word_t := (others => '0');
+	signal pc_nxt	: word_t;
 begin
 
 	opcode_nxt <= instr_data(15 downto 10);
@@ -55,12 +55,18 @@ begin
 	instr_addr <= pc;
 	pc_out <= pc;
 
-	process(pc, pc_in, branch)
+	process(reset, pc, pc_in, branch, instr_valid)
 	begin
-		if branch='1' then
-			pc_nxt <= pc_in;
+		if reset = '1' then
+			pc_nxt <= (others => '0');
+		elsif instr_valid /= '1' then
+			pc_nxt <= pc;
 		else
-			pc_nxt <= std_logic_vector(unsigned(pc) + 2);
+			if branch='1' then
+				pc_nxt <= pc_in;
+			else
+				pc_nxt <= std_logic_vector(unsigned(pc) + 2);
+			end if;
 		end if;
 	end process;
 
