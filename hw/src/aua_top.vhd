@@ -150,8 +150,8 @@ architecture sat1 of aua is
 
 			-- interface to EX stage
 			ex_address	: in word_t;
-			ex_wr_data	: in word_t;
 			ex_rd_data	: out word_t;
+			ex_wr_data	: in word_t;
 			ex_enable	: in std_logic;
 			ex_opcode	: in std_logic_vector(1 downto 0);
 			ex_valid	: out std_logic;
