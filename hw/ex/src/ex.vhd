@@ -59,7 +59,7 @@ begin
 ldst_n_mux: process(opcode, opa, opb, mmu_result, mmu_valid, alu_result)
 	begin
 		mmu_address <= opb;
-		mmu_wr_data <= opa;
+		mmu_st_data <= opa;
 		mmu_opcode <= opcode(1 downto 0);
 
 		if opcode(5 downto 2) = "1111" then
