@@ -13,8 +13,9 @@
 using namespace std;
 using namespace boost;
 
-std::map<std::string, instruction> instructions;
-std::map<std::string, int> labels;
+std::map<string, instruction> instructions;
+std::map<string, string> settings;
+std::map<string, int> labels;
 std::vector<loc> lines_prec;
 
 void usage() {
@@ -31,15 +32,20 @@ void removeComment(char* line) {
 	}
 }
 
-void loadInstructions() {
+void loadConfig() {
 	FILE* file = fopen(INSTR_CONFIG, "r");
 	char line[1024];
 	regex reg_instr("(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*");
+	regex reg_setting("\\s*(\\w+)\\s*=\\s*(\\w+)\\s*");
 	regex reg_empty("\\s*");
 	cmatch tokens;
 	while (fgets(line, 1024, file) != NULL) {
 		removeComment(line);
-		if (regex_match(line, tokens, reg_instr)) {
+		if (regex_match(line, tokens, reg_setting)) {
+			string key(tokens[1].first, tokens[1].second);
+			string value(tokens[2].first, tokens[2].second);
+			settings[key] = value;
+		} else if (regex_match(line, tokens, reg_instr)) {
 			string opcode(tokens[2].first, tokens[2].second);
 			instruction i;
 			i.opcode = strtol(opcode.c_str(), NULL, 0);
@@ -61,8 +67,8 @@ void precompile(const string& filename, const string& file_precomp) {
 
 	regex reg_empty("\\s*");
 	regex reg_label("(\\w+)\\:\\s*");
-	regex reg_instr1("\\s*(\\w+)\\s+([\\$\\w]+)\\s*"); /* 1 Parameter */
-	regex reg_instr2("\\s*(\\w+)\\s+([\\$\\w]+)\\s*,\\s*([\\$\\w]+)\\s*"); /* 1 Parameter */
+	regex reg_instr1("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*"); /* 1 Parameter */
+	regex reg_instr2("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*,\\s*([\\$\\w-]+)\\s*"); /* 1 Parameter */
 
 	cmatch tokens;
 	int cnt = 0;
@@ -95,21 +101,21 @@ void precompile(const string& filename, const string& file_precomp) {
 		} else {
 			if (regex_match(line, tokens, reg_empty)) {
 				copy_line = false;
-			}
-			else{
+			} else {
 				cnt += 2;
 			}
 		}
-		if(copy_line){
+		if (copy_line) {
 			loc l;
 			l.instr = fields[0];
-			for(int i=1; i<=type_len; i++){
-				cout << "Adding l.params: i: " << i << ", fields[i]: " << fields[i] << endl;
+			for (int i = 1; i <= type_len; i++) {
+				cout << "Adding l.params: i: " << i << ", fields[i]: "
+						<< fields[i] << endl;
 				l.params.push_back(fields[i]);
 			}
 			vector<loc> locs;
 			replace_pseudo_instructions(locs, l);
-			for(int i=0; i<locs.size(); i++){
+			for (int i = 0; i < locs.size(); i++) {
 				lines_prec.push_back(locs[i]);
 			}
 		}
@@ -125,37 +131,45 @@ void compile(const string& file_in, const string& file_out) {
 	char line[1024];
 
 	vector<loc>::iterator iter = lines_prec.begin();
-	for(; iter!=lines_prec.end(); iter++){
+	for (; iter != lines_prec.end(); iter++) {
 		loc& l = *iter;
 		cout << "l.instr: " << l.instr << endl;
 		instruction i = instructions[l.instr];
-		int type_len = l.params.size()*3;
+		int type_len = l.params.size() * 3;
 		cout << "l.params.size(): " << l.params.size() << endl;
-		cout << "type_len: " << type_len << ", i.type.length: " << i.type.length() << endl;
+		cout << "type_len: " << type_len << ", i.type.length: "
+				<< i.type.length() << endl;
 		assert(type_len == i.type.length());
 
 		int bin_code = i.opcode << 10;
+		cout << "opcode: " << hex << (i.opcode << 10) << dec << endl;
 		int bit_cnt = 0;
 		int field_cnt = 0;
 
 		for (int cnt = 0; cnt < type_len; cnt += 3) {
 			cout << "foo" << endl;
 			cout << "field_cnt: " << field_cnt << endl;
-			cout << "l.params[field_cnt][" << field_cnt << "]: " << l.params[field_cnt][0] << endl;
+			cout << "l.params[field_cnt][" << field_cnt << "]: "
+					<< l.params[field_cnt][0] << endl;
 			char tmp[2] = { 0, 0 };
 			tmp[0] = i.type[cnt + 1];
 			int cur_field_pos = strtol(tmp, NULL, 16);
 			tmp[0] = *(i.type.c_str() + cnt + 2);
 			int cur_field_len = strtol(tmp, NULL, 16);
-			switch (i.type[cnt]) {
-			case 'i': {
-				int imm = 0;
-				bool valid = true;
-				try {
-					imm = lexical_cast<int> (l.params[field_cnt]);
-				} catch (bad_lexical_cast& e) {
-					valid = false;
-				}
+			char type = i.type[cnt];
+			switch (type) {
+			/* signed oder unsigned immediate */
+			case 'u':
+				cout << "u" << endl;
+			case 's': {
+				cout << "s" << endl;
+				const char* param = l.params[field_cnt].c_str();
+				char* end_ptr;
+				cout << param << endl;
+				int imm = strtol(param, &end_ptr, 0);
+				printf("param: %p, end_ptr: %p\n", param, end_ptr);
+				printf("imm: %d\n", imm);
+				bool valid = param != end_ptr;
 				if (!valid) {
 					map<string, int>::iterator iter = labels.find(
 							l.params[field_cnt]);
@@ -167,6 +181,7 @@ void compile(const string& file_in, const string& file_out) {
 				bin_code |= imm << (cur_field_pos);
 				break;
 			}
+				/* register */
 			case 'r':
 				if (l.params[field_cnt][0] == '$') {
 					int reg_num = strtol(l.params[field_cnt].c_str() + 1, NULL,
@@ -176,6 +191,8 @@ void compile(const string& file_in, const string& file_out) {
 					assert(reg_num>=0);
 					assert(reg_num<(1<<cur_field_len));
 					bin_code |= reg_num << (cur_field_pos);
+				} else {
+					assert(0); // TODO: evtl. Labels ersetzen
 				}
 				break;
 			default:
@@ -194,48 +211,44 @@ void compile(const string& file_in, const string& file_out) {
 }
 
 void gen_rom(string file_in, string file_out) {
+	cout << "gen_rom" << endl;
 	FILE* in = fopen(file_in.c_str(), "r");
-	FILE* out = fopen(file_out.c_str(), "w+");
+	cout << "file_out: " << file_out.c_str() << endl;
+	FILE* out = fopen(file_out.c_str(), "w");
+	perror("out");
+	cout << "out: " << out << endl;
 	string header = "";
-	header+= "-- ROM file, generated\n"\
-	"\n"\
-	"library ieee;\n"\
-	"use ieee.std_logic_1164.all;\n"\
-	"\n"\
-	"entity rom is\n"\
-	"generic (width : integer; addr_width : integer); -- for compatibility\n"\
-	"port (\n"\
-	"\t\tclk : in std_logic;\n"\
-	"\t\taddress : in std_logic_vector(15 downto 0);\n"\
-	"\t\tq : out std_logic_vector(15 downto 0)\n"\
-	");\n"\
-	"end rom;\n"\
-	"\n"\
-	"architecture rtl of rom is\n"\
-	"\n"\
-	"signal areg : std_logic_vector(15 downto 0);\n"\
-	"signal data : std_logic_vector(15 downto 0);\n"\
-	"\n"\
-	"begin\n"\
-	"\n"\
-	"process(clk) begin\n"\
-	"\n"\
-	"if rising_edge(clk) then\n"\
-	"\tareg <= address;\n"\
-	"end if;\n"\
-	"\n"\
-	"end process;\n"\
-	"\n"\
-	"q <= data;\n"\
-	"\n"\
-	"process(areg) begin\n"\
-	"\n"\
-	"\tcase arg is\n";
+	header += "-- ROM file, generated\n"
+		"\n"
+		"library ieee;\n"
+		"use ieee.std_logic_1164.all;\n"
+		"\n"
+		"entity rom is\n"
+		"port (\n"
+		"\t\tclk : in std_logic;\n"
+		"\t\taddress : in std_logic_vector(15 downto 0);\n"
+		"\t\tq : out std_logic_vector(15 downto 0)\n"
+		");\n"
+		"end rom;\n"
+		"\n"
+		"architecture rtl of rom is\n"
+		"\n"
+		"signal data : std_logic_vector(15 downto 0);\n"
+		"\n"
+		"begin\n"
+		"\n"
+		"q <= data;\n"
+		"\n"
+		"process(address) begin\n"
+		"\n"
+		"\tcase address is\n";
+	cout << "gen_rom" << endl;
 	fwrite(header.c_str(), header.length(), 1, out);
 
+	cout << "gen_rom" << endl;
 	fseek(in, 0, SEEK_SET);
 	char buffer[2];
-	int addr = 0;
+	int addr = strtol(settings["rom_start"].c_str(), NULL, 0);
 	while (fread(buffer, 2, 1, in) == 1) {
 		string line_out = "\t\twhen \"";
 		for (int i = 15; i >= 0; i--) {
@@ -250,13 +263,13 @@ void gen_rom(string file_in, string file_out) {
 		}
 		line_out += "\";\n";
 		fwrite(line_out.c_str(), line_out.length(), 1, out);
-		addr+=2;
+		addr += 2;
 	}
 
-	string footer = "\t\twhen others => data <= \"0000000000000000\";\n"\
-		"\tend case;\n"\
-		"end process;\n"\
-		"\n"\
+	string footer = "\t\twhen others => data <= \"0000000000000000\";\n"
+		"\tend case;\n"
+		"end process;\n"
+		"\n"
 		"end rtl;\n";
 
 	fwrite(footer.c_str(), footer.length(), 1, out);
@@ -284,14 +297,14 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	loadInstructions();
+	loadConfig();
 	load_pseudo_instructions();
 
 	string file_in = argv[optind];
-	string file_out = argv[optind+1];
+	string file_out = argv[optind + 1];
 	string file_precomp = file_out + ".pre";
 	//string file_rom = file_out + ".rom";
-	string file_rom = "../hw/src/mmu/rom.vhd";
+	string file_rom = "../hw/mmu/src/rom.vhd";
 
 	precompile(file_in, file_precomp);
 	compile(file_precomp, file_out);

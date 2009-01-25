@@ -66,7 +66,7 @@ architecture sat1 of mmu is
 begin
     
     cmp_rom: rom
-	port map(clk, instr_addr, rom_q);
+	port map(clk, rom_addr, rom_q);
     
 	-- Speicher 16bit Adressen
 	-- 0*		--> SRAM

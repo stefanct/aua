@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-#define INSTR_CONFIG "resources/instructions.conf"
+#define INSTR_CONFIG "resources/aua.conf"
 
 #define NUM_REGS 32
 
