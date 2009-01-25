@@ -59,7 +59,7 @@ begin
 	begin
 		if reset = '1' then
 			--pc_nxt <= (others => '0');
-			pc_nxt <= "1000000000000000"; -- direkt in ROM
+			pc_nxt <= x"8000"; -- direkt in ROM
 		elsif instr_valid /= '1' then
 			pc_nxt <= pc;
 		else

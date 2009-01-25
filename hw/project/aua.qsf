@@ -84,7 +84,6 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME ent_if -section_id if
 set_global_assignment -name SIMULATION_MODE "TIMING USING FAST TIMING MODEL"
 set_global_assignment -name EDA_TEST_BENCH_FILE ../if/sim/tb.vhd -section_id if
 set_global_assignment -name FMAX_REQUIREMENT "50 MHz"
-set_global_assignment -name USE_CONFIGURATION_DEVICE ON
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
 set_global_assignment -name VHDL_FILE ../io/digits/src/digits.vhd
 set_global_assignment -name VHDL_FILE ../mmu/src/rom.vhd
