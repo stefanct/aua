@@ -2,7 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
-use work.aua_config.all;
+--~ use work.aua_config.all;
 use work.aua_types.all;
 
 entity aua is
@@ -136,9 +136,9 @@ architecture sat1 of aua is
 	end component;
 
 	component mmu is
-		generic (
-			irq_cnt	: natural
-		);
+		--~ generic (
+			--~ irq_cnt	: natural
+		--~ );
 		port (
 			clk     : in std_logic;
 			reset	: in std_logic;
@@ -316,7 +316,7 @@ cmp_ex: ex
 cmp_icache: instr_cache
 	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
-	generic map(irq_cnt)
+	--~ generic map(irq_cnt)
 	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt,
 		sram_addr, sram_dq, sram_we, sram_oe, sram_ub, sram_lb, sram_ce);

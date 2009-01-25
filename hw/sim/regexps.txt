@@ -1,0 +1,7 @@
+port -> tb signals
+(\t+)(.*): [a-z_]+ (.*)
+\1signal \2: \3
+
+port -> mapping
+(\t+)([a-z0-9_]+).*:.*
+\t\t\2 => \2,

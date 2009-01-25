@@ -76,30 +76,13 @@ set_location_assignment PIN_U4 -to switch_pins[15]
 set_location_assignment PIN_G26 -to reset_pin
 set_global_assignment -name EDA_SIMULATION_TOOL "ModelSim (VHDL)"
 set_global_assignment -name EDA_OUTPUT_DATA_FORMAT VHDL -section_id eda_simulation
-set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS NOT_USED -section_id eda_simulation
-set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH if -section_id eda_simulation
+set_global_assignment -name EDA_TEST_BENCH_ENABLE_STATUS TEST_BENCH_MODE -section_id eda_simulation
+set_global_assignment -name EDA_NATIVELINK_SIMULATION_TEST_BENCH "aua top" -section_id eda_simulation
 set_global_assignment -name EDA_TEST_BENCH_NAME if -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME if1 -section_id if
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME ent_if -section_id if
 set_global_assignment -name SIMULATION_MODE "TIMING USING FAST TIMING MODEL"
-set_global_assignment -name EDA_TEST_BENCH_FILE ../if/sim/tb.vhd -section_id if
 set_global_assignment -name FMAX_REQUIREMENT "50 MHz"
-set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
-set_global_assignment -name VHDL_FILE ../io/digits/src/digits.vhd
-set_global_assignment -name VHDL_FILE ../mmu/src/rom.vhd
-set_global_assignment -name VHDL_FILE ../caches/src/cache_null.vhd
-set_global_assignment -name VHDL_FILE ../caches/src/cache_ent.vhd
-set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
-set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
-set_global_assignment -name VHDL_FILE ../mmu/src/mmu.vhd
-set_global_assignment -name VHDL_FILE ../if/src/if.vhd
-set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
-set_global_assignment -name VHDL_FILE ../id/src/id.vhd
-set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
-set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
-set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
-set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
-set_global_assignment -name QIP_FILE ../reg/src/ram.qip
 set_location_assignment PIN_V13 -to digit0_pins[6]
 set_location_assignment PIN_V14 -to digit0_pins[5]
 set_location_assignment PIN_AE11 -to digit0_pins[4]
@@ -181,3 +164,27 @@ set_location_assignment PIN_AE9 -to sram_lb
 set_location_assignment PIN_AD10 -to sram_oe
 set_location_assignment PIN_AF9 -to sram_ub
 set_location_assignment PIN_AE10 -to sram_we
+set_global_assignment -name EDA_TEST_BENCH_NAME "aua top" -section_id eda_simulation
+set_global_assignment -name EDA_DESIGN_INSTANCE_NAME aua1 -section_id "aua top"
+set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME aua_tb -section_id "aua top"
+set_global_assignment -name EDA_MAINTAIN_DESIGN_HIERARCHY OFF -section_id eda_simulation
+set_global_assignment -name USE_CONFIGURATION_DEVICE ON
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
+set_global_assignment -name END_TIME "5 ns"
+set_global_assignment -name EDA_TEST_BENCH_FILE ../if/sim/tb.vhd -section_id if
+set_global_assignment -name EDA_TEST_BENCH_FILE ../sim/tb.vhd -section_id "aua top" -library work
+set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
+set_global_assignment -name VHDL_FILE ../io/digits/src/digits.vhd
+set_global_assignment -name VHDL_FILE ../mmu/src/rom.vhd
+set_global_assignment -name VHDL_FILE ../caches/src/cache_ent.vhd
+set_global_assignment -name VHDL_FILE ../caches/src/cache_null.vhd
+set_global_assignment -name VHDL_FILE ../mmu/src/mmu.vhd
+set_global_assignment -name VHDL_FILE ../if/src/if.vhd
+set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
+set_global_assignment -name VHDL_FILE ../id/src/id.vhd
+set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
+set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
+set_global_assignment -name QIP_FILE ../reg/src/ram.qip
+set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
+set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
