@@ -114,14 +114,16 @@ begin
 		if(address(15) = '0') then -- SRAM
 			sram_addr(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
 			if(write = '1') then
-			    null; -- TODO
+			    sram_we <= '0';
+			    sram_dq <= ex_wr_data;
+			    valid <= '1';
 			else
 				q_out <= sram_dq;
 				valid <= '1';
 			end if;
 		else
 		    if(address(14) = '0') then -- non-Simpcon
-		    	if(address(13) = '0') then -- ROM
+		    	if(address(13) = '0') then -- ROM (write wird ignoriert)
 		    		rom_addr <= address;
 		    		q_out <= rom_q;
 		    		valid <= '1';
@@ -136,7 +138,7 @@ begin
 	    end if;
 	end process;
 	
-	mmu_return_result: process(ex_enable, q_out, valid)
+	mmu_return_result: process(ex_enable, q_out, valid) -- write wird ignoriert, wer trotzdem liest...
 	begin
 	    instr_data <= (others => '0');
 	    ex_rd_data <= (others => '0');
