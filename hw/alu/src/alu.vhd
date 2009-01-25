@@ -127,7 +127,7 @@ architecture sat1 of alu is
 				when "110010" => -- scb
 					tmp := x"0001";
 					tmp := std_logic_vector(unsigned(tmp) sll to_integer(unsigned(opb(3 downto 0))));
-					if b(4) = '1' then
+					if opb(4) = '1' then
 						result <= opa or tmp;
 					else
 						result <= opa and (not tmp);
