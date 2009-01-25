@@ -49,6 +49,13 @@ begin
 	
 	rd_data(31 downto 0) <= (others => 'Z');
 
+	digit0_pins <= digit0;
+	digit1_pins <= digit1;
+	digit2_pins <= digit2;
+	digit3_pins <= digit3;
+	digit4_pins <= digit4;
+	digit5_pins <= digit5;
+
 	process(address, wr_data, wr, digit0, digit1, digit2, digit3, digit4, digit5)
 	begin
 		digit0_nxt <= digit0; 	    	
@@ -75,12 +82,12 @@ begin
 	begin
 
 		if (reset='1') then
-			digit0_pins <= (others => '1');
-			digit1_pins <= (others => '1');
-			digit2_pins <= (others => '1');
-			digit3_pins <= (others => '1');
-			digit4_pins <= (others => '1');
-			digit5_pins <= (others => '1');
+			digit0 <= (others => '1');
+			digit1 <= (others => '1');
+			digit2 <= (others => '1');
+			digit3 <= (others => '1');
+			digit4 <= (others => '1');
+			digit5 <= (others => '1');
 
 		elsif rising_edge(clk) then
 		    digit0 <= digit0_nxt;
@@ -89,12 +96,6 @@ begin
 		    digit3 <= digit3_nxt;
 		    digit4 <= digit4_nxt;
 		    digit5 <= digit5_nxt;
-		    digit0_pins <= digit0;
-		    digit1_pins <= digit1;
-		    digit2_pins <= digit2;
-		    digit3_pins <= digit3;
-		    digit4_pins <= digit4;
-		    digit5_pins <= digit5;
 		end if;
 
 	end process;

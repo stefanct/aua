@@ -25,6 +25,15 @@ void _replace_rjmpi(vector<loc>& locs, loc& l){
 	locs.push_back(l_new);
 }
 
+void _replace_scb(vector<loc>& loc, loc& l){
+/*	loc l_new;
+	l_new.instr = "scb";
+	l_new.params.push_back(l.params[0]);
+	char* arg = l.params[1].c_str();
+	int imm = strtol()
+	l_new.params.push_back(l.params[0]);*/
+}
+
 void replace_pseudo_instructions(vector<loc>& locs, loc& l){
 	replace_fun f = replace_functions[l.instr];
 	if(f){
