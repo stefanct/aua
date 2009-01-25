@@ -107,17 +107,7 @@ architecture sat1 of alu is
 					result <= not opb;
 					
 				when "101100" => -- neg
---					if opb = x"0000" then
---						result <= x"0000";
---					else
---						tmp := not opb;    
---						tmp := std_logic_vector(unsigned(tmp) + 1);
---						if opb(15) = '1' and tmp(15) = '1' then
---							V <= '1';
---						end if;
---						result <= tmp;
---					end if;
-					result <= std_logic_vector(unsigned(opb) + 1); 
+					result <= std_logic_vector(unsigned(not opb) + 1); 
 					
 				when "101101" => -- asr
 					result <= to_stdlogicvector(to_bitvector(opb) sra 1);
@@ -135,13 +125,12 @@ architecture sat1 of alu is
 					result <= std_logic_vector(unsigned(opa) srl to_integer(unsigned(opb(3 downto 0))));
 					
 				when "110010" => -- scb
-					tmp := x"0000";
-					tmp(to_integer(unsigned(opb(3 downto 0)))) := '1';
-					if opb(4) = '1' then -- set
+					tmp := x"0001";
+					tmp := std_logic_vector(unsigned(tmp) sll to_integer(unsigned(opb(3 downto 0))));
+					if b(4) = '1' then
 						result <= opa or tmp;
-					else -- clear
-						tmp := not tmp;
-						result <= opa and tmp;
+					else
+						result <= opa and (not tmp);
 					end if;
 					
 				when "110011" => -- roti
