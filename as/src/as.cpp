@@ -18,6 +18,12 @@ std::map<string, string> settings;
 std::map<string, int> labels;
 std::vector<loc> lines_prec;
 
+#ifdef DEBUG
+#define DBG(...) cout << __FILE__ << ": " << __LINE__ <<": "; printf(__VA_ARGS__); printf("\n");
+#else
+#define DBG(...)
+#endif
+
 void usage() {
 	cerr << "Usage: as [-r] input.as output" << endl;
 }
@@ -74,14 +80,13 @@ void precompile(const string& filename, const string& file_precomp) {
 	int cnt = 0;
 	while (fgets(line, 1024, in) != NULL) {
 		removeComment(line);
-		cout << "--------------\n\nPrecompiling: " << line << endl;
+		DBG("--------------\n\nPrecompiling: ");
 		string instr;
 		string fields[3];
 		int type_len = 0;
 		if (regex_match(line, tokens, reg_empty)) {
 			continue;
 		} else if (regex_match(line, tokens, reg_label)) {
-			continue;
 		} else if (regex_match(line, tokens, reg_instr1)) {
 			type_len = 1;
 		} else if (regex_match(line, tokens, reg_instr2)) {
@@ -98,6 +103,8 @@ void precompile(const string& filename, const string& file_precomp) {
 			string label;
 			label.assign(tokens[1].first, tokens[1].second);
 			labels[label] = cnt;
+			DBG("Found label: %s: %d", label.c_str(), cnt);
+			copy_line = false;
 		} else {
 			if (regex_match(line, tokens, reg_empty)) {
 				copy_line = false;
@@ -109,8 +116,7 @@ void precompile(const string& filename, const string& file_precomp) {
 			loc l;
 			l.instr = fields[0];
 			for (int i = 1; i <= type_len; i++) {
-				cout << "Adding l.params: i: " << i << ", fields[i]: "
-						<< fields[i] << endl;
+				DBG("Adding l.params: i: %d, fields[%d]: %s", i, i, fields[i].c_str());
 				l.params.push_back(fields[i]);
 			}
 			vector<loc> locs;
@@ -125,32 +131,30 @@ void precompile(const string& filename, const string& file_precomp) {
 }
 
 void compile(const string& file_in, const string& file_out) {
+	int foo = 7;
 	FILE* in = fopen(file_in.c_str(), "r");
 	FILE* out = fopen(file_out.c_str(), "w+");
 	fseek(in, 0, SEEK_SET);
 	char line[1024];
+	int addr = 0;
 
 	vector<loc>::iterator iter = lines_prec.begin();
 	for (; iter != lines_prec.end(); iter++) {
 		loc& l = *iter;
-		cout << "l.instr: " << l.instr << endl;
+		DBG("l.instr: %s", l.instr.c_str());
 		instruction i = instructions[l.instr];
 		int type_len = l.params.size() * 3;
-		cout << "l.params.size(): " << l.params.size() << endl;
-		cout << "type_len: " << type_len << ", i.type.length: "
-				<< i.type.length() << endl;
+		DBG("l.params.size(): %d", l.params.size());
+		DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
 		assert(type_len == i.type.length());
 
 		int bin_code = i.opcode << 10;
-		cout << "opcode: " << hex << (i.opcode << 10) << dec << endl;
+		DBG("opcode: %x", i.opcode << 10);
 		int bit_cnt = 0;
 		int field_cnt = 0;
 
 		for (int cnt = 0; cnt < type_len; cnt += 3) {
-			cout << "foo" << endl;
-			cout << "field_cnt: " << field_cnt << endl;
-			cout << "l.params[field_cnt][" << field_cnt << "]: "
-					<< l.params[field_cnt][0] << endl;
+			DBG("field_cnt: %d", field_cnt);
 			char tmp[2] = { 0, 0 };
 			tmp[0] = i.type[cnt + 1];
 			int cur_field_pos = strtol(tmp, NULL, 16);
@@ -160,25 +164,50 @@ void compile(const string& file_in, const string& file_out) {
 			switch (type) {
 			/* signed oder unsigned immediate */
 			case 'u':
-				cout << "u" << endl;
-			case 's': {
-				cout << "s" << endl;
+			case 'U':
+				DBG("u");
+			case 's':
+			case 'S': {
+				DBG("s");
 				const char* param = l.params[field_cnt].c_str();
 				char* end_ptr;
-				cout << param << endl;
+				DBG(param);
 				int imm = strtol(param, &end_ptr, 0);
-				printf("param: %p, end_ptr: %p\n", param, end_ptr);
-				printf("imm: %d\n", imm);
 				bool valid = param != end_ptr;
 				if (!valid) {
 					map<string, int>::iterator iter = labels.find(
 							l.params[field_cnt]);
 					if (iter != labels.end()) {
-						imm = iter->second;
+						if (isupper(type)) { // Adresse relativ
+							imm = iter->second - addr;
+						} else {
+							imm = iter->second;
+						}
+						DBG("imm: %d", imm);
+					} else {
+						cerr << "Immediate \"" << l.params[field_cnt]
+								<< "\" invalid." << endl;
+						exit(1);
 					}
 				}
-				assert(imm < (1<<cur_field_len));
-				bin_code |= imm << (cur_field_pos);
+				if (type == 'u') {
+					if (imm >= (1 << cur_field_len)) {
+						cerr << l.instr << ": value " << imm
+								<< " out of range: [0.." << ((1
+								<< cur_field_len) - 1) << "]" << endl;
+						exit(1);
+					}
+				} else {
+					if (imm >= (1 << (cur_field_len - 1)) || imm < -(1
+							<< (cur_field_len - 1))) {
+						cerr << l.instr << ": value " << imm
+								<< " out of range: [-" << (1 << cur_field_len)
+								<< ".." << (1 << cur_field_len) - 1 << "]"
+								<< endl;
+						exit(1);
+					}
+				}
+				bin_code |= ((imm & ((1<< cur_field_len)-1)) << cur_field_pos);
 				break;
 			}
 				/* register */
@@ -186,7 +215,7 @@ void compile(const string& file_in, const string& file_out) {
 				if (l.params[field_cnt][0] == '$') {
 					int reg_num = strtol(l.params[field_cnt].c_str() + 1, NULL,
 					10);
-					cout << "reg_num: " << reg_num << endl;
+					DBG("reg_num: %d", reg_num);
 					assert(cur_field_len<=5);
 					assert(reg_num>=0);
 					assert(reg_num<(1<<cur_field_len));
@@ -204,19 +233,17 @@ void compile(const string& file_in, const string& file_out) {
 		char *p = (char*) &bin_code;
 		fwrite(p + 1, 1, 1, out);
 		fwrite(p, 1, 1, out);
-		cout << "-----------------------" << endl << endl;
+		DBG("----------------\n");
+		addr += 2;
 	}
 	fclose(in);
 	fclose(out);
 }
 
 void gen_rom(string file_in, string file_out) {
-	cout << "gen_rom" << endl;
 	FILE* in = fopen(file_in.c_str(), "r");
-	cout << "file_out: " << file_out.c_str() << endl;
 	FILE* out = fopen(file_out.c_str(), "w");
-	perror("out");
-	cout << "out: " << out << endl;
+	DBG("out: %p", out);
 	string header = "";
 	header += "-- ROM file, generated\n"
 		"\n"
@@ -242,10 +269,8 @@ void gen_rom(string file_in, string file_out) {
 		"process(address) begin\n"
 		"\n"
 		"\tcase address is\n";
-	cout << "gen_rom" << endl;
 	fwrite(header.c_str(), header.length(), 1, out);
 
-	cout << "gen_rom" << endl;
 	fseek(in, 0, SEEK_SET);
 	char buffer[2];
 	int addr = strtol(settings["rom_start"].c_str(), NULL, 0);
@@ -303,7 +328,6 @@ int main(int argc, char** argv) {
 	string file_in = argv[optind];
 	string file_out = argv[optind + 1];
 	string file_precomp = file_out + ".pre";
-	//string file_rom = file_out + ".rom";
 	string file_rom = "../hw/mmu/src/rom.vhd";
 
 	precompile(file_in, file_precomp);
