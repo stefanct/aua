@@ -13,18 +13,9 @@ end rom;
 
 architecture rtl of rom is
 
-signal areg : std_logic_vector(15 downto 0);
 signal data : std_logic_vector(15 downto 0);
 
 begin
-
-process(clk) begin
-
-if rising_edge(clk) then
-	areg <= address;
-end if;
-
-end process;
 
 q <= data;
 

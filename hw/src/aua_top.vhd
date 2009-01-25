@@ -12,6 +12,12 @@ port (
 	reset_pin	: in std_logic;
 	switch_pins	: in std_logic_vector(15 downto 0);
 	led_pins	: out std_logic_vector(15 downto 0);
+	digit0_pins	: out std_logic_vector(6 downto 0);
+	digit1_pins	: out std_logic_vector(6 downto 0);
+	digit2_pins	: out std_logic_vector(6 downto 0);
+	digit3_pins	: out std_logic_vector(6 downto 0);
+	digit4_pins	: out std_logic_vector(6 downto 0);
+	digit5_pins	: out std_logic_vector(6 downto 0);
 	sram_addr	: out std_logic_vector(17 downto 0);
 	sram_dq		: inout word_t;
 	sram_we		: out std_logic;
@@ -144,8 +150,8 @@ architecture sat1 of aua is
 
 			-- interface to EX stage
 			ex_address	: in word_t;
-			ex_wr_data	: out word_t;
-			ex_rd_data	: in word_t;
+			ex_wr_data	: in word_t;
+			ex_rd_data	: out word_t;
 			ex_enable	: in std_logic;
 			ex_opcode	: in std_logic_vector(1 downto 0);
 			ex_valid	: out std_logic;
@@ -189,6 +195,32 @@ architecture sat1 of aua is
 			switch_pins	: in std_logic_vector(15 downto 0);
 			led_pins	: out std_logic_vector(15 downto 0)
 		);
+	end component;
+	
+	component digits is
+	    generic(
+	    	sc_addr	: std_logic_vector(31 downto 0)
+	    );
+	    port (
+			clk     : in std_logic;
+			reset	: in std_logic;
+
+			-- SimpCon slave interface to IO ctrl
+			address	: in std_logic_vector(31 downto 0);
+			wr_data	: in std_logic_vector(31 downto 0);
+			rd		: in std_logic;
+			wr		: in std_logic;
+			rd_data	: out std_logic_vector(31 downto 0);
+			rdy_cnt	: out unsigned(1 downto 0);
+
+			-- pins
+			digit0_pins	: out std_logic_vector(6 downto 0);
+			digit1_pins	: out std_logic_vector(6 downto 0);
+			digit2_pins	: out std_logic_vector(6 downto 0);
+			digit3_pins	: out std_logic_vector(6 downto 0);
+			digit4_pins	: out std_logic_vector(6 downto 0);
+			digit5_pins	: out std_logic_vector(6 downto 0)
+	    );
 	end component;
 
 	signal reset	: std_logic;
@@ -350,6 +382,10 @@ sync: process(clk, reset)
 
 --IO devices below
 cmp_switches: switches
-	generic map((others => '0'))
+	generic map(x"0000ff00")
 	port map(clk, reset, mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt, switch_pins, led_pins);
+cmp_digits: digits
+	generic map(x"0000ff10")
+	port map(clk, reset, mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt,
+		digit0_pins, digit1_pins, digit2_pins, digit3_pins, digit4_pins, digit5_pins);
 end sat1;

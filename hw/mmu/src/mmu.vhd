@@ -19,8 +19,8 @@ entity mmu is
 
 		-- interface to EX stage
 		ex_address	: in word_t;
-		ex_wr_data	: out word_t;
-		ex_rd_data	: in word_t;
+		ex_wr_data	: in word_t;
+		ex_rd_data	: out word_t;
 		ex_enable	: in std_logic;
 		ex_opcode	: in std_logic_vector(1 downto 0);
 		ex_valid	: out std_logic;
@@ -47,6 +47,11 @@ end mmu;
 architecture sat1 of mmu is
 --	constant io_devs_name : io_devs := ("bla", "blu");
 
+	signal address	: std_logic_vector(15 downto 0); -- Addresse zu lesen (gemuxt Ex - Instr)
+	signal write	: std_logic; -- schreiben=1, lesen=0 (gemuxt Ex - Instr)
+	signal q_out	: std_logic_vector(15 downto 0);
+	signal valid	: std_logic;
+
 	component rom is
 		port (
 			clk     : in std_logic;
@@ -63,14 +68,29 @@ begin
     cmp_rom: rom
 	port map(clk, instr_addr, rom_q);
     
-	ex_wr_data <= (others => '0');
-	
-	io_address <= (others => '0');
-	io_wr_data(31 downto 16) <= (others => '0');
-
 	-- Speicher 16bit Adressen
-	-- 0* --> SRAM
-	process(instr_addr, ex_enable, ex_opcode)
+	-- 0*		--> SRAM
+	-- 1*		--> Blöcke /4
+		-- 10*	--> non-Simpcon
+			-- 1000*	--> ROM
+		-- 11*	--> Simpcon
+  			-- 1111*	--> Blöcke /8
+  				-- 11111111*	--> Blöcke /12 (I/O Devices)
+  					-- 111111110000*	--> Switches
+  					-- 111111110001*	--> Digits
+
+	mmu_get_addr: process(instr_addr, ex_address, ex_enable)
+	begin
+	    if(ex_enable = '1') then
+	        address <= ex_address;
+	        write <= ex_opcode(1);
+		else
+		    address <= instr_addr;
+		    write <= '0';
+	    end if;
+	end process;
+
+	mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q)
 	begin
 		sram_addr <= (others => '0');
 		sram_dq <= (others => 'Z'); -- tri-state, 'Z' unless writing to SRAM
@@ -80,35 +100,57 @@ begin
 		sram_lb <= '0';
 		sram_ce <= '0';
 		
-		instr_data <= (others => '0');
-
+		io_address <= (others => '0');
+		io_wr_data <= (others => '0');
+		io_rd <= '0';
+		io_wr <= '0';
+		
 		rom_addr <= (others => '0');
 		
+		q_out <= (others => '0');
+		
+		valid <= '0';
+		
+		if(address(15) = '0') then -- SRAM
+			sram_addr(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
+			if(write = '1') then
+			    null; -- TODO
+			else
+				q_out <= sram_dq;
+				valid <= '1';
+			end if;
+		else
+		    if(address(14) = '0') then -- non-Simpcon
+		    	if(address(13) = '0') then -- ROM
+		    		rom_addr <= address;
+		    		q_out <= rom_q;
+		    		valid <= '1';
+		    	end if;
+			else -- Simpcon
+		    	io_address(15 downto 0) <= address;
+		    	if(write = '1') then
+		    	    io_wr <= '1';
+		    	    io_wr_data(15 downto 0) <= ex_wr_data;
+		    	end if;
+		    end if;
+	    end if;
+	end process;
+	
+	mmu_return_result: process(ex_enable, q_out, valid)
+	begin
+	    instr_data <= (others => '0');
+	    ex_rd_data <= (others => '0');
+
 		instr_valid <= '0';
 		ex_valid <= '0';
 		
-		-- ueber die MMU laufen instruction fetch und EX - EX hat Vorrang, erst dann werden Instructions geholt
-		if(ex_enable = '1') then -- ex will was
-			if(ex_opcode(1) = '1') then -- load
-				if(instr_addr(15) = '0') then -- SRAM
-					sram_addr(13 downto 0) <= instr_addr(14 downto 1);
-				else
-				    null; -- TODO: store
-				end if;
-			else -- store
-			end if;
-		else -- ex will nichts, instruction fetchen
-			if (instr_addr(15) = '0') then -- SRAM
-				 sram_addr(13 downto 0) <= instr_addr(14 downto 1); -- SRAM word, instr byte => shift
-				 instr_valid <= '1'; -- ACHTUNG!!! Stirbt wenn clk_freq > 50MHz
-			else -- nicht SRAM
-				if(instr_addr(14 downto 12) = "000") then
-				    instr_data <= rom_q;
-				    instr_valid <= '1';
-				end if;
-			end if; -- TODO: else fuer Simpcon Devices
-		end if;
+		if(ex_enable = '1') then
+	        ex_rd_data <= q_out;
+	        ex_valid <= valid;
+	    else
+	        instr_data <= q_out;
+	        instr_valid <= valid;
+	    end if;
 	end process;
-
-
+	
 end sat1;
