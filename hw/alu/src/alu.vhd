@@ -15,7 +15,8 @@ entity alu is
 end alu;
 
 architecture sat1 of alu is
-	signal C: bit;
+	signal carry: 		std_logic_vector(0 downto 0);
+	signal carry_nxt:	std_logic_vector(0 downto 0);
 	--constant max_value : integer := 2**word_t'length - 1;
 	--constant min_value : integer := -2**(word_t'length-1); --so irgendwas halt... falls dus ueberhaupt brauchst
 	constant max_value: integer := 2**15-1;
@@ -32,16 +33,26 @@ architecture sat1 of alu is
 --		end if;
 --	end function;
 	
-	begin
-		process(opcode, opa, opb,C)
-			variable tmp: word_t;
-			variable tmp_reg: std_logic_vector(16 downto 0);
+	begin	
+
+		process(carry)
 		begin
-			C <= '0';
+			if carry(0) = '1' then
+				carry_nxt(0) <= '1';
+			else
+				carry_nxt(0) <= '0';
+			end if;
+		end process;
+		
+		process(opcode, opa, opb)
+			variable tmp: word_t;
+			variable tmp_carry: std_logic_vector(16 downto 0);
+			variable tmp_mul:   std_logic_vector(31 downto 0);
+		begin
 			case opcode(5 downto 0) is
 				when "011000" => --addi
 					result <= std_logic_vector(signed(opa) + signed(opb));
-				   
+					
 				when "011001" => --addi
 					result <= std_logic_vector(signed(opa) + signed(opb));
 					
@@ -51,48 +62,73 @@ architecture sat1 of alu is
 				when "011011" => --addi
 					result <= std_logic_vector(signed(opa) + signed(opb));
 					
-				when "011100" => result <= x"0000";-- muli
-				when "011101" => result <= x"0000";-- muli
-				when "011110" => result <= x"0000";-- muli
-				when "011111" => result <= x"0000";-- muli
+				when "011100" => --muli
+					if opb(6) = '1' then
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+					else
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+					end if;
+					result <= tmp_mul(15 downto 0);
+					
+				when "011101" => --muli
+					if opb(6) = '1' then
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+					else
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+					end if;
+					result <= tmp_mul(15 downto 0);
+					
+				when "011110" => --muli
+					if opb(6) = '1' then
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+					else
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+					end if;
+					result <= tmp_mul(15 downto 0);
+					
+				when "011111" => --muli
+					if opb(6) = '1' then
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+					else
+						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+					end if;
+					result <= tmp_mul(15 downto 0);
 					
 				when "100000" => -- add
-					tmp_reg := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)));
-					C <= to_bit(tmp_reg(16));
-					result <= tmp_reg(15 downto 0);
+					tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)));
+					carry(0) <= tmp_carry(16);
+					result <= tmp_carry(15 downto 0);
 					
 				when "100001" => -- addc
-					tmp_reg := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)));
-					if C = '1' then
-						tmp_reg := std_logic_vector(unsigned(tmp_reg) + to_unsigned(1,tmp_reg'length));
-					end if;
-					C <= to_bit(tmp_reg(16));
-					result <= tmp_reg(15 downto 0);
+					tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)) + unsigned(carry_nxt));
+					carry(0) <= tmp_carry(16);
+					result <= tmp_carry(15 downto 0);
 					
 				when "100010" => --sub
-					tmp_reg := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)));
-					C <= to_bit(tmp_reg(16));
-					result <= tmp_reg(15 downto 0);
+					tmp_carry := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)));
+					carry(0) <= tmp_carry(16);
+					result <= tmp_carry(15 downto 0);
 					
 				when "100011" => -- subc
-					tmp_reg := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)));
-					if C = '1' then
-						tmp_reg := std_logic_vector(unsigned(tmp_reg) - to_unsigned(1,tmp_reg'length));
-					end if;
-					C <= to_bit(tmp_reg(16));
-					result <= tmp_reg(15 downto 0);
+					tmp_carry := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)) - unsigned(carry_nxt));
+					carry(0) <= tmp_carry(16);
+					result <= tmp_carry(15 downto 0);
 					
 				when "100100" => -- mul
-					result <= x"0000";
+					tmp_mul := std_logic_vector(signed(opa) * signed(opb));
+					result <= tmp_mul(15 downto 0);
 					
 				when "100101" => -- mulu
-					result <= x"0000";
+					tmp_mul := std_logic_vector(unsigned(opa) * unsigned(opb));
+					result <= tmp_mul(15 downto 0);
 					
 				when "100110" => -- mulh
-					result <= x"0000";
+					tmp_mul := std_logic_vector(signed(opa) * signed(opb));
+					result <= tmp_mul(31 downto 16);
 					
 				when "100111" => -- mulhu
-					result <= x"0000";
+					tmp_mul := std_logic_vector(unsigned(opa) * unsigned(opb));
+					result <= tmp_mul(31 downto 16);
 					
 				when "101000" => -- or 
 					result <= opa or opb;
