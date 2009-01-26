@@ -61,47 +61,47 @@ architecture sat1 of id is
 	signal valb			: word_t;
 	
 	signal regb_done	: word_t;	-- hides r0 changes
-	signal opb_override	: std_logic;
-	signal opa_override	: std_logic;
-	signal opb_branch	: word_t;
+	signal jmpl_op		: std_logic; -- set if instr is jmpl. used to propagate $ra to EX
+	signal opa_to_nop	: std_logic; -- set if we need opa to be all 0s for idle EX
 
 begin
 	cmp_reg : reg
 		port map(clk, reset, async_rega, async_regb, regr, valr, vala, valb);
 
-	opb_branch <= pc;
-	pc_out <= std_logic_vector(TO_INTEGER(unsigned(pc)) + signed(opb_nxt));
-
 	branch: process (opcode, opa_nxt, pc, dest, opb_nxt)
 		variable inv : std_ulogic;
-		variable brinstr : std_ulogic;
+		variable brinstr : std_ulogic; -- set if op changes PC
 	begin
 		inv := '0';
 		brinstr := '0';
 
-		opa_override <= '0';
-		opb_override <= '0';
+		opa_to_nop <= '0';
+		jmpl_op <= '0';
+		pc_out <= std_logic_vector(TO_INTEGER(unsigned(pc)) + signed(opb_nxt));
 
 		if opcode(5 downto 3)="010" then
 			inv := opcode(2);
 			brinstr := '1';
 			-- schedule nop
 			opcode_nxt <= (others => '0');
-			opa_override <= '1';
+			opa_to_nop <= '1';
 			dest_nxt <= (others => '0');
 		elsif opcode(5 downto 1) ="00111" then
 			inv := opcode(0);
 			brinstr := '1';
 			-- schedule nop
 			opcode_nxt <= (others => '0');
-			opa_override <= '1';
+			opa_to_nop <= '1';
 			dest_nxt <= (others => '0');
 		elsif opcode = "001101" then
-			inv := '0'; -- jmpl, schedule mov r31, pc!
-			opcode_nxt <= "111011";
-			opb_override <= '1';
-			dest_nxt <= "11111";
+			inv := '0';
 			brinstr := '1';
+			-- jmpl, schedule mov r31, pc!
+			opcode_nxt <= "111011";
+			dest_nxt <= "11111";
+			jmpl_op <= '1';
+			-- jump is absolute!
+			pc_out <= opb_nxt;
 		else
 			opcode_nxt <= opcode;
 			dest_nxt <= dest;
@@ -115,9 +115,9 @@ begin
 	end process;
 
 	-- hide r0 changes
-	r0readonly: process (rega, regb, vala, valb, opa_override)
+	r0readonly: process (rega, regb, vala, valb, opa_to_nop)
 	begin
-		if rega="00000" or opa_override = '1' then
+		if rega="00000" or opa_to_nop = '1' then
 			opa_nxt <= (others => '0');
 		else
 			opa_nxt <= vala;
@@ -131,7 +131,7 @@ begin
 	end process;
 
 	-- sign extend, expand and mux with regb
-	extend: process (opcode, imm,regb_done, opb_branch, opb_override)
+	extend: process (opcode, imm,regb_done, jmpl_op, pc)
 	begin
 		if opcode(5 downto 3)="000" then
 			opb_nxt <= (15 downto 8 => '0') & imm(7 downto 0);
@@ -141,8 +141,8 @@ begin
 		elsif opcode(5 downto 4)="01" then
 			--sign extend imm(6 downto 0)
 			opb_nxt <= (15 downto 7 => imm(6)) & imm(6 downto 0);
-		elsif opb_override='1' then
-			opb_nxt <= opb_branch;
+		elsif jmpl_op='1' then
+			opb_nxt <= pc;
 		else
 			opb_nxt <= regb_done;
 		end if;
