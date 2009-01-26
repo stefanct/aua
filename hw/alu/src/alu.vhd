@@ -44,7 +44,7 @@ architecture sat1 of alu is
 			end if;
 		end process;
 		
-		process(opcode, opa, opb, carry_nxt)
+		process(opcode, opa, opb)
 			variable tmp: word_t;
 			variable tmp_carry: std_logic_vector(16 downto 0);
 			variable tmp_mul:   std_logic_vector(31 downto 0);
@@ -227,14 +227,15 @@ architecture sat1 of alu is
 						result <= x"0000";
 					end if;
 						
-				when "000000" => result <= x"0000";-- ldi
-					when "000001" => result <= x"0000";-- ldi
-					when "000010" => result <= x"0000";-- ldi
-					when "000011" => result <= x"0000";-- ldi
-					when "000100" => result <= x"0000";-- ldi
-					when "000101" => result <= x"0000";-- ldi
-					when "000110" => result <= x"0000";-- ldi
-					when "000111" => result <= x"0000";-- ldi
+				when "000000" => -- ldi
+					result <= (15 downto 8 =>'0') & opb(7 downto 0);
+					when "000001" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
+					when "000010" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
+					when "000011" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
+					when "000100" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
+					when "000101" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
+					when "000110" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
+					when "000111" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
 				when "001101" => result <= x"0000";-- jmpl
 				when "001110" => result <= x"0000";-- brez
 				when "001111" => result <= x"0000";-- brnez
