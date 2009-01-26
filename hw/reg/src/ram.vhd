@@ -107,7 +107,7 @@ BEGIN
 		operation_mode => "DUAL_PORT",
 		outdata_aclr_b => "NONE",
 		--~ outdata_reg_b => "CLOCK0",
-		outdata_reg_b => "NONE",
+		outdata_reg_b => "UNREGISTERED",
 		power_up_uninitialized => "FALSE",
 		read_during_write_mode_mixed_ports => "OLD_DATA",
 		widthad_a => 5,
@@ -203,7 +203,7 @@ END SYN;
 -- Retrieval info: CONSTANT: NUMWORDS_B NUMERIC "32"
 -- Retrieval info: CONSTANT: OPERATION_MODE STRING "DUAL_PORT"
 -- Retrieval info: CONSTANT: OUTDATA_ACLR_B STRING "NONE"
--- Retrieval info: CONSTANT: OUTDATA_REG_B STRING "CLOCK0"
+-- Retrieval info: CONSTANT: OUTDATA_REG_B STRING "UNREGISTERED"
 -- Retrieval info: CONSTANT: POWER_UP_UNINITIALIZED STRING "FALSE"
 -- Retrieval info: CONSTANT: READ_DURING_WRITE_MODE_MIXED_PORTS STRING "OLD_DATA"
 -- Retrieval info: CONSTANT: WIDTHAD_A NUMERIC "5"
