@@ -44,11 +44,12 @@ architecture sat1 of alu is
 			end if;
 		end process;
 		
-		process(opcode, opa, opb)
+		process(opcode, opa, opb, carry_nxt)
 			variable tmp: word_t;
 			variable tmp_carry: std_logic_vector(16 downto 0);
 			variable tmp_mul:   std_logic_vector(31 downto 0);
 		begin
+			carry(0) <= '0'; 
 			case opcode(5 downto 0) is
 				when "011000" => --addi
 					result <= std_logic_vector(signed(opa) + signed(opb));
