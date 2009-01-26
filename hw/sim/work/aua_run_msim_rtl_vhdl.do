@@ -103,14 +103,18 @@ add wave -hex /aua_tb/aua1/cmp_ex/result
 
 
 add wave -divider REG-file
+add wave -dec /aua_tb/aua1/cmp_id/cmp_reg/rega
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/rdaddress
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/vala
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valb
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/regr
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/wraddress
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valr
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_a(1)
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_a
 #add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_b # always X?
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_b/altsyncram_component/memory/m_mem_data_a
 #add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_b/altsyncram_component/memory/m_mem_data_b # always X?
-add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/vala
-add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valb
 
 
 view structure
