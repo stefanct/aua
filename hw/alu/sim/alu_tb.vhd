@@ -10,7 +10,7 @@ architecture alu_test of alu_tb is
 	
 	component alu is
 		port (
-		clk     : in std_logic;
+		clk		: in std_logic;
 		reset	: in std_logic;
 		opcode	: in opcode_t;
 		opa		: in word_t;
@@ -35,7 +35,7 @@ architecture alu_test of alu_tb is
 		clk <= '0';
 		wait for 5 ns;
 	end process CLKGEN;
-    
+	
 	TEST: process
 	procedure icwait(cycles : natural) is
 		begin
@@ -44,12 +44,6 @@ architecture alu_test of alu_tb is
 		  end loop;
 		end;
 	begin
---
-		--reset <= '0';
-		--icwait(5);
---
-		icwait(1);
-		
 		-- ldi 
 		opcode <= "000000";
 		opb <= std_logic_vector(to_unsigned(12,word_t'length));
@@ -132,7 +126,6 @@ architecture alu_test of alu_tb is
 		
 		--muli
 		opcode <= "011100";
-		assert false report "muli: not implemented";
 		opa <= std_logic_vector(to_signed(12,word_t'length));
 		opb <= std_logic_vector(to_signed(11,word_t'length));
 		icwait(1);
@@ -141,7 +134,6 @@ architecture alu_test of alu_tb is
 		
 		--muli
 		opcode <= "011100";
-		assert false report "muli: not implemented";
 		opa <= std_logic_vector(to_signed(-12,word_t'length));
 		opb <= std_logic_vector(to_signed(11,word_t'length));
 		icwait(1);
@@ -150,7 +142,6 @@ architecture alu_test of alu_tb is
 		
 		--muli
 		opcode <= "011100";
-		assert false report "muli: not implemented";
 		opa <= std_logic_vector(to_signed(12,word_t'length));
 		opb <= std_logic_vector(to_signed(-11,word_t'length));
 		icwait(1);
@@ -159,7 +150,6 @@ architecture alu_test of alu_tb is
 		
 		--muli
 		opcode <= "011100";
-		assert false report "muli: not implemented";
 		opa <= std_logic_vector(to_signed(-12,word_t'length));
 		opb <= std_logic_vector(to_signed(-11,word_t'length));
 		icwait(1);
@@ -244,27 +234,49 @@ architecture alu_test of alu_tb is
 		icwait(5);
 		
 		--subc
-		--opcode <= "100010";
-		--opa <= std_logic_vector(to_unsigned(1,word_t'length));
-		--opb <= std_logic_vector(to_unsigned(3,word_t'length));
-		--assert std_logic_vector(to_unsigned(result,word_t'length)) /= to_signed(-2) report "add: (+) - (+), (1 - 3 != -2,c=1)"
-		--opcode <= "100011";
-		--raga <= std_logic_vector(to_unsigned(0,word_t'length));
-		--opb <= std_logic_vector(to_unsigned(2,word_t'length));
-		--assert std_logic_vector(to_unsigned(result,word_t'length)) /= to_signed(3) report "addi: (+) + (+), (0 - 2 - c(=1) != 3)"
-		
+		opcode <= "100010";
+		opa <= std_logic_vector(to_signed(1,word_t'length));
+		opb <= std_logic_vector(to_signed(3,word_t'length));
+		icwait(1);
+		assert signed(result) = to_signed(-2,word_t'length) report "subc: (+) - (+), (1 - 3 != -2,c=1)";
+		opcode <= "100011";
+		opa <= std_logic_vector(to_signed(6,word_t'length));
+		opb <= std_logic_vector(to_signed(2,word_t'length));
+		icwait(1);
+		assert signed(result) = to_signed(3,word_t'length) report "subc: (+) - (+), (6 - 2 - c(=1) != 3)";
+		icwait(5);
+
 		--mul
 		opcode <= "100100";
-		assert false report "mul: not implemented";		
+		opa <= x"FFFF";
+		opb <= x"FFFF";
+		icwait(1);
+		assert result = x"0001" report "mul: -1 * -1 != 1";
+		icwait(5);
+		
 		--mulu
 		opcode <= "100101";
-		assert false report "mulu: not implemented";
+		opa <= x"FFFF";
+		opb <= x"FFFF";
+		icwait(1);
+		assert result = x"0001" report "mulu: 65535 * 65535 != 4294836225 (FFFF * FFFF != FFFE0001)"; 
+		icwait(5);
+
 		--mulh
 		opcode <= "100110";
-		assert false report "mulhu: not implemented";
+		opa <= x"FFFF";
+		opb <= x"FFFF";
+		icwait(1);
+		assert result = x"0000" report "mulh: -1 * -1 != 1";
+		icwait(5);
+
 		--mulhu
 		opcode <= "100111";
-		assert false report "mulhu: not implemented";
+		opa <= x"FFFF";
+		opb <= x"FFFF";
+		icwait(1);
+		assert result = x"FFFE" report "mulhu: 65535 * 65535 != 4294836225 (FFFF * FFFF != FFFE0001)";
+		icwait(5);
 		
 		--or
 		opcode <= "101000";
