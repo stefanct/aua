@@ -241,6 +241,8 @@ void compile(const string& file_in, const string& file_out) {
 }
 
 void gen_rom(string file_in, string file_out) {
+	vector<loc>::iterator iter = lines_prec.begin(); // PFUSCH
+	iter = lines_prec.begin(); // PFUSCH
 	FILE* in = fopen(file_in.c_str(), "r");
 	FILE* out = fopen(file_out.c_str(), "w");
 	DBG("out: %p", out);
@@ -286,9 +288,21 @@ void gen_rom(string file_in, string file_out) {
 		for (int i = 7; i >= 0; i--) {
 			line_out += buffer[1] & (1 << i) ? '1' : '0';
 		}
-		line_out += "\";\n";
+		line_out += "\";";
 		fwrite(line_out.c_str(), line_out.length(), 1, out);
 		addr += 2;
+
+		// <PFUSCH>
+		string dreck = "\t-- ";
+		dreck+= iter->instr;
+		for(int i=0; i<iter->params.size(); i++){
+			dreck+=" ";
+			dreck+=iter->params[i];
+		}
+		dreck+="\n";
+		fwrite(dreck.c_str(), dreck.length(), 1, out);
+		iter++;
+		// </PFUSCH>
 	}
 
 	string footer = "\t\twhen others => data <= \"0000000000000000\";\n"

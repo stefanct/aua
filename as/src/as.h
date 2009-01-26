@@ -15,8 +15,10 @@ struct instruction {
 };
 
 struct loc{
+	std::string src;
 	std::string instr;
 	std::vector<std::string> params;
+	char opcode[2];
 };
 
 #endif /* AS_H_ */
