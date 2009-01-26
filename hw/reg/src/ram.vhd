@@ -106,7 +106,8 @@ BEGIN
 		numwords_b => 32,
 		operation_mode => "DUAL_PORT",
 		outdata_aclr_b => "NONE",
-		outdata_reg_b => "CLOCK0",
+		--~ outdata_reg_b => "CLOCK0",
+		outdata_reg_b => "NONE",
 		power_up_uninitialized => "FALSE",
 		read_during_write_mode_mixed_ports => "OLD_DATA",
 		widthad_a => 5,
@@ -167,7 +168,7 @@ END SYN;
 -- Retrieval info: PRIVATE: MIFfilename STRING ""
 -- Retrieval info: PRIVATE: OPERATION_MODE NUMERIC "2"
 -- Retrieval info: PRIVATE: OUTDATA_ACLR_B NUMERIC "0"
--- Retrieval info: PRIVATE: OUTDATA_REG_B NUMERIC "1"
+-- Retrieval info: PRIVATE: OUTDATA_REG_B NUMERIC "0"
 -- Retrieval info: PRIVATE: RAM_BLOCK_TYPE NUMERIC "0"
 -- Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_MIXED_PORTS NUMERIC "1"
 -- Retrieval info: PRIVATE: READ_DURING_WRITE_MODE_PORT_A NUMERIC "3"
