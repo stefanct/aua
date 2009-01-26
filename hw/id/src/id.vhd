@@ -40,7 +40,7 @@ end id;
 architecture sat1 of id is
 	component reg is
 		port (
-			clock	: in std_logic;
+			clk	: in std_logic;
 			reset	: in std_logic;
 			rega	: in reg_t;
 			regb	: in reg_t;
@@ -60,7 +60,7 @@ architecture sat1 of id is
 	signal vala			: word_t;
 	signal valb			: word_t;
 	
-	signal regb_done	: word_t;
+	signal regb_done	: word_t;	-- hides r0 changes
 	signal opb_override	: std_logic;
 	signal opa_override	: std_logic;
 	signal opb_branch	: word_t;
@@ -114,24 +114,6 @@ begin
 		end if;
 	end process;
 
-	-- sign extend, expand and mux with regb
-	extend: process (opcode,imm,regb_done,opb_branch,opb_override)
-	begin
-	   if opcode(5 downto 3)="000" then
-		  opb_nxt <= (15 downto 8 => '0') & imm(7 downto 0);
-		elsif opcode(5 downto 2) ="1100" or opcode(5 downto 0) ="111010" then
-			--expand whole imm (alu has to take care if thats "too much")
-			opb_nxt <= (15 downto 7 => '0') & imm(6 downto 0);
-		elsif opcode(5 downto 4)="01" then
-			--sign extend imm(6 downto 0)
-			opb_nxt <= (15 downto 7 => imm(6)) & imm(6 downto 0);
-		elsif opb_override='1' then
-			opb_nxt <= opb_branch;
-		else
-			opb_nxt <= regb_done;
-		end if;
-	end process;
-	
 	-- hide r0 changes
 	r0readonly: process (rega, regb, vala, valb, opa_override)
 	begin
@@ -147,7 +129,24 @@ begin
 			regb_done <= valb;
 		end if;
 	end process;
-	
+
+	-- sign extend, expand and mux with regb
+	extend: process (opcode, imm,regb_done, opb_branch, opb_override)
+	begin
+		if opcode(5 downto 3)="000" then
+			opb_nxt <= (15 downto 8 => '0') & imm(7 downto 0);
+		elsif opcode(5 downto 2) ="1100" or opcode(5 downto 0) ="111010" then
+			--expand whole imm (alu has to take care if thats "too much")
+			opb_nxt <= (15 downto 7 => '0') & imm(6 downto 0);
+		elsif opcode(5 downto 4)="01" then
+			--sign extend imm(6 downto 0)
+			opb_nxt <= (15 downto 7 => imm(6)) & imm(6 downto 0);
+		elsif opb_override='1' then
+			opb_nxt <= opb_branch;
+		else
+			opb_nxt <= regb_done;
+		end if;
+	end process;	
 	
 	sync: process (clk, reset)
 	begin

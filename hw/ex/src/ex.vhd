@@ -53,7 +53,7 @@ begin
 	cmp_alu: alu
 		port map(clk, reset, opcode, opa, opb, alu_result);
 
-	dest_nxt <= (others => '0');
+	dest_nxt <= dest;
 
 
 ldst_n_mux: process(opcode, opa, opb, mmu_result, mmu_valid, alu_result)
@@ -73,22 +73,15 @@ ldst_n_mux: process(opcode, opa, opb, mmu_result, mmu_valid, alu_result)
 		end if;
 	end process;
 
-sync: process(clk, reset)
+output: process(reset, dest_nxt, result_nxt)
 	begin
 		if reset = '1' then
-		elsif rising_edge(clk) then
+			dest_out <= (others => '0');
+			result <= (others => '0');
+		else
 			dest_out <= dest_nxt;
 			result <= result_nxt;
 		end if;
-	end process;
-
---	ldst: process(clk, reset, opcode, opa, opb)
---		begin
---			if reset = '1' then
---			elsif rising_edge(clk) then
---			end if;
---		end process;
-
-	
+	end process;	
 
 end sat1;

@@ -6,7 +6,7 @@ use work.aua_types.all;
 
 entity reg is
 	port (
-		clock	: in std_logic;
+		clk	: in std_logic;
 		reset	: in std_logic;
 		rega	: in reg_t;
 		regb	: in reg_t;
@@ -41,8 +41,8 @@ end component;
 begin
 	
 	cmp_ram_a: ram
-		port map(clock, valr, rega, regr, '1', vala);
+		port map(clk, valr, rega, regr, '1', vala);
 	cmp_ram_b: ram
-		port map(clock, valr, regb, regr, '1', valb);
+		port map(clk, valr, regb, regr, '1', valb);
 	
 end rtl;

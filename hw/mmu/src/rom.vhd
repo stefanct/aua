@@ -21,8 +21,10 @@ q <= data;
 
 process(address) begin
 
-	case address is                              
-		when "1000000000000000" => data <= "0100000000000000";
+	case address is
+		when "1000000000000000" => data <= "1010010000000001";
+		when "1000000000000010" => data <= "0110000001100001";
+		when "1000000000000100" => data <= "0100111111000000";
 		when others => data <= "0000000000000000";
 	end case;
 end process;
