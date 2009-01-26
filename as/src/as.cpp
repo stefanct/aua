@@ -18,12 +18,6 @@ std::map<string, string> settings;
 std::map<string, int> labels;
 std::vector<loc> lines_prec;
 
-#ifdef DEBUG
-#define DBG(...) cout << __FILE__ << ": " << __LINE__ <<": "; printf(__VA_ARGS__); printf("\n");
-#else
-#define DBG(...)
-#endif
-
 void usage() {
 	cerr << "Usage: as [-r] input.as output" << endl;
 }
@@ -73,20 +67,22 @@ void precompile(const string& filename, const string& file_precomp) {
 
 	regex reg_empty("\\s*");
 	regex reg_label("(\\w+)\\:\\s*");
+	regex reg_instr0("\\s*(\\w+)\\s*"); /* 0 Parameter */
 	regex reg_instr1("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*"); /* 1 Parameter */
 	regex reg_instr2("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*,\\s*([\\$\\w-]+)\\s*"); /* 1 Parameter */
 
 	cmatch tokens;
 	int cnt = 0;
 	while (fgets(line, 1024, in) != NULL) {
-		removeComment(line);
-		DBG("--------------\n\nPrecompiling: ");
+		removeComment(line);DBG("--------------\n\nPrecompiling: ");
 		string instr;
 		string fields[3];
 		int type_len = 0;
 		if (regex_match(line, tokens, reg_empty)) {
 			continue;
 		} else if (regex_match(line, tokens, reg_label)) {
+		} else if (regex_match(line, tokens, reg_instr0)) {
+			type_len = 0;
 		} else if (regex_match(line, tokens, reg_instr1)) {
 			type_len = 1;
 		} else if (regex_match(line, tokens, reg_instr2)) {
@@ -102,8 +98,7 @@ void precompile(const string& filename, const string& file_precomp) {
 		if (regex_match(line, tokens, reg_label)) {
 			string label;
 			label.assign(tokens[1].first, tokens[1].second);
-			labels[label] = cnt;
-			DBG("Found label: %s: %d", label.c_str(), cnt);
+			labels[label] = cnt;DBG("Found label: %s: %d", label.c_str(), cnt);
 			copy_line = false;
 		} else {
 			if (regex_match(line, tokens, reg_empty)) {
@@ -144,8 +139,7 @@ void compile(const string& file_in, const string& file_out) {
 		DBG("l.instr: %s", l.instr.c_str());
 		instruction i = instructions[l.instr];
 		int type_len = l.params.size() * 3;
-		DBG("l.params.size(): %d", l.params.size());
-		DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
+		DBG("l.params.size(): %d", l.params.size());DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
 		assert(type_len == i.type.length());
 
 		int bin_code = i.opcode << 10;
@@ -182,8 +176,7 @@ void compile(const string& file_in, const string& file_out) {
 							imm = iter->second - addr;
 						} else {
 							imm = iter->second;
-						}
-						DBG("imm: %d", imm);
+						}DBG("imm: %d", imm);
 					} else {
 						cerr << "Immediate \"" << l.params[field_cnt]
 								<< "\" invalid." << endl;
@@ -207,7 +200,8 @@ void compile(const string& file_in, const string& file_out) {
 						exit(1);
 					}
 				}
-				bin_code |= ((imm & ((1<< cur_field_len)-1)) << cur_field_pos);
+				bin_code |= ((imm & ((1 << cur_field_len) - 1))
+						<< cur_field_pos);
 				break;
 			}
 				/* register */
@@ -232,8 +226,7 @@ void compile(const string& file_in, const string& file_out) {
 		}
 		char *p = (char*) &bin_code;
 		fwrite(p + 1, 1, 1, out);
-		fwrite(p, 1, 1, out);
-		DBG("----------------\n");
+		fwrite(p, 1, 1, out);DBG("----------------\n");
 		addr += 2;
 	}
 	fclose(in);
@@ -294,12 +287,12 @@ void gen_rom(string file_in, string file_out) {
 
 		// <PFUSCH>
 		string dreck = "\t-- ";
-		dreck+= iter->instr;
-		for(int i=0; i<iter->params.size(); i++){
-			dreck+=" ";
-			dreck+=iter->params[i];
+		dreck += iter->instr;
+		for (int i = 0; i < iter->params.size(); i++) {
+			dreck += " ";
+			dreck += iter->params[i];
 		}
-		dreck+="\n";
+		dreck += "\n";
 		fwrite(dreck.c_str(), dreck.length(), 1, out);
 		iter++;
 		// </PFUSCH>

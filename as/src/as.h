@@ -9,6 +9,12 @@
 
 #define NUM_REGS 32
 
+#ifdef DEBUG
+#define DBG(...) cout << __FILE__ << ": " << __LINE__ <<": "; printf(__VA_ARGS__); printf("\n");
+#else
+#define DBG(...)
+#endif
+
 struct instruction {
 	int opcode;
 	std::string type;
