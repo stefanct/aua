@@ -28,32 +28,39 @@ architecture rtl of reg is
 
 component ram is
 	port (
-		address_a	: in reg_t;
-		address_b	: in reg_t;
 		clock		: in std_logic;
-		data_a		: in word_t;
-		data_b		: in word_t;
-		wren_a		: in std_logic;
-		wren_b		: in std_logic;
-		q_a			: out word_t;
-		q_b			: out word_t
+		data		: in word_t;
+		rdaddress	: in reg_t;
+		wraddress	: in reg_t;
+		wren		: in std_logic;
+		q			: out word_t
 		
 	);
 end component;
 
-    signal scheiss	: word_t;
-    signal vhdl	: word_t;
+    signal vala_ram	: word_t;
+    signal valb_ram	: word_t;
 
 begin
-    
-    
-	cmp_ram_a: ram
-		port map(regr, rega, clk, valr, (others=>'0'), '1', '0', vala, scheiss);
+    cmp_ram_a: ram
+		port map(clk, valr, rega, regr, '1', vala_ram);
 	cmp_ram_b: ram
-		port map(regr, regb, clk, valr, (others=>'0'), '1', '0', valb, vhdl);
-	--cmp_ram_a: ram
-	--	port map(clk, valr, rega, regr, '1', vala);
-	--cmp_ram_b: ram
-	--	port map(clk, valr, regb, regr, '1', valb);
+		port map(clk, valr, regb, regr, '1', valb_ram);
+	
+	process(rega, regb, regr, valr, vala_ram, valb_ram)
+	begin
+      if(rega = regr) then
+          vala <= valr;
+      else
+          vala <= vala_ram;
+      end if;
+      
+      if(regb = regr) then
+          valb <= valr;
+      else
+          valb <= valb_ram;
+      end if;
+    end process;
+    
 	
 end rtl;
