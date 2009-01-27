@@ -194,8 +194,8 @@ void compile(const string& file_in, const string& file_out) {
 					if (imm >= (1 << (cur_field_len - 1)) || imm < -(1
 							<< (cur_field_len - 1))) {
 						cerr << l.instr << ": value " << imm
-								<< " out of range: [-" << (1 << cur_field_len)
-								<< ".." << (1 << cur_field_len) - 1 << "]"
+								<< " out of range: [-" << (1 << (cur_field_len-1))
+								<< ".." << (1 << (cur_field_len-1)) - 1 << "]"
 								<< endl;
 						exit(1);
 					}

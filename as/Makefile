@@ -1,6 +1,6 @@
 CC=g++
 LIBS=-lboost_regex
-FLAGS=-g
+FLAGS=-g -DDEBUG
 
 all: as
 
