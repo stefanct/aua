@@ -53,19 +53,24 @@ begin
 	cmp_alu: alu
 		port map(clk, reset, opcode, opa, opb, alu_result);
 
-	dest_nxt <= dest;
 
 
-ldst_n_mux: process(opcode, opa, opb, mmu_result, mmu_valid, alu_result)
+ldst_n_mux: process(opcode, opa, opb, mmu_result, mmu_valid, alu_result, dest)
 	begin
 		mmu_address <= opb;
 		mmu_st_data <= opa;
 		mmu_opcode <= opcode(1 downto 0);
+		dest_nxt <= dest;
 
 		if opcode(5 downto 2) = "1111" then
 			mmu_enable <= '1';
 			ex_locks <= not mmu_valid;
 			result_nxt <= mmu_result;
+
+			-- stores should not alter registers
+			if opcode(1) = '1' then
+				dest_nxt <= (others => '0');
+			end if;
 		else
 			mmu_enable <= '0';
 			ex_locks <= '0';

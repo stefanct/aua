@@ -1,16 +1,15 @@
-#restart -f
+restart -f
 transcript on
 if ![file isdirectory vhdl_libs] {
 	file mkdir vhdl_libs
 }
 
-
 #set path_to_quartus d:/quartus
-set path_to_quartus C:/Programme/altera/80sp1/quartus
+#set path_to_quartus C:/Programme/altera/80sp1/quartus
 
 # where is the "AUA" dir?
 #set path_to_calu_svn H:/Documents/uni/calu/svn
-set path_to_calu_svn H:/uni/calu
+#set path_to_calu_svn H:/uni/calu
 
 
 
@@ -100,18 +99,19 @@ add wave -hex /aua_tb/aua1/cmp_ex/opcode
 add wave -hex /aua_tb/aua1/cmp_ex/opa
 add wave -hex /aua_tb/aua1/cmp_ex/opb
 add wave -dec /aua_tb/aua1/cmp_ex/dest
-#add wave -dec /aua_tb/aua1/cmp_ex/dest_out #atm gleich
+add wave -dec /aua_tb/aua1/cmp_ex/dest_out
 add wave -hex /aua_tb/aua1/cmp_ex/result
 
 
 add wave -divider REG-file
-#add wave -dec /aua_tb/aua1/cmp_id/cmp_reg/rega
+add wave -dec /aua_tb/aua1/cmp_id/cmp_reg/rega
 #add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/rdaddress
-#add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/vala
-#add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valb
-#add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/regr
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/vala
+add wave -dec /aua_tb/aua1/cmp_id/cmp_reg/regb
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valb
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/regr
 #add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/wraddress
-#add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valr
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valr
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_a(1)
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_a
 #add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_b # always X?
