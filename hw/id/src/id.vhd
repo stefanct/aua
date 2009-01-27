@@ -31,6 +31,10 @@ entity id is
 		opa_out		: out word_t;
 		opb_out		: out word_t;
 
+		-- needed for EX forwarding
+		rega_out	: out reg_t;
+		regb_out	: out reg_t;
+
 		-- branch decision
 		pc_out		: out word_t;
 		branch_out	: out std_logic
@@ -59,6 +63,8 @@ architecture sat1 of id is
 	signal dest_nxt		: reg_t;
 	signal opa_nxt		: word_t;
 	signal opb_nxt		: word_t;
+	signal rega_nxt		: reg_t;
+	signal regb_nxt		: reg_t;
 	signal vala			: word_t;
 	signal valb			: word_t;
 	
@@ -69,6 +75,9 @@ architecture sat1 of id is
 begin
 	cmp_reg : reg
 		port map(clk, reset, async_rega, async_regb, rega, regb, regr, valr, vala, valb);
+		
+		rega_nxt <= rega;
+		regb_nxt <= regb;
 
 	branch: process (opcode, opa_nxt, pc, dest, opb_nxt)
 		variable inv : std_ulogic;
@@ -157,11 +166,15 @@ begin
 			dest_out <= (others => '0');
 			opa_out <= (others => '0');
 			opb_out <= (others => '0');
+			rega_out <= (others => '0');
+			regb_out <= (others => '0');
 		elsif rising_edge(clk) then
 			opcode_out <= opcode_nxt;
 			dest_out <= dest_nxt;
 			opa_out <= opa_nxt;
 			opb_out <= opb_nxt;
+			rega_out <= rega_nxt;
+			regb_out <= regb_nxt;
 		end if;
 	end process;
 end sat1;

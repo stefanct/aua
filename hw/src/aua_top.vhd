@@ -85,6 +85,10 @@ architecture sat1 of aua is
 			opa_out		: out word_t;
 			opb_out		: out word_t;
 
+			-- needed for EX forwarding
+			rega_out	: out reg_t;
+			regb_out	: out reg_t;
+
 			-- branch decision
 			pc_out		: out word_t;
 			branch_out	: out std_logic
@@ -98,13 +102,13 @@ architecture sat1 of aua is
 
 		-- pipeline register inputs
 		opcode	: in opcode_t;
-		dest	: in reg_t;
+		dest_in	: in reg_t;
 		opa		: in word_t;
 		opb		: in word_t;
 		
 		-- pipeline register outputs
 		dest_out	: out reg_t;
-		result		: out word_t;
+		result_out	: out word_t;
 
 		-- interface to MMU
 		mmu_address		: out word_t;
@@ -301,16 +305,20 @@ architecture sat1 of aua is
 	signal mmu_sram_lb		: std_logic;
 	signal mmu_sram_ce		: std_logic;
 
+	--forwarding stuff
+	signal id_rega_in			: reg_t;
+	signal id_regb_in			: reg_t;
+	signal exid_dest			: reg_t;
+	signal exid_result			: word_t;
 	--interlocks
 	signal ex_locks	: std_logic;
 
 
 begin
-reset <= reset_pin; -- in case we need to invert... should be "calculated" with help of a constant from config
 cmp_if: ent_if
 	port map(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_imm_in, ifid_async_rega_in, ifid_async_regb_in, idif_pc_out, idif_branch_out, ifcache_addr, ifcache_valid, ifcache_data);
 cmp_id: id
-	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, idif_pc_in, idif_branch_in);
+	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, id_rega_in, id_regb_in, idif_pc_in, idif_branch_in);
 cmp_ex: ex
 	port map(clk, reset, idex_opcode_out, idex_dest_out, idex_opa_out, idex_opb_out, exid_dest_in, exid_result_in, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid, ex_locks);
 cmp_icache: instr_cache
@@ -320,28 +328,54 @@ cmp_mmu: mmu
 	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt,
 		sram_addr, sram_dq, sram_we, sram_oe, sram_ub, sram_lb, sram_ce);
-		--mmu_sram_addr, mmu_sram_dq, mmu_sram_we, mmu_sram_oe, mmu_sram_ub, mmu_sram_lb, mmu_sram_ce);
-	
-locks: process(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_async_rega_in, ifid_async_regb_in, ifid_imm_in, idif_pc_in, idif_branch_in, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, exid_dest_in, exid_result_in)
+
+reset <= reset_pin; -- in case we need to invert... should be "calculated" with help of a constant from config
+
+sync: process (clk, reset)
 	begin
 		if reset = '1' then
-			ifid_opcode_out <= (others => '0');
-			ifid_dest_out <= (others => '0');
-			ifid_pc_out <= (others => '0');
-			ifid_rega_out <= (others => '0');
-			ifid_regb_out <= (others => '0');
-			ifid_async_rega_out <= (others => '0');
-			ifid_async_regb_out <= (others => '0');
-			ifid_imm_out <= (others => '0');
-			idif_pc_out <= (others => '0');
-			idif_branch_out <= '0';
-			idex_opcode_out <= (others => '0');
-			idex_dest_out <= (others => '0');
-			idex_opa_out <= (others => '0');
-			idex_opb_out <= (others => '0');
-			exid_dest_out <= (others => '0');
-			exid_result_out <= (others => '0');
+			exid_dest <= (others => '0');
+			exid_result <= (others => '0');
+		elsif rising_edge(clk) then
+			exid_dest <= exid_dest_in;
+			exid_result <= exid_result_in;
+		end if;
+	end process;
+
+
+ex_fw: process(id_rega_in, id_regb_in, exid_dest, exid_result, idex_opa_in, idex_opb_in)
+	begin
+		if id_rega_in = exid_dest then
+			idex_opa_out <= exid_result;
 		else
+			idex_opa_out <= idex_opa_in;
+		end if;
+		if id_regb_in = exid_dest then
+			idex_opb_out <= exid_result;
+		else
+			idex_opb_out <= idex_opb_in;
+		end if;
+end process;
+--~ locks: process(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_async_rega_in, ifid_async_regb_in, ifid_imm_in, idif_pc_in, idif_branch_in, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, exid_dest_in, exid_result_in)
+	--~ begin
+		--~ if reset = '1' then
+			--~ ifid_opcode_out <= (others => '0');
+			--~ ifid_dest_out <= (others => '0');
+			--~ ifid_pc_out <= (others => '0');
+			--~ ifid_rega_out <= (others => '0');
+			--~ ifid_regb_out <= (others => '0');
+			--~ ifid_async_rega_out <= (others => '0');
+			--~ ifid_async_regb_out <= (others => '0');
+			--~ ifid_imm_out <= (others => '0');
+			--~ idif_pc_out <= (others => '0');
+			--~ idif_branch_out <= '0';
+			--~ idex_opcode_out <= (others => '0');
+			--~ idex_dest_out <= (others => '0');
+			--~ idex_opa_out <= (others => '0');
+			--~ idex_opb_out <= (others => '0');
+			--~ exid_dest_out <= (others => '0');
+			--~ exid_result_out <= (others => '0');
+		--~ else
 		--~ elsif rising_edge(clk) then
 			--~ if ex_locks = '1' then
 				--~ ifid_opcode_out <= ifid_opcode_out;
@@ -373,13 +407,13 @@ locks: process(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_i
 				idif_branch_out <= idif_branch_in;
 				idex_opcode_out <= idex_opcode_in;
 				idex_dest_out <= idex_dest_in;
-				idex_opa_out <= idex_opa_in;
-				idex_opb_out <= idex_opb_in;
+				--~ idex_opa_out <= idex_opa_in;
+				--~ idex_opb_out <= idex_opb_in;
 				exid_dest_out <= exid_dest_in;
 				exid_result_out <= exid_result_in;
 			--~ end if;
-		end if;
-	end process;
+		--~ end if;
+	--~ end process;
 
 --IO devices below
 cmp_switches: switches

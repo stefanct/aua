@@ -11,13 +11,13 @@ entity ex is
 
 		-- pipeline register inputs
 		opcode	: in opcode_t;
-		dest	: in reg_t;
+		dest_in	: in reg_t;
 		opa		: in word_t;
 		opb		: in word_t;
 		
 		-- pipeline register outputs
 		dest_out	: out reg_t;
-		result		: out word_t;
+		result_out	: out word_t;
 
 		-- interface to MMU
 		mmu_address		: out word_t;
@@ -49,18 +49,23 @@ architecture sat1 of ex is
 	signal result_nxt	: word_t;
 	signal alu_result	: word_t;
 
-begin
+	-- forwarding
+	--~ signal dest_old		: reg_t;
+	--~ signal result_old	: word_t;
+	--~ signal dest			: reg_t;
+	--~ signal result		: word_t;
+begin
 	cmp_alu: alu
 		port map(clk, reset, opcode, opa, opb, alu_result);
 
 
 
-ldst_n_mux: process(opcode, opa, opb, mmu_result, mmu_valid, alu_result, dest)
+ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_valid, alu_result)
 	begin
 		mmu_address <= opb;
 		mmu_st_data <= opa;
 		mmu_opcode <= opcode(1 downto 0);
-		dest_nxt <= dest;
+		dest_nxt <= dest_in;
 
 		if opcode(5 downto 2) = "1111" then
 			mmu_enable <= '1';
@@ -82,11 +87,42 @@ output: process(reset, dest_nxt, result_nxt)
 	begin
 		if reset = '1' then
 			dest_out <= (others => '0');
-			result <= (others => '0');
+			result_out <= (others => '0');
+			--~ dest <= (others => '0');
+			--~ result <= (others => '0');
 		else
+			--~ dest <= dest_nxt;
+			--~ result <= result_nxt;
 			dest_out <= dest_nxt;
-			result <= result_nxt;
+			result_out <= result_nxt;
 		end if;
 	end process;	
+
+--~ forward: process(dest_old, result_old, dest_in)
+	--~ begin
+		--~ if dest_in = '1' then
+			--~ dest_out <= (others => '0');
+			--~ result_out <= (others => '0');
+			--~ dest <= (others => '0');
+			--~ result <= (others => '0');
+		--~ else
+			--~ dest <= dest_nxt;
+			--~ result <= result_nxt;
+			--~ dest_out <= dest_nxt;
+			--~ result_out <= result_nxt;
+		--~ end if;
+	--~ end process;	
+
+
+--~ sync: process (clk, reset)
+	--~ begin
+		--~ if reset = '1' then
+			--~ dest_old <= (others => '0');
+			--~ result_old <= (others => '0');
+		--~ elsif rising_edge(clk) then
+			--~ dest_old <= dest;
+			--~ result_old <= result;
+		--~ end if;
+	--~ end process;
 
 end sat1;

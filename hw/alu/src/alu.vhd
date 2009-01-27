@@ -44,7 +44,7 @@ architecture sat1 of alu is
 			end if;
 		end process;
 		
-		process(opcode, opa, opb)
+		process(opcode, opa, opb, carry_nxt)
 			variable tmp: word_t;
 			variable tmp_carry: std_logic_vector(16 downto 0);
 			variable tmp_mul:   std_logic_vector(31 downto 0);
