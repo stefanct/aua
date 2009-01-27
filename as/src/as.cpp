@@ -240,7 +240,7 @@ void gen_rom(string file_in, string file_out) {
 	FILE* out = fopen(file_out.c_str(), "w");
 	DBG("out: %p", out);
 	string header = "";
-	header += "-- ROM file, generated\n"
+	header += "-- Program " + file_in + ", generated ROM file\n"
 		"\n"
 		"library ieee;\n"
 		"use ieee.std_logic_1164.all;\n"
