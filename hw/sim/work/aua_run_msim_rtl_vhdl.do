@@ -107,8 +107,10 @@ add wave -divider REG-file
 add wave -dec /aua_tb/aua1/cmp_id/cmp_reg/rega
 #add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/rdaddress
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/vala
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/vala_ram
 add wave -dec /aua_tb/aua1/cmp_id/cmp_reg/regb
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valb
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valb_ram
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/regr
 #add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/wraddress
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/valr

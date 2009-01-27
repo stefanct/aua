@@ -40,16 +40,18 @@ end id;
 architecture sat1 of id is
 	component reg is
 		port (
-			clk	: in std_logic;
-			reset	: in std_logic;
-			rega	: in reg_t;
-			regb	: in reg_t;
+			clk			: in std_logic;
+			reset		: in std_logic;
+			async_rega	: in reg_t;
+			async_regb	: in reg_t;
+			rega		: in reg_t;
+			regb		: in reg_t;
 
-			regr	: in reg_t;
-			valr	: in word_t;
+			async_regr	: in reg_t;
+			async_valr	: in word_t;
 
-			vala	: out word_t;
-			valb	: out word_t
+			vala		: out word_t;
+			valb		: out word_t
 		);
 	end component;
 
@@ -66,7 +68,7 @@ architecture sat1 of id is
 
 begin
 	cmp_reg : reg
-		port map(clk, reset, async_rega, async_regb, regr, valr, vala, valb);
+		port map(clk, reset, async_rega, async_regb, rega, regb, regr, valr, vala, valb);
 
 	branch: process (opcode, opa_nxt, pc, dest, opb_nxt)
 		variable inv : std_ulogic;
