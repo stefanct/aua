@@ -93,7 +93,7 @@ begin
         icwait(2);
         reset_pin <= '0';
         
-        icwait(25);
+        icwait(50);
         
         assert false report "sim finish" SEVERITY failure;
                 

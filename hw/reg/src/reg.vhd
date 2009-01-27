@@ -28,21 +28,32 @@ architecture rtl of reg is
 
 component ram is
 	port (
+		address_a	: in reg_t;
+		address_b	: in reg_t;
 		clock		: in std_logic;
-		data		: in word_t;
-		rdaddress	: in reg_t;
-		wraddress	: in reg_t;
-		wren		: in std_logic;
-		q			: out word_t
+		data_a		: in word_t;
+		data_b		: in word_t;
+		wren_a		: in std_logic;
+		wren_b		: in std_logic;
+		q_a			: out word_t;
+		q_b			: out word_t
 		
 	);
 end component;
 
+    signal scheiss	: word_t;
+    signal vhdl	: word_t;
+
 begin
-	
+    
+    
 	cmp_ram_a: ram
-		port map(clk, valr, rega, regr, '1', vala);
+		port map(regr, rega, clk, valr, (others=>'0'), '1', '0', vala, scheiss);
 	cmp_ram_b: ram
-		port map(clk, valr, regb, regr, '1', valb);
+		port map(regr, regb, clk, valr, (others=>'0'), '1', '0', valb, vhdl);
+	--cmp_ram_a: ram
+	--	port map(clk, valr, rega, regr, '1', vala);
+	--cmp_ram_b: ram
+	--	port map(clk, valr, regb, regr, '1', valb);
 	
 end rtl;
