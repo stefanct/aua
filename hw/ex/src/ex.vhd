@@ -58,45 +58,48 @@ architecture sat1 of ex is
 	cmp_alu: alu
 		port map(clk, reset, opcode, opa, opb, alu_result);
 
-
-
 ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_valid, alu_result)
 	begin
 		mmu_address <= opb;
 		mmu_st_data <= opa;
 		mmu_opcode <= opcode(1 downto 0);
-		dest_nxt <= dest_in;
+		dest_out <= dest_in;
 
 		if opcode(5 downto 2) = "1111" then
 			mmu_enable <= '1';
 			ex_locks <= not mmu_valid;
-			result_nxt <= mmu_result;
+			result_out <= mmu_result;
 
 			-- stores should not alter registers
 			if opcode(1) = '1' then
-				dest_nxt <= (others => '0');
+				dest_out <= (others => '0');
 			end if;
 		else
 			mmu_enable <= '0';
 			ex_locks <= '0';
-			result_nxt <= alu_result;
+			result_out <= alu_result;
+		end if;
+
+		-- hide r0 changes
+		if dest_in="00000" then
+			result_out <= (others => '0');
 		end if;
 	end process;
 
-output: process(reset, dest_nxt, result_nxt)
-	begin
-		if reset = '1' then
-			dest_out <= (others => '0');
-			result_out <= (others => '0');
+--~ output: process(reset, dest_nxt, result_nxt)
+	--~ begin
+		--~ if reset = '1' then
+			--~ dest_out <= (others => '0');
+			--~ result_out <= (others => '0');
 			--~ dest <= (others => '0');
 			--~ result <= (others => '0');
-		else
+		--~ else
 			--~ dest <= dest_nxt;
 			--~ result <= result_nxt;
-			dest_out <= dest_nxt;
-			result_out <= result_nxt;
-		end if;
-	end process;	
+			--~ dest_out <= dest_nxt;
+			--~ result_out <= result_nxt;
+		--~ end if;
+	--~ end process;	
 
 --~ forward: process(dest_old, result_old, dest_in)
 	--~ begin

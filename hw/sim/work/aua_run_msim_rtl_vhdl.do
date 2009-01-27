@@ -98,6 +98,7 @@ add wave -divider EX
 add wave -hex /aua_tb/aua1/cmp_ex/opcode
 add wave -hex /aua_tb/aua1/cmp_ex/opa
 add wave -hex /aua_tb/aua1/cmp_ex/opb
+add wave /aua_tb/aua1/cmp_ex/cmp_alu/carry
 add wave -dec /aua_tb/aua1/cmp_ex/dest_out
 add wave -hex /aua_tb/aua1/cmp_ex/result_out
 

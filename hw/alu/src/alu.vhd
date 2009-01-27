@@ -15,8 +15,8 @@ entity alu is
 end alu;
 
 architecture sat1 of alu is
-	signal carry: 		std_logic_vector(0 downto 0);
-	signal carry_nxt:	std_logic_vector(0 downto 0);
+	signal carry: 		std_logic;
+	signal carry_nxt:	std_logic;
 	--constant max_value : integer := 2**word_t'length - 1;
 	--constant min_value : integer := -2**(word_t'length-1); --so irgendwas halt... falls dus ueberhaupt brauchst
 	constant max_value: integer := 2**15-1;
@@ -35,21 +35,21 @@ architecture sat1 of alu is
 	
 	begin	
 
-		process(carry)
-		begin
-			if carry(0) = '1' then
-				carry_nxt(0) <= '1';
-			else
-				carry_nxt(0) <= '0';
-			end if;
-		end process;
+sync_carry: process (clk, reset)
+	begin
+		if reset = '1' then
+			carry <= '0';
+		elsif rising_edge(clk) then
+			carry <= carry_nxt;
+		end if;
+	end process;
 		
-		process(opcode, opa, opb, carry_nxt)
+		process(opcode, opa, opb, carry)
 			variable tmp: word_t;
 			variable tmp_carry: std_logic_vector(16 downto 0);
 			variable tmp_mul:   std_logic_vector(31 downto 0);
 		begin
-			carry(0) <= '0'; 
+		carry_nxt <= carry;
 			case opcode(5 downto 0) is
 				when "011000" => --addi
 					result <= std_logic_vector(signed(opa) + signed(opb));
@@ -96,23 +96,23 @@ architecture sat1 of alu is
 					result <= tmp_mul(15 downto 0);
 					
 				when "100000" => -- add
-					tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)));
-					carry(0) <= tmp_carry(16);
+					tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)) );
+					carry_nxt <= tmp_carry(16);
 					result <= tmp_carry(15 downto 0);
 					
 				when "100001" => -- addc
-					tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)) + unsigned(carry_nxt));
-					carry(0) <= tmp_carry(16);
+					tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)) + (x"0000"&carry));
+					carry_nxt <= tmp_carry(16);
 					result <= tmp_carry(15 downto 0);
 					
 				when "100010" => --sub
 					tmp_carry := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)));
-					carry(0) <= tmp_carry(16);
+					carry_nxt <= tmp_carry(16);
 					result <= tmp_carry(15 downto 0);
 					
 				when "100011" => -- subc
-					tmp_carry := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)) - unsigned(carry_nxt));
-					carry(0) <= tmp_carry(16);
+					tmp_carry := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)) - (x"0000"&carry));
+					carry_nxt <= tmp_carry(16);
 					result <= tmp_carry(15 downto 0);
 					
 				when "100100" => -- mul
