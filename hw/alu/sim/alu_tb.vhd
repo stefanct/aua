@@ -48,13 +48,13 @@ architecture alu_test of alu_tb is
 		opcode <= "000000";
 		opb <= std_logic_vector(to_unsigned(12,word_t'length));
 		icwait(1);
-		assert result = x"0000" report "ldi: load not ignored - 1";
+		assert result = opb report "ldi: load failed - 1";
 		icwait(5);
 		
 		opcode <= "000111";
 		opb <= std_logic_vector(to_unsigned(12,word_t'length));
 		icwait(1);
-		assert result = x"0000" report "ldi: load not ignored - 2";
+		assert result = opb report "ldi: load failed - 2";
 		icwait(5);
 		
 		--jmpl
