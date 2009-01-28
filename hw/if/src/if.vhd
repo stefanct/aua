@@ -28,8 +28,10 @@ entity ent_if is
 		-- cache
 		instr_addr	: out word_t;
 		instr_valid	: in std_logic;
-		instr_data	: in word_t
-
+		instr_data	: in word_t;
+		
+		-- interlock
+		lock	: in std_logic
 	);
 end ent_if;
 

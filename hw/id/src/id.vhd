@@ -10,12 +10,12 @@ entity id is
 		reset	: in std_logic;
 
 		-- pipeline register inputs
-		opcode	: in opcode_t;
-		dest	: in reg_t;
-		pc		: in word_t;
-		rega	: in reg_t;
-		regb	: in reg_t;
-		imm		: in std_logic_vector(7 downto 0);
+		opcode_in	: in opcode_t;
+		dest_in		: in reg_t;
+		pc_in		: in word_t;
+		rega_in		: in reg_t;
+		regb_in		: in reg_t;
+		imm_in		: in std_logic_vector(7 downto 0);
 
 		-- asynchron register inputs
 		async_rega	: in reg_t;
@@ -37,7 +37,10 @@ entity id is
 
 		-- branch decision
 		pc_out		: out word_t;
-		branch_out	: out std_logic
+		branch_out	: out std_logic;
+
+		-- interlock
+		lock	: in std_logic
 	);
 end id;
 
@@ -65,6 +68,10 @@ architecture sat1 of id is
 	signal opb_nxt		: word_t;
 	signal rega_nxt		: reg_t;
 	signal regb_nxt		: reg_t;
+	signal opcode		: opcode_t;
+	signal dest			: reg_t;
+	signal opa			: word_t;
+	signal opb			: word_t;
 	signal vala			: word_t;
 	signal valb			: word_t;
 	
@@ -74,12 +81,17 @@ architecture sat1 of id is
 
 begin
 	cmp_reg : reg
-		port map(clk, reset, async_rega, async_regb, rega, regb, regr, valr, vala, valb);
+		port map(clk, reset, async_rega, async_regb, rega_in, regb_in, regr, valr, vala, valb);
 		
-		rega_nxt <= rega;
-		regb_nxt <= regb;
+		rega_nxt <= rega_in;
+		regb_nxt <= regb_in;
 
-	branch: process (opcode, opa_nxt, pc, dest, opb_nxt)
+		opcode_out <= opcode;
+		dest_out <= dest;
+		opa_out <= opa;
+		opb_out <= opb;
+
+	branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
 		variable inv : std_ulogic;
 		variable brinstr : std_ulogic; -- set if op changes PC
 	begin
@@ -88,23 +100,23 @@ begin
 
 		opa_to_nop <= '0';
 		jmpl_op <= '0';
-		pc_out <= std_logic_vector(TO_INTEGER(unsigned(pc)) + signed(opb_nxt));
+		pc_out <= std_logic_vector(TO_INTEGER(unsigned(pc_in)) + signed(opb_nxt));
 
-		if opcode(5 downto 3)="010" then
-			inv := opcode(2);
+		if opcode_in(5 downto 3)="010" then
+			inv := opcode_in(2);
 			brinstr := '1';
 			-- schedule nop
 			opcode_nxt <= (others => '0');
 			opa_to_nop <= '1';
 			dest_nxt <= (others => '0');
-		elsif opcode(5 downto 1) ="00111" then
-			inv := opcode(0);
+		elsif opcode_in(5 downto 1) ="00111" then
+			inv := opcode_in(0);
 			brinstr := '1';
 			-- schedule nop
 			opcode_nxt <= (others => '0');
 			opa_to_nop <= '1';
 			dest_nxt <= (others => '0');
-		elsif opcode = "001101" then
+		elsif opcode_in = "001101" then
 			inv := '0';
 			brinstr := '1';
 			-- jmpl, schedule mov r31, pc!
@@ -114,8 +126,8 @@ begin
 			-- jump is absolute!
 			pc_out <= opb_nxt;
 		else
-			opcode_nxt <= opcode;
-			dest_nxt <= dest;
+			opcode_nxt <= opcode_in;
+			dest_nxt <= dest_in;
 		end if;
 		
 		if ((std_logic_vector(to_unsigned(0, 16)))=opa_nxt xor inv='1') and brinstr='1' then
@@ -126,15 +138,15 @@ begin
 	end process;
 
 	-- hide r0 changes
-	r0readonly: process (rega, regb, vala, valb, opa_to_nop)
+	r0readonly: process (rega_in, regb_in, vala, valb, opa_to_nop)
 	begin
-		if rega="00000" or opa_to_nop = '1' then
+		if rega_in="00000" or opa_to_nop = '1' then
 			opa_nxt <= (others => '0');
 		else
 			opa_nxt <= vala;
 		end if;
 
-		if regb=(4 downto 0=>'0') then
+		if regb_in=(4 downto 0=>'0') then
 			regb_done <= (others => '0');
 		else
 			regb_done <= valb;
@@ -142,18 +154,18 @@ begin
 	end process;
 
 	-- sign extend, expand and mux with regb
-	extend: process (opcode, imm,regb_done, jmpl_op, pc)
+	extend: process (opcode_in, imm_in,regb_done, jmpl_op, pc_in)
 	begin
-		if opcode(5 downto 3)="000" then
-			opb_nxt <= (15 downto 8 => '0') & imm(7 downto 0);
-		elsif opcode(5 downto 2) ="1100" or opcode(5 downto 0) ="111010" then
+		if opcode_in(5 downto 3)="000" then
+			opb_nxt <= (15 downto 8 => '0') & imm_in(7 downto 0);
+		elsif opcode_in(5 downto 2) ="1100" or opcode_in(5 downto 0) ="111010" then
 			--expand whole imm (alu has to take care if thats "too much")
-			opb_nxt <= (15 downto 7 => '0') & imm(6 downto 0);
-		elsif opcode(5 downto 4)="01" then
+			opb_nxt <= (15 downto 7 => '0') & imm_in(6 downto 0);
+		elsif opcode_in(5 downto 4)="01" then
 			--sign extend imm(6 downto 0)
-			opb_nxt <= (15 downto 7 => imm(6)) & imm(6 downto 0);
+			opb_nxt <= (15 downto 7 => imm_in(6)) & imm_in(6 downto 0);
 		elsif jmpl_op='1' then
-			opb_nxt <= pc;
+			opb_nxt <= pc_in;
 		else
 			opb_nxt <= regb_done;
 		end if;
@@ -162,19 +174,31 @@ begin
 	sync: process (clk, reset)
 	begin
 		if reset = '1' then
-			opcode_out <= (others => '0');
-			dest_out <= (others => '0');
-			opa_out <= (others => '0');
-			opb_out <= (others => '0');
+			opcode <= (others => '0');
+			dest <= (others => '0');
+			opa <= (others => '0');
+			opb <= (others => '0');
+
 			rega_out <= (others => '0');
 			regb_out <= (others => '0');
 		elsif rising_edge(clk) then
-			opcode_out <= opcode_nxt;
-			dest_out <= dest_nxt;
-			opa_out <= opa_nxt;
-			opb_out <= opb_nxt;
-			rega_out <= rega_nxt;
-			regb_out <= regb_nxt;
+			if lock='1' then
+				opcode <= opcode_nxt;
+				dest <= dest_nxt;
+				opa <= opa_nxt;
+				opb <= opb_nxt;
+
+				rega_out <= rega_nxt;
+				regb_out <= regb_nxt;
+			else
+				opcode <= opcode_nxt;
+				dest <= dest_nxt;
+				opa <= opa_nxt;
+				opb <= opb_nxt;
+
+				rega_out <= rega_nxt;
+				regb_out <= regb_nxt;
+			end if;
 		end if;
 	end process;
 end sat1;

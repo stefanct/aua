@@ -83,13 +83,13 @@ add wave -hex /aua_tb/aua1/cmp_mmu/instr_data
 add wave /aua_tb/aua1/cmp_mmu/instr_valid
 
 add wave -divider ID
-add wave -hex /aua_tb/aua1/cmp_id/opcode
-add wave -hex /aua_tb/aua1/cmp_id/pc
-add wave -dec /aua_tb/aua1/cmp_id/rega
+add wave -hex /aua_tb/aua1/cmp_id/opcode_in
+add wave -hex /aua_tb/aua1/cmp_id/pc_in
+add wave -dec /aua_tb/aua1/cmp_id/rega_in
 add wave -hex /aua_tb/aua1/cmp_id/vala
-add wave -dec /aua_tb/aua1/cmp_id/regb
+add wave -dec /aua_tb/aua1/cmp_id/regb_in
 add wave -hex /aua_tb/aua1/cmp_id/valb
-add wave -dec /aua_tb/aua1/cmp_id/imm
+add wave -dec /aua_tb/aua1/cmp_id/imm_in
 
 add wave -divider EX
 add wave -hex /aua_tb/aua1/cmp_ex/opcode
@@ -115,10 +115,9 @@ add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/
 add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_b/altsyncram_component/memory/m_mem_data_a
 
 add wave -divider interstages
-add wave -dec /aua_tb/aua1/id_rega_in 
-add wave -dec /aua_tb/aua1/id_regb_in 
-add wave -dec /aua_tb/aua1/exid_dest
-add wave -hex /aua_tb/aua1/exid_result
+add wave -dec /aua_tb/aua1/ex_locks 
+add wave -dec /aua_tb/aua1/lock_if
+add wave -dec /aua_tb/aua1/lock_id
 
 view structure
 view signals
