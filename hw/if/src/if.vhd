@@ -10,12 +10,12 @@ entity ent_if is
 		reset	: in std_logic;
 
 		-- pipeline register outputs
-		opcode	: out opcode_t;
-		dest	: out reg_t;
-		pc_out	: out word_t;
-		rega	: out reg_t;
-		regb	: out reg_t;
-		imm		: out std_logic_vector(7 downto 0);
+		opcode_out	: out opcode_t;
+		dest_out	: out reg_t;
+		pc_out		: out word_t;
+		rega_out	: out reg_t;
+		regb_out	: out reg_t;
+		imm_out		: out std_logic_vector(7 downto 0);
 
 		-- asynchron register outputs
 		async_rega	: out reg_t;
@@ -41,9 +41,14 @@ architecture sat1 of ent_if is
 	signal rega_nxt		: reg_t;
 	signal regb_nxt		: reg_t;
 	signal imm_nxt		: std_logic_vector(7 downto 0);
-
-	signal pc		: word_t;
-	signal pc_nxt	: word_t;
+	signal pc_nxt		: word_t;
+	
+	signal opcode	: opcode_t;
+	signal dest		: reg_t;
+	signal rega		: reg_t;
+	signal regb		: reg_t;
+	signal imm		: std_logic_vector(7 downto 0);
+	signal pc	: word_t;
 begin
 
 	instr_dec: process(reset, instr_data, branch, instr_valid)
@@ -66,6 +71,12 @@ begin
 	async_regb <= regb_nxt;
 	
 	instr_addr <= pc;
+
+	opcode_out <= opcode;
+	dest_out <= dest;
+	rega_out <= rega;
+	regb_out <= regb;
+	imm_out <= imm;
 
 	calc_pc_nxt: process(reset, pc, pc_in, branch, instr_valid)
 	begin
@@ -96,12 +107,24 @@ begin
 			--~ instr_addr <= (others => '0');
 			pc_out <= (others => '0');
 		elsif rising_edge(clk) then
-			opcode <= opcode_nxt;
-			dest <= dest_nxt;
-			rega <= rega_nxt;
-			regb <= regb_nxt;
-			imm <= imm_nxt;
-			pc <= pc_nxt;
+			if lock='1' then
+				opcode <= opcode;
+				dest <= dest;
+				rega <= rega;
+				regb <= regb;
+				imm <= imm;
+
+				pc <= pc;
+			else
+				opcode <= opcode_nxt;
+				dest <= dest_nxt;
+				rega <= rega_nxt;
+				regb <= regb_nxt;
+				imm <= imm_nxt;
+
+				pc <= pc_nxt;
+			end if;
+
 			pc_out <= pc;
 		end if;
 	end process;

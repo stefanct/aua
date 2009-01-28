@@ -35,12 +35,12 @@ architecture sat1 of aua is
 			reset	: in std_logic;
 
 			-- pipeline register outputs
-			opcode	: out opcode_t;
-			dest	: out reg_t;
-			pc_out	: out word_t;
-			rega	: out reg_t;
-			regb	: out reg_t;
-			imm		: out std_logic_vector(7 downto 0);
+			opcode_out	: out opcode_t;
+			dest_out	: out reg_t;
+			pc_out		: out word_t;
+			rega_out	: out reg_t;
+			regb_out	: out reg_t;
+			imm_out		: out std_logic_vector(7 downto 0);
 
 			-- asynchron register outputs
 			async_rega	: out reg_t;
@@ -50,11 +50,11 @@ architecture sat1 of aua is
 			pc_in		: in word_t;
 			branch		: in std_logic;
 
-			-- mmu
+			-- cache
 			instr_addr	: out word_t;
 			instr_valid	: in std_logic;
 			instr_data	: in word_t;
-
+			
 			-- interlock
 			lock	: in std_logic
 		);
