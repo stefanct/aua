@@ -16,7 +16,7 @@ package aua_types is
 	constant SC_ADDR_SIZE : integer := 16;--word_t'length;
 	constant SC_DATA_SIZE : integer := 32;--word_t'length;
 	constant RDY_CNT_SIZE : integer := 2;
-	constant SLAVE_CNT : integer := 2;
+	constant SLAVE_CNT : integer := 3;
 	-- number of bits needed to address all slaves (2**SC_ADDR_BITS >= SLAVE_CNT)
 	constant SC_ADDR_BITS : integer := integer(ceil(log2(real(SLAVE_CNT))));
 	-- number of bits that can be used inside the slave

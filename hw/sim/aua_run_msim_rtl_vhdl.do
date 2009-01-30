@@ -43,9 +43,10 @@ vlib rtl_work
 vmap work rtl_work
 
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_types.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/test/src/test.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/digits/src/digits.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/rom.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/switches/src/switches.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/rom.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/ram.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_ent.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_null.vhd
@@ -126,6 +127,7 @@ add wave -hex /aua_tb/aua1/cmp_mmu/sc_addr
 add wave -hex /aua_tb/aua1/cmp_mmu/sc_wr_data
 add wave /aua_tb/aua1/cmp_mmu/sc_rd
 add wave /aua_tb/aua1/cmp_mmu/sc_wr
+add wave -hex /aua_tb/aua1/cmp_test/xyz
 add wave -hex /aua_tb/aua1/cmp_mmu/sc_rd_data
 add wave -hex /aua_tb/aua1/cmp_mmu/ex_rd_data
 add wave /aua_tb/aua1/cmp_mmu/sc_rdy_cnt

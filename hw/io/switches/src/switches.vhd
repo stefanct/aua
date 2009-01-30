@@ -27,29 +27,29 @@ entity switches is
 end switches;
 
 architecture sat1 of switches is
-	signal out_reg	: std_logic_vector(15 downto 0);
-	signal in_reg	: std_logic_vector(15 downto 0);
+	signal switch_reg	: std_logic_vector(15 downto 0);
+	signal led_reg	: std_logic_vector(15 downto 0);
 begin
 	rdy_cnt <= "00";	-- no wait states
-	rd_data <= ((rd_data'length-1 downto out_reg'length => '0')&out_reg);
+	rd_data <= ((rd_data'length-1 downto switch_reg'length => '0')&switch_reg);
 
-	led_pins <= in_reg;
+	led_pins <= led_reg;
 
 	process(clk, reset)
 	begin
 
 		if (reset='1') then
-			out_reg <= (others => '0');
-			in_reg <= (others => '1');
+			switch_reg <= (others => '0');
+			led_reg <= (others => '1');
 
 		elsif rising_edge(clk) then
 			if address = sc_addr then
 				if rd = '1' then
-					out_reg <= switch_pins;
+					switch_reg <= switch_pins;
 				end if;
 
 				if wr = '1' then
-					in_reg <= not wr_data(15 downto 0);
+					led_reg <= not wr_data(15 downto 0);
 				end if;
 			end if;
 		end if;

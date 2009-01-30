@@ -227,6 +227,24 @@ architecture sat1 of aua is
 	    );
 	end component;
 
+	component sc_test_slave is
+		generic(
+			sc_addr	: sc_addr_t
+		);
+		port (
+				clk     : in std_logic;
+				reset	: in std_logic;
+
+				-- SimpCon slave interface to IO ctrl
+				address	: in sc_addr_t;
+				wr_data	: in sc_data_t;
+				rd		: in std_logic;
+				wr		: in std_logic;
+				rd_data	: out sc_data_t;
+				rdy_cnt	: out sc_rdy_cnt_t
+		);
+	end component;
+
 	signal reset	: std_logic;
 
 	-- pipeline registers (written by top)
@@ -402,6 +420,8 @@ sc_mux: process (mmuio_ina, sc_sel_reg)
 -- 11111111 * --> Blöcke 0xFF00/8 (I/O Devices)
 -- 11111111 0000* --> Switches 0xFF00/12
 -- 11111111 0001* --> Digits 0xFF10/12
+-- 
+-- 11111111 11111111 --> Test 0xFFFF/16
 -- FEDCBA98 76543210
 sc_addr <= mmuio_out.address;
 sc_sc_selector: process (mmuio_out, sc_addr)
@@ -423,4 +443,7 @@ cmp_digits: digits
 	generic map(x"ff10")
 	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(1).rd_data, mmuio_ina(1).rdy_cnt,
 		digit0_pins, digit1_pins, digit2_pins, digit3_pins, digit4_pins, digit5_pins);
+cmp_test: sc_test_slave
+	generic map(x"ffff")
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(2).rd_data, mmuio_ina(2).rdy_cnt);
 end sat1;
