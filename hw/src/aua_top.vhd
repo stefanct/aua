@@ -2,7 +2,6 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
---~ use work.aua_config.all;
 use work.aua_types.all;
 
 entity aua is
@@ -166,12 +165,8 @@ architecture sat1 of aua is
 			ex_valid	: out std_logic;
 
 			-- SimpCon interface to IO devices
-			io_address	: out std_logic_vector(31 downto 0);
-			io_wr_data	: out std_logic_vector(31 downto 0);
-			io_rd		: out std_logic;
-			io_wr		: out std_logic;
-			io_rd_data	: in std_logic_vector(31 downto 0);
-			io_rdy_cnt	: in unsigned(1 downto 0);
+			sc_io_in		: in sc_in_t;
+			sc_io_out		: out sc_out_t;
 			
 			-- interface to SRAM
 			sram_addr	: out std_logic_vector(17 downto 0);
@@ -186,19 +181,19 @@ architecture sat1 of aua is
 
 	component switches is
 		generic(
-			sc_addr	: std_logic_vector(31 downto 0)
+			sc_addr	: sc_addr_t
 		);
 		port (
 			clk     : in std_logic;
 			reset	: in std_logic;
 
 			-- SimpCon slave interface to IO ctrl
-			address	: in std_logic_vector(31 downto 0);
-			wr_data	: in std_logic_vector(31 downto 0);
+			address	: in sc_addr_t;
+			wr_data	: in sc_data_t;
 			rd		: in std_logic;
 			wr		: in std_logic;
-			rd_data	: out std_logic_vector(31 downto 0);
-			rdy_cnt	: out unsigned(1 downto 0);
+			rd_data	: out sc_data_t;
+			rdy_cnt	: out sc_rdy_cnt_t;
 
 			-- pins
 			switch_pins	: in std_logic_vector(15 downto 0);
@@ -208,19 +203,19 @@ architecture sat1 of aua is
 	
 	component digits is
 	    generic(
-	    	sc_addr	: std_logic_vector(31 downto 0)
+			sc_addr	: sc_addr_t
 	    );
 	    port (
 			clk     : in std_logic;
 			reset	: in std_logic;
 
 			-- SimpCon slave interface to IO ctrl
-			address	: in std_logic_vector(31 downto 0);
-			wr_data	: in std_logic_vector(31 downto 0);
+			address	: in sc_addr_t;
+			wr_data	: in sc_data_t;
 			rd		: in std_logic;
 			wr		: in std_logic;
-			rd_data	: out std_logic_vector(31 downto 0);
-			rdy_cnt	: out unsigned(1 downto 0);
+			rd_data	: out sc_data_t;
+			rdy_cnt	: out sc_rdy_cnt_t;
 
 			-- pins
 			digit0_pins	: out std_logic_vector(6 downto 0);
@@ -234,7 +229,7 @@ architecture sat1 of aua is
 
 	signal reset	: std_logic;
 
-	-- pipeline registers (read by top)
+	-- pipeline registers (written by top)
 	-- IF/ID
 	signal ifid_opcode_out		: opcode_t;
 	signal ifid_dest_out			: reg_t;
@@ -256,7 +251,7 @@ architecture sat1 of aua is
 	signal exid_dest_out		: reg_t;
 	signal exid_result_out	: word_t;
 
-	-- pipeline registers (written by top)
+	-- pipeline registers (read by top)
 	-- IF/ID
 	signal ifid_opcode_in		: opcode_t;
 	signal ifid_dest_in		: reg_t;
@@ -295,12 +290,9 @@ architecture sat1 of aua is
 	signal exmmu_mmu_opcode	: std_logic_vector(1 downto 0);
 	signal exmmu_valid		: std_logic;
 	-- MMU/IO
-	signal mmuio_address	: std_logic_vector(31 downto 0);
-	signal mmuio_wr_data	: std_logic_vector(31 downto 0);
-	signal mmuio_rd			: std_logic;
-	signal mmuio_wr			: std_logic;
-	signal mmuio_rd_data	: std_logic_vector(31 downto 0);
-	signal mmuio_rdy_cnt	: unsigned(1 downto 0);
+	signal mmuio_out	: sc_out_t;
+	signal mmuio_in		: sc_in_t;
+	signal mmuio_ina	: sc_in_at;
 	-- MMU/SRAM
 	signal mmu_sram_addr	: std_logic_vector(17 downto 0);
 	signal mmu_sram_dq		: word_t;
@@ -309,6 +301,10 @@ architecture sat1 of aua is
 	signal mmu_sram_ub		: std_logic;
 	signal mmu_sram_lb		: std_logic;
 	signal mmu_sram_ce		: std_logic;
+	-- IO stuff
+	signal sc_sel, sc_sel_reg		: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
+	signal sc_addr 			: sc_addr_t;
+
 
 	--forwarding stuff
 	signal id_rega_in			: reg_t;
@@ -332,11 +328,12 @@ cmp_icache: instr_cache
 	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
 	generic map(1)
-	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
-		mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt,
+	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid,
+		exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
+		mmuio_in, mmuio_out,
 		sram_addr, sram_dq, sram_we, sram_oe, sram_ub, sram_lb, sram_ce);
 
-	reset <= reset_pin; -- in case we need to invert... should be "calculated" with help of a constant from config
+	reset <= not reset_pin; -- in case we need to invert... should be "calculated" with help of a constant
 
 	ifid_opcode_out <= ifid_opcode_in;
 	ifid_dest_out <= ifid_dest_in;
@@ -381,14 +378,49 @@ sync: process (clk, reset)
 		end if;
 	end process;
 
+sc_sync: process(clk, reset)
+	begin
+		if (reset='1') then
+			sc_sel_reg <= 0;
+		elsif rising_edge(clk) then
+			sc_sel_reg <= sc_sel;
+		end if;
+	end process;
 
+sc_mux: process (mmuio_ina, sc_sel_reg)
+	begin
+		if sc_sel_reg /= 0 then
+			mmuio_in.rd_data <= mmuio_ina(sc_sel_reg-1).rd_data;
+			mmuio_in.rdy_cnt <= mmuio_ina(sc_sel_reg-1).rdy_cnt;
+		else
+			mmuio_in.rd_data <= (others => '0');
+			mmuio_in.rdy_cnt <= (others => '0');
+		end if;
+	end process;
+
+-- 1111* --> Blöcke 0xF000/4
+-- 11111111 * --> Blöcke 0xFF00/8 (I/O Devices)
+-- 11111111 0000* --> Switches 0xFF00/12
+-- 11111111 0001* --> Digits 0xFF10/12
+-- FEDCBA98 76543210
+sc_addr <= mmuio_out.address;
+sc_sc_selector: process (mmuio_out, sc_addr)
+	begin
+		if((sc_addr and x"FF00") = x"FF00") then
+			sc_sel <= 0;
+		elsif((sc_addr and x"FF10") = x"FF10") then
+			sc_sel <= 1;
+		else
+			sc_sel <= 2;
+		end if;
+	end process;
 
 --IO devices below
 cmp_switches: switches
-	generic map(x"0000ff00")
-	port map(clk, reset, mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt, switch_pins, led_pins);
+	generic map(x"ff00")
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(0).rd_data, mmuio_ina(0).rdy_cnt, switch_pins, led_pins);
 cmp_digits: digits
-	generic map(x"0000ff10")
-	port map(clk, reset, mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt,
+	generic map(x"ff10")
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(1).rd_data, mmuio_ina(1).rdy_cnt,
 		digit0_pins, digit1_pins, digit2_pins, digit3_pins, digit4_pins, digit5_pins);
 end sat1;

@@ -65,33 +65,33 @@ sync_carry: process (clk, reset)
 					
 				when "011100" => --muli
 					if opb(6) = '1' then
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '0')&opb(5 downto 0))));
 					else
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '0')&opb(5 downto 0))));
 					end if;
 					result <= tmp_mul(15 downto 0);
 					
 				when "011101" => --muli
 					if opb(6) = '1' then
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '1')&opb(5 downto 0))));
 					else
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '0')&opb(5 downto 0))));
 					end if;
 					result <= tmp_mul(15 downto 0);
 					
 				when "011110" => --muli
 					if opb(6) = '1' then
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '1')&opb(5 downto 0))));
 					else
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '0')&opb(5 downto 0))));
 					end if;
 					result <= tmp_mul(15 downto 0);
 					
 				when "011111" => --muli
 					if opb(6) = '1' then
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '1')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '1')&opb(5 downto 0))));
 					else
-						tmp_mul := std_logic_vector(signed(opa) * signed((15 downto 6 => '0')&opb(5 downto 0)));
+						tmp_mul := std_logic_vector(signed(opa) * signed(std_logic_vector'((15 downto 6 => '0')&opb(5 downto 0))));
 					end if;
 					result <= tmp_mul(15 downto 0);
 					

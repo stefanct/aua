@@ -6,6 +6,8 @@ use work.aua_types.all;
 
 entity mmu is
 	generic (
+		SLAVE_CNT	: natural := 0;
+		SC_ADDR_BITS	: natural := 0;
 		irq_cnt	: natural := 0
 	);
 	port (
@@ -25,13 +27,9 @@ entity mmu is
 		ex_opcode	: in std_logic_vector(1 downto 0);
 		ex_valid	: out std_logic;
 		
-		-- SimpCon interface to IO devices
-		io_address	: out std_logic_vector(31 downto 0);
-		io_wr_data	: out std_logic_vector(31 downto 0);
-		io_rd		: out std_logic;
-		io_wr		: out std_logic;
-		io_rd_data	: in std_logic_vector(31 downto 0);
-		io_rdy_cnt	: in unsigned(1 downto 0);
+		-- SimpCon interfaces to IO devices
+		sc_io_in		: in sc_in_t;
+		sc_io_out		: out sc_out_t;
 		
 		-- interface to SRAM
 		sram_addr	: out std_logic_vector(17 downto 0);
@@ -47,9 +45,16 @@ end mmu;
 architecture sat1 of mmu is
 --	constant io_devs_name : io_devs := ("bla", "blu");
 
-	signal address	: std_logic_vector(15 downto 0); -- Addresse zu lesen (gemuxt Ex - Instr)
+	signal sc_addr			: sc_addr_t;
+	signal sc_wr_data		: sc_data_t;
+	signal sc_rd, sc_wr		: std_logic;
+	signal sc_rd_data		: sc_data_t;
+	signal sc_rdy_cnt		: sc_rdy_cnt_t;
+
+
+	signal address	: word_t; -- Addresse zu lesen (gemuxt Ex - Instr)
 	signal write	: std_logic; -- schreiben=1, lesen=0 (gemuxt Ex - Instr)
-	signal q_out	: std_logic_vector(15 downto 0);
+	signal q		: word_t;
 	signal valid	: std_logic;
 
 	component rom is
@@ -68,16 +73,18 @@ begin
     cmp_rom: rom
 	port map(clk, rom_addr, rom_q);
     
+	sc_io_out.address <= sc_addr;
+	sc_io_out.wr_data <= sc_wr_data;
+	sc_io_out.rd <= sc_rd;
+	sc_io_out.wr <= sc_wr;
+	sc_rd_data <= sc_io_in.rd_data;
+	sc_rdy_cnt <= sc_io_in.rdy_cnt;
+
 	-- Speicher 16bit Adressen
-	-- 0*		--> SRAM
-	-- 1*		--> Blöcke /4
-		-- 10*	--> non-Simpcon
-			-- 1000*	--> ROM
-		-- 11*	--> Simpcon
-  			-- 1111*	--> Blöcke /8
-  				-- 11111111*	--> Blöcke /12 (I/O Devices)
-  					-- 111111110000*	--> Switches
-  					-- 111111110001*	--> Digits
+	-- 0* --> SRAM
+	-- 10* --> non-Simpcon
+	-- 1000* --> ROM
+	-- 11* --> Simpcon 0xC000/2
 
 	mmu_get_addr: process(instr_addr, ex_address, ex_enable, ex_opcode)
 	begin
@@ -90,7 +97,7 @@ begin
 	    end if;
 	end process;
 
-	mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q)
+	mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, sc_rd_data, sc_rdy_cnt)
 	begin
 		sram_addr <= (others => '0');
 		sram_dq <= (others => 'Z'); -- tri-state, 'Z' unless writing to SRAM
@@ -100,14 +107,14 @@ begin
 		sram_lb <= '0';
 		sram_ce <= '0';
 		
-		io_address <= (others => '0');
-		io_wr_data <= (others => '0');
-		io_rd <= '0';
-		io_wr <= '0';
+		sc_addr <= (others => '0');
+		sc_wr_data <= (others => '0');
+		sc_rd <= '0';
+		sc_wr <= '0';
 		
 		rom_addr <= (others => '0');
 		
-		q_out <= (others => '0');
+		q <= (others => '0');
 		
 		valid <= '0';
 		
@@ -118,27 +125,34 @@ begin
 			    sram_dq <= ex_wr_data;
 			    valid <= '1';
 			else
-				q_out <= sram_dq;
+				q <= sram_dq;
 				valid <= '1';
 			end if;
 		else
 		    if(address(14) = '0') then -- non-Simpcon
 		    	if(address(13) = '0') then -- ROM (write wird ignoriert)
 		    		rom_addr <= address;
-		    		q_out <= rom_q;
+		    		q <= rom_q;
 		    		valid <= '1';
 		    	end if;
 			else -- Simpcon
-		    	io_address(15 downto 0) <= address;
+		    	sc_addr <= address;
 		    	if(write = '1') then
-		    	    io_wr <= '1';
-		    	    io_wr_data(15 downto 0) <= ex_wr_data;
+		    	    sc_wr <= '1';
+		    	    sc_wr_data(15 downto 0) <= ex_wr_data;
+				else
+					sc_rd <= '1';
+					if(sc_rdy_cnt = 0) then
+						q <= sc_rd_data(15 downto 0);
+					else
+						q <= (others => '0');
+					end if;
 		    	end if;
 		    end if;
 	    end if;
 	end process;
 	
-	mmu_return_result: process(ex_enable, q_out, valid) -- write wird ignoriert, wer trotzdem liest...
+	mmu_return_result: process(ex_enable, q, valid) -- write wird ignoriert, wer trotzdem liest...
 	begin
 	    instr_data <= (others => '0');
 	    ex_rd_data <= (others => '0');
@@ -147,10 +161,10 @@ begin
 		ex_valid <= '0';
 		
 		if(ex_enable = '1') then
-	        ex_rd_data <= q_out;
+	        ex_rd_data <= q;
 	        ex_valid <= valid;
 	    else
-	        instr_data <= q_out;
+	        instr_data <= q;
 	        instr_valid <= valid;
 	    end if;
 	end process;

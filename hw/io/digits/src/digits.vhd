@@ -2,21 +2,23 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.aua_types.all;
+
 entity digits is
 	generic(
-		sc_addr	: std_logic_vector(31 downto 0)
+		sc_addr	: sc_addr_t
 	);
 	port (
 		clk     : in std_logic;
 		reset	: in std_logic;
 
 		-- SimpCon slave interface to IO ctrl
-		address	: in std_logic_vector(31 downto 0);
-		wr_data	: in std_logic_vector(31 downto 0);
+		address	: in sc_addr_t;
+		wr_data	: in sc_data_t;
 		rd		: in std_logic;
 		wr		: in std_logic;
-		rd_data	: out std_logic_vector(31 downto 0);
-		rdy_cnt	: out unsigned(1 downto 0);
+		rd_data	: out sc_data_t;
+		rdy_cnt	: out sc_rdy_cnt_t;
 
 		-- pins
 		digit0_pins	: out std_logic_vector(6 downto 0);
@@ -47,7 +49,7 @@ architecture rtl of digits is
 begin
 
 	
-	rd_data(31 downto 0) <= (others => 'Z');
+	rd_data(31 downto 0) <= (others => '0');
 
 	digit0_pins <= digit0;
 	digit1_pins <= digit1;

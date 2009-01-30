@@ -2,21 +2,23 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
+use work.aua_types.all;
+
 entity switches is
 	generic(
-		sc_addr	: std_logic_vector(31 downto 0)
+		sc_addr	: sc_addr_t
 	);
 	port (
 		clk     : in std_logic;
 		reset	: in std_logic;
 
 		-- SimpCon slave interface to IO ctrl
-		address	: in std_logic_vector(31 downto 0);
-		wr_data	: in std_logic_vector(31 downto 0);
+		address	: in sc_addr_t;
+		wr_data	: in sc_data_t;
 		rd		: in std_logic;
 		wr		: in std_logic;
-		rd_data	: out std_logic_vector(31 downto 0);
-		rdy_cnt	: out unsigned(1 downto 0);
+		rd_data	: out sc_data_t;
+		rdy_cnt	: out sc_rdy_cnt_t;
 
 		-- pins
 		switch_pins	: in std_logic_vector(15 downto 0);
@@ -25,26 +27,30 @@ entity switches is
 end switches;
 
 architecture sat1 of switches is
+	signal out_reg	: std_logic_vector(15 downto 0);
+	signal in_reg	: std_logic_vector(15 downto 0);
 begin
+	rdy_cnt <= "00";	-- no wait states
+	rd_data <= ((rd_data'length-1 downto out_reg'length => '0')&out_reg);
 
-	rd_data(31 downto 16) <= (others => 'Z');
+	led_pins <= in_reg;
 
 	process(clk, reset)
 	begin
 
 		if (reset='1') then
-			rd_data(15 downto 0) <= (others => 'Z');
-			led_pins(15 downto 0) <= (others => '1');
+			out_reg <= (others => '0');
+			in_reg <= (others => '1');
 
 		elsif rising_edge(clk) then
-			if rd = '1' and address = sc_addr then
-					rd_data(15 downto 0) <= switch_pins;
-					rdy_cnt <= "00";	-- no wait states
-			end if;
+			if address = sc_addr then
+				if rd = '1' then
+					out_reg <= switch_pins;
+				end if;
 
-			if wr = '1' and address = sc_addr then
-					led_pins <= not wr_data(15 downto 0);
-					rdy_cnt <= "00";	-- no wait states
+				if wr = '1' then
+					in_reg <= not wr_data(15 downto 0);
+				end if;
 			end if;
 		end if;
 
