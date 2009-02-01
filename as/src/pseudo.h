@@ -3,9 +3,11 @@
 
 #include <vector>
 
+#include<boost/shared_ptr.hpp>
+
 #include "as.h"
 
-void replace_pseudo_instructions(std::vector<loc>& locs, loc& l);
+int replace_pseudo_instructions(loc& l);
 
 void load_pseudo_instructions();
 

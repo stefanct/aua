@@ -5,81 +5,92 @@
 
 #include "pseudo.h"
 #include "as.h"
+#include "msg.h"
 
 #include <map>
 
 using namespace std;
 using namespace boost;
 
-typedef void (*replace_fun)(vector<loc>&, loc& l);
+typedef int (*replace_fun)(loc& l);
 
 map<string, replace_fun> replace_functions;
 
-void _replace_nop(vector<loc>& locs, loc& l){
+Msg msg;
+
+int _replace_nop(loc& l) {
 	loc l_new;
 	l_new.instr = "ldi";
 	l_new.params.push_back("$0");
 	l_new.params.push_back("0");
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_ret(vector<loc>& locs, loc& l){
+int _replace_ret(loc& l) {
 	loc l_new;
 	l_new.instr = "brez";
 	l_new.params.push_back("$0");
 	l_new.params.push_back("$31");
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_jmp(vector<loc>& locs, loc& l){
+int _replace_jmp(loc& l) {
 	loc l_new;
 	l_new.instr = "brez";
 	l_new.params.push_back("$0");
 	l_new.params.push_back(l.params[0]);
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_rjmpi(vector<loc>& locs, loc& l){
+int _replace_rjmpi(loc& l) {
 	loc l_new;
 	l_new.instr = "brezi";
 	l_new.params.push_back("$0");
 	l_new.params.push_back(l.params[0]);
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_cmpgt(vector<loc>& locs, loc& l){
+int _replace_cmpgt(loc& l) {
 	loc l_new;
 	l_new.instr = "cmplte";
 	l_new.params.push_back(l.params[1]);
 	l_new.params.push_back(l.params[0]);
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_cmpgtu(vector<loc>& locs, loc& l){
+int _replace_cmpgtu(loc& l) {
 	loc l_new;
 	l_new.instr = "cmplteu";
 	l_new.params.push_back(l.params[1]);
 	l_new.params.push_back(l.params[0]);
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_cmpgte(vector<loc>& locs, loc& l){
+int _replace_cmpgte(loc& l) {
 	loc l_new;
 	l_new.instr = "cmplt";
 	l_new.params.push_back(l.params[1]);
 	l_new.params.push_back(l.params[0]);
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_cmpgteu(vector<loc>& locs, loc& l){
+int _replace_cmpgteu(loc& l) {
 	loc l_new;
 	l_new.instr = "cmpltu";
 	l_new.params.push_back(l.params[1]);
 	l_new.params.push_back(l.params[0]);
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_scb(vector<loc>& locs, loc& l){
+int _replace_scb(loc& l) {
 	loc l_new;
 	l_new.instr = "scb";
 	l_new.params.push_back(l.params[0]);
@@ -89,13 +100,13 @@ void _replace_scb(vector<loc>& locs, loc& l){
 	assert(arg!=end_ptr);
 	assert(imm<16);
 	assert(imm>0);
-	imm+=l.instr[0]=='s'?16:0;
-	DBG("imm: %d", imm);
-	l_new.params.push_back(lexical_cast<string>(imm));
-	locs.push_back(l_new);
+	imm += l.instr[0] == 's' ? 16 : 0;DBG("imm: %d", imm);
+	l_new.params.push_back(lexical_cast<string> (imm));
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_roti(vector<loc>& locs, loc& l){
+int _replace_roti(loc& l) {
 	loc l_new;
 	l_new.instr = "roti";
 	l_new.params.push_back(l.params[0]);
@@ -105,62 +116,92 @@ void _replace_roti(vector<loc>& locs, loc& l){
 	assert(arg!=end_ptr);
 	assert(imm<16);
 	assert(imm>0);
-	imm+=l.instr[3]=='r'?16:0; // rotr? Nicht rotl
-	l_new.params.push_back(lexical_cast<string>(imm));
-	locs.push_back(l_new);
+	imm += l.instr[3] == 'r' ? 16 : 0; // rotr? Nicht rotl
+	l_new.params.push_back(lexical_cast<string> (imm));
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_swpb(vector<loc>& locs, loc& l){
+int _replace_swpb(loc& l) {
 	loc l_new;
 	l_new.instr = "roti";
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("8");
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_set(vector<loc>& locs, loc& l){
+int _replace_set(loc& l) {
 	loc l_new;
 	l_new.instr = "not";
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("$0");
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_clr(vector<loc>& locs, loc& l){
+int _replace_clr(loc& l) {
 	loc l_new;
 	l_new.instr = "mov";
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("$0");
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_inc(vector<loc>& locs, loc& l){
+int _replace_inc(loc& l) {
 	loc l_new;
 	l_new.instr = "addi";
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("1");
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void _replace_dec(vector<loc>& locs, loc& l){
+int _replace_dec(loc& l) {
 	loc l_new;
 	l_new.instr = "addi";
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("-1");
-	locs.push_back(l_new);
+	l.loc_replaced.push_back(l_new);
+	return 0;
 }
 
-void replace_pseudo_instructions(vector<loc>& locs, loc& l){
+int _replace_ldiw(loc& l) {
+	const char* cimm = l.params[1].c_str();
+	char* end_ptr;
+	int imm = strtol(cimm, &end_ptr, 0);
+	if (cimm == end_ptr) {
+		msg.err_no_int(l.line, l.params[1].c_str());
+		return -1;
+	}
+	loc l_new[3];
+
+	l_new[0].instr = "ldih";
+	l_new[0].params.push_back(l.params[0]);
+	l_new[0].params.push_back(l.params[1]);
+	l.loc_replaced.push_back(l_new[0]);
+
+	l_new[1].instr = "lsli";
+	l_new[1].params.push_back(l.params[0]);
+	l_new[1].params.push_back("8");
+	l.loc_replaced.push_back(l_new[1]);
+
+	l_new[2].instr = "ldil";
+	l_new[2].params.push_back(l.params[0]);
+	l_new[2].params.push_back(l.params[1]);
+	l.loc_replaced.push_back(l_new[2]);
+	return 0;
+}
+
+int replace_pseudo_instructions(loc& l) {
 	replace_fun f = replace_functions[l.instr];
-	if(f){
-		f(locs, l);
-	}
-	else{
-		locs.push_back(l);
+	if (f) {
+		return f(l);
 	}
 }
 
-void load_pseudo_instructions(){
+void load_pseudo_instructions() {
 	replace_functions["nop"] = &_replace_nop;
 	replace_functions["ret"] = &_replace_ret;
 	replace_functions["jmp"] = &_replace_jmp;
@@ -178,4 +219,5 @@ void load_pseudo_instructions(){
 	replace_functions["clr"] = &_replace_clr;
 	replace_functions["inc"] = &_replace_inc;
 	replace_functions["dec"] = &_replace_dec;
+	replace_functions["ldiw"] = &_replace_ldiw;
 }
