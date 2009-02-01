@@ -24,9 +24,9 @@ void removeComment(char* line) {
 	}
 }
 
-string trim(const string& str) {
-	size_t start = str.find_first_not_of(" \t\n");
-	size_t end = str.find_last_not_of(" \t\n");
+string trim(const string& str, const char* trim) {
+	size_t start = str.find_first_not_of(trim);
+	size_t end = str.find_last_not_of(trim);
 	if (string::npos == start || string::npos == end) {
 		return "";
 	} else {
@@ -34,8 +34,47 @@ string trim(const string& str) {
 	}
 }
 
+shared_ptr<vector<string> > split(string str, string sep) {
+	int found = str.find_first_of(sep);
+	shared_ptr<vector<string> > results(new vector<string> ());
+	while (found != string::npos) {
+		if (found > 0) {
+			results->push_back(str.substr(0, found));
+		}
+		str = str.substr(found + 1);
+		found = str.find_first_of(sep);
+	}
+	if (str.length() > 0) {
+		results->push_back(str);
+	}
+	return results;
+}
+
+string to_dual(int number, int len) {
+	string result = "";
+	for (int i = len - 1; i >= 0; i--) {
+		result += number & (1 << i) ? '1' : '0';
+	}
+	return result;
+}
+
+string to_dual(const string& str, int len) {
+	string result = "";
+	int i = 0;
+	for (; i < str.length(); i++) {
+		char c = str[i];
+		for (int j = 7; j >= 0; j--) {
+			result += c & (1 << j) ? '1' : '0';
+		}
+	}
+	for (; i < len; i++) {
+		result += "00000000";
+	}
+	return result;
+}
+
 As::As(const string& inputfile) :
-	inputfile(inputfile), addr(0), error(0) {
+	inputfile(inputfile), addr(0), cnt_instr(0), error(0) {
 	_load_config();
 	load_pseudo_instructions();
 }
@@ -68,12 +107,41 @@ void As::_load_config() {
 	fclose(file);
 }
 
-void As::_precompile() {
-	FILE* in = fopen(inputfile.c_str(), "r");
+int As::_add_constant(const std::string& key, const std::string& str_const) {
+	char *end_ptr;
+	const char* c = str_const.c_str();
+	int i = strtol(c, &end_ptr, 0);
+	if (c == end_ptr) {
+		if (str_const[0] == '"') {
+			if (str_const[str_const.size() - 1] != '"') {
+				return -1;
+			}
+			constants[key]
+					= constant(CONST_STRING, 0, trim(str_const, "\""), 0);
+			return 0;
+		}
+		if (str_const[0] == '{') {
+			if (str_const[str_const.size() - 1] != '}') {
+				return -1;
+			}
+			constants[key] = constant(CONST_ARRAY, 0, str_const.substr(1,
+					str_const.size() - 2), 0);
+			return 0;
+		}
+	}
+	constants[key] = constant(CONST_INT, 0, str_const, i);
+	return 0;
+}
+
+void As::_precompile(const string& file) {
+	FILE* in = fopen(file.c_str(), "r");
 	char line[1024];
 
 	regex reg_empty("\\s*");
-	regex reg_label("(\\w+)\\:\\s*");
+	regex reg_include("\\s*#include\\s*(\\S+)\\s*");
+	regex reg_label("\\s*(\\w+)\\:\\s*");
+	regex reg_define("\\s*#define\\s+([a-zA-Z]\\w*)\\s+(\\S+.*\\S+)\\s*");
+	regex reg_assign("\\s*([a-zA-Z]\\w*)\\s*=\\s*([\"\\w]+)\\s*");
 	regex reg_instr0("\\s*(\\w+)\\s*"); /* 0 Parameter */
 	regex reg_instr1("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*"); /* 1 Parameter */
 	regex reg_instr2("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*,\\s*([\\$\\w-]+)\\s*"); /* 1 Parameter */
@@ -90,7 +158,19 @@ void As::_precompile() {
 		bool copy_line = true;
 		if (regex_match(line, tokens, reg_empty)) {
 			continue;
+		} else if (regex_match(line, tokens, reg_include)) {
+			string file_nxt(tokens[1].first, tokens[1].second);
+			_precompile(file_nxt);
+			continue;
 		} else if (regex_match(line, tokens, reg_label)) {
+		} else if (regex_match(line, tokens, reg_define) || regex_match(line,
+				tokens, reg_assign)) {
+			string key(tokens[1].first, tokens[1].second);
+			string str_constant(tokens[2].first, tokens[2].second);
+			if (_add_constant(key, str_constant) == -1) {
+				msg.warn_illegal_const(file, line_number, str_constant);
+			}
+			continue;
 		} else if (regex_match(line, tokens, reg_instr0)) {
 			type_len = 0;
 		} else if (regex_match(line, tokens, reg_instr1)) {
@@ -98,7 +178,7 @@ void As::_precompile() {
 		} else if (regex_match(line, tokens, reg_instr2)) {
 			type_len = 2;
 		} else {
-			msg.err_syntax(line_number, line);
+			msg.err_syntax(file, line_number, line);
 			copy_line = false;
 			error = 1;
 		}
@@ -120,6 +200,7 @@ void As::_precompile() {
 		}
 		if (copy_line) {
 			shared_ptr<loc> l(new loc());
+			l->file = file;
 			l->line = line_number;
 			l->src = line;
 			l->instr = fields[0];
@@ -128,26 +209,44 @@ void As::_precompile() {
 						fields[i].c_str());
 				l->params.push_back(fields[i]);
 			}
-			if (replace_pseudo_instructions(*l) == 0) {
+			int result = replace_pseudo_instructions(*l);
+			if (result > 0) {
 				program.push_back(l);
+				cnt_instr += result;
 			}
 		}
 	}DBG("Precompile fertig");DBG("program.size(): %d", program.size());
 	fclose(in);
 }
 
+void As::_set_const_addresses() {
+	map<string, constant>::iterator it = constants.begin();
+	int caddr = strtol(settings["rom_start"].c_str(), NULL, 0) + cnt_instr * 2;
+	for (; it != constants.end(); it++) {
+		if (it->second.type == CONST_STRING) {
+			it->second.address = caddr;
+			caddr += it->second.str_value.length();
+			if (caddr & 1)
+				caddr++;
+		} else if (it->second.type == CONST_ARRAY) {
+			it->second.address = caddr;
+			caddr += split(trim(it->second.str_value, "\" \t\n"), ",")->size();
+		}
+	}
+}
+
 int As::_compile_instr(loc& l) {
 	DBG("l.instr: %s", l.instr.c_str());
 	map<string, instruction>::iterator iter = instructions.find(l.instr);
 	if (iter == instructions.end()) {
-		msg.err_no_instr(l.line, l.instr);
+		msg.err_no_instr(l.file, l.line, l.instr);
 		return -1;
 	}
 	instruction& i = iter->second;
 	int type_len = l.params.size() * 3;
 	DBG("l.params.size(): %d", l.params.size());DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
 	if (type_len != i.type.length()) {
-		msg.err_number_args(l.line, l.instr, i.type.length(), type_len);
+		msg.err_number_args(l.file, l.line, l.instr, i.type.length(), type_len);
 		return -1;
 	}
 
@@ -172,12 +271,12 @@ int As::_compile_instr(loc& l) {
 		case 'S':
 		case 'h':
 		case 'l': {
-			DBG("s");
 			const char* param = l.params[field_cnt].c_str();
 			char* end_ptr;
 			DBG(param);
 			int imm = strtol(param, &end_ptr, 0);
 			bool valid = param != end_ptr;
+
 			if (!valid) {
 				map<string, int>::iterator iter = labels.find(
 						l.params[field_cnt]);
@@ -187,19 +286,44 @@ int As::_compile_instr(loc& l) {
 					} else {
 						imm = iter->second;
 					}DBG("imm: %d", imm);
-				} else {
-					msg.err_no_imm(l.line, l.params[field_cnt]);
-					return -1;
+					valid = true;
 				}
+			}
+
+			if (!valid) {
+				map<string, constant>::iterator iter = constants.find(
+						l.params[field_cnt]);
+				if (iter != constants.end()) {
+					if (isupper(type)) {
+						msg.warn_const_as_offset(l.file, l.line);
+						if (iter->second.type) {
+							imm = iter->second.address - addr;
+						} else {
+							imm = iter->second.i_value - addr;
+						}
+					} else {
+						if (iter->second.type) {
+							imm = iter->second.address;
+						} else {
+							imm = iter->second.i_value;
+						}
+					}
+					valid = true;
+				}
+			}
+
+			if (!valid) {
+				msg.err_no_imm(l.file, l.line, l.params[field_cnt]);
+				return -1;
 			}
 
 			if (type == 'h') {
 				if (imm < 0) {
-					msg.err_no_signed(l.line, imm);
+					msg.err_no_signed(l.file, l.line, imm);
 					return -1;
 				}
 				if (imm > 0xffff) {
-					msg.warn_out_of_range_word(l.line, imm);
+					msg.warn_out_of_range_word(l.file, l.line, imm);
 				}
 				imm >>= 8;
 				imm &= ((1 << cur_field_len) - 1);
@@ -207,7 +331,7 @@ int As::_compile_instr(loc& l) {
 
 			else if (type == 'l') {
 				if (imm < 0) {
-					msg.err_no_signed(l.line, imm);
+					msg.err_no_signed(l.file, l.line, imm);
 					return -1;
 				}
 				imm &= ((1 << cur_field_len) - 1);
@@ -215,18 +339,23 @@ int As::_compile_instr(loc& l) {
 
 			else if (type == 'u') {
 				if (imm >= (1 << cur_field_len)) {
-					msg.err_out_of_range(l.line, imm, 0, ((1 << cur_field_len)
-							- 1));
+					msg.err_out_of_range(l.file, l.line, imm, 0, ((1
+							<< cur_field_len) - 1));
 					return -1;
 				}
-			} else {
-				if (imm >= (1 << (cur_field_len - 1)) || imm < -(1
-						<< (cur_field_len - 1))) {
-					msg.err_out_of_range(l.line, imm, -(1
+			} else if (type == 's' || type == 'S') {
+				if (imm >= (1 << cur_field_len) || imm < -(1 << (cur_field_len
+						- 1))) {
+					msg.err_out_of_range(l.file, l.line, imm, -(1
 							<< (cur_field_len - 1)), (1 << (cur_field_len - 1))
 							- 1);
 					return -1;
 				}
+				if (imm >= (1 << (cur_field_len - 1))) {
+					msg.wall_signed_overflow(l.file, l.line, imm);
+				}
+			} else {
+				assert(0);
 			}
 			bin_code |= ((imm & ((1 << cur_field_len) - 1)) << cur_field_pos);
 			break;
@@ -238,14 +367,14 @@ int As::_compile_instr(loc& l) {
 				const char* reg = l.params[field_cnt].c_str() + 1;
 				int reg_num = strtol(reg, &end_ptr, 10);
 				if (reg == end_ptr) {
-					msg.err_no_reg(l.line, l.params[field_cnt]);
+					msg.err_no_reg(l.file, l.line, l.params[field_cnt]);
 				}DBG("reg_num: %d", reg_num);
 				assert(cur_field_len <= 5);
 				assert(reg_num >= 0);
 				assert(reg_num < (1 << cur_field_len));
 				bin_code |= reg_num << (cur_field_pos);
 			} else {
-				msg.err_no_reg(l.line, l.params[field_cnt]);
+				msg.err_no_reg(l.file, l.line, l.params[field_cnt]);
 				return -1;
 			}
 			break;
@@ -292,9 +421,9 @@ void As::_compile() {
 }
 
 int As::compile() {
-	msg.set_file(inputfile);
 	msg.set_level(INFO);
-	_precompile();
+	_precompile(inputfile);
+	_set_const_addresses();
 	_compile();
 	msg.flush();
 	return error;
@@ -302,8 +431,8 @@ int As::compile() {
 
 void As::write_bin(const string& filename) {
 	FILE* out = fopen(filename.c_str(), "w+");
-	vector<shared_ptr<loc> >::iterator iter = program.begin();
-	for (; iter != program.end(); iter++) {
+	for (vector<shared_ptr<loc> >::iterator iter = program.begin(); iter
+			!= program.end(); iter++) {
 		loc& l = **iter;
 
 		if (l.loc_replaced.size()) {
@@ -313,6 +442,36 @@ void As::write_bin(const string& filename) {
 			}
 		} else {
 			fwrite(l.opcode, 2, 1, out);
+		}
+	}
+
+	for (map<string, constant>::iterator iter = constants.begin(); iter
+			!= constants.end(); iter++) {
+		if (iter->second.type) {
+			string value = iter->second.str_value;
+			int addr = iter->second.address;
+			if (iter->second.type == CONST_STRING) {
+				if (value.length() & 1) {
+					value.append("\0");
+				}
+				fwrite(value.c_str(), value.length(), 1, out);
+			} else {
+				vector<string> tokens = *split(value, ",");
+				for (vector<string>::iterator iter = tokens.begin(); iter
+						!= tokens.end(); iter++) {
+					string token = trim(*iter, " \t\n");
+					const char* ctoken = token.c_str();
+					char *end_ptr;
+					int i = strtol(ctoken, &end_ptr, 0);
+					if (i < -0x8000 || i > 0xffff) {
+						cerr << "ASM internal error: " << __FILE__ << ":"
+								<< __LINE__ << ": TODO" << endl;
+					}
+					char *p = (char*) &i;
+					fwrite(p + 1, 1, 1, out);
+					fwrite(p, 1, 1, out);
+				}
+			}
 		}
 	}
 
@@ -334,16 +493,16 @@ string As::_gen_rom_line(int addr, const loc& l, bool hex,
 		ss << (l.opcode[1] & (1 << i) ? '1' : '0');
 	}
 	ss << "\";\t-- ";
-	ss << trim(l.src);
+	ss << trim(l.src, " \t\n");
 	if (orig_src) {
 		ss << l.instr << " ";
-		if(l.params.size()){
+		if (l.params.size()) {
 			ss << l.params[0];
 		}
-		for(int i=1; i<l.params.size(); i++){
+		for (int i = 1; i < l.params.size(); i++) {
 			ss << ", " << l.params[i];
 		}
-		ss << " (" << trim(orig_src) << ")";
+		ss << " (" << trim(orig_src, " \t\n") << ")";
 	}
 	ss << "\n";
 	return ss.str();
@@ -351,7 +510,6 @@ string As::_gen_rom_line(int addr, const loc& l, bool hex,
 
 void As::write_rom(const string& file_out) {
 	FILE* out = fopen(file_out.c_str(), "w");
-	vector<shared_ptr<loc> >::iterator iter = program.begin();
 
 	string header = "";
 	header += "-- Program " + inputfile + ", generated ROM file\n" // TODO: programname
@@ -380,15 +538,15 @@ void As::write_rom(const string& file_out) {
 				"\tcase address is\n";
 	fwrite(header.c_str(), header.length(), 1, out);
 
-	bool hex = (settings["rom_hex"] == "1");
+	bool hex = (settings["rom_hex"][0] == '1');
 	if (hex) {
-		msg.print_msg(WARN, 0,
+		msg.print_msg(WARN, "<General>", 0,
 				"Using hex addresses/values for ROM-file not implemented.");
 	}
 
 	int addr = strtol(settings["rom_start"].c_str(), NULL, 0);
-	iter = program.begin();
-	for (; iter != program.end(); iter++) {
+	for (vector<shared_ptr<loc> >::iterator iter = program.begin(); iter
+			!= program.end(); iter++) {
 		loc& l = **iter;
 		int lines_replaced = l.loc_replaced.size();
 		if (lines_replaced) {
@@ -404,8 +562,49 @@ void As::write_rom(const string& file_out) {
 			fwrite(line.c_str(), line.length(), 1, out);
 			addr += 2;
 		}
-//		fwrite("\n", 1, 1, out);
+		//		fwrite("\n", 1, 1, out);
+	}
 
+	for (map<string, constant>::iterator iter = constants.begin(); iter
+			!= constants.end(); iter++) {
+		if (iter->second.type) {
+			string value = iter->second.str_value;
+			int addr = iter->second.address;
+			if (iter->second.type == CONST_STRING) {
+				stringstream ss;
+				if (value.length() & 1) {
+					value.append("\0");
+				}
+				const char* cvalue = value.c_str();
+				for (int i = 0; i < value.length(); i += 2) {
+					ss << "\t\twhen \"" << to_dual(addr, 16)
+							<< "\" => data <= \"";
+					string s = value.substr(i, 2);
+					ss << to_dual(s, 2) << "\";\n";
+					addr += 2;
+				}
+				fwrite(ss.str().c_str(), ss.str().length(), 1, out);
+			} else {
+				vector<string> tokens = *split(value, ",");
+				for (vector<string>::iterator iter = tokens.begin(); iter
+						!= tokens.end(); iter++) {
+					stringstream ss;
+					string token = trim(*iter, " \t\n");
+					const char* ctoken = token.c_str();
+					char *end_ptr;
+					int i = strtol(ctoken, &end_ptr, 0);
+					if (i < -0x8000 || i > 0xffff) {
+						cerr << "ASM internal error: " << __FILE__ << ":"
+								<< __LINE__ << ": TODO" << endl;
+					}
+					ss << "\t\twhen \"" << to_dual(addr, 16)
+							<< "\" => data <= \"";
+					ss << to_dual(i, 16) << "\";\n";
+					addr += 2;
+					fwrite(ss.str().c_str(), ss.str().length(), 1, out);
+				}
+			}
+		}
 	}
 
 	string footer = "\t\twhen others => data <= \"0000000000000000\";\n"

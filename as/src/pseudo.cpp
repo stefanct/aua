@@ -24,7 +24,7 @@ int _replace_nop(loc& l) {
 	l_new.params.push_back("$0");
 	l_new.params.push_back("0");
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_ret(loc& l) {
@@ -33,7 +33,7 @@ int _replace_ret(loc& l) {
 	l_new.params.push_back("$0");
 	l_new.params.push_back("$31");
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_jmp(loc& l) {
@@ -42,7 +42,7 @@ int _replace_jmp(loc& l) {
 	l_new.params.push_back("$0");
 	l_new.params.push_back(l.params[0]);
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_rjmpi(loc& l) {
@@ -51,7 +51,7 @@ int _replace_rjmpi(loc& l) {
 	l_new.params.push_back("$0");
 	l_new.params.push_back(l.params[0]);
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_cmpgt(loc& l) {
@@ -69,7 +69,7 @@ int _replace_cmpgtu(loc& l) {
 	l_new.params.push_back(l.params[1]);
 	l_new.params.push_back(l.params[0]);
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_cmpgte(loc& l) {
@@ -78,7 +78,7 @@ int _replace_cmpgte(loc& l) {
 	l_new.params.push_back(l.params[1]);
 	l_new.params.push_back(l.params[0]);
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_cmpgteu(loc& l) {
@@ -87,7 +87,7 @@ int _replace_cmpgteu(loc& l) {
 	l_new.params.push_back(l.params[1]);
 	l_new.params.push_back(l.params[0]);
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_scb(loc& l) {
@@ -103,7 +103,7 @@ int _replace_scb(loc& l) {
 	imm += l.instr[0] == 's' ? 16 : 0;DBG("imm: %d", imm);
 	l_new.params.push_back(lexical_cast<string> (imm));
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_roti(loc& l) {
@@ -119,7 +119,7 @@ int _replace_roti(loc& l) {
 	imm += l.instr[3] == 'r' ? 16 : 0; // rotr? Nicht rotl
 	l_new.params.push_back(lexical_cast<string> (imm));
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_swpb(loc& l) {
@@ -128,7 +128,7 @@ int _replace_swpb(loc& l) {
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("8");
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_set(loc& l) {
@@ -137,7 +137,7 @@ int _replace_set(loc& l) {
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("$0");
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_clr(loc& l) {
@@ -155,7 +155,7 @@ int _replace_inc(loc& l) {
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("1");
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_dec(loc& l) {
@@ -164,17 +164,10 @@ int _replace_dec(loc& l) {
 	l_new.params.push_back(l.params[0]);
 	l_new.params.push_back("-1");
 	l.loc_replaced.push_back(l_new);
-	return 0;
+	return 1;
 }
 
 int _replace_ldiw(loc& l) {
-	const char* cimm = l.params[1].c_str();
-	char* end_ptr;
-	int imm = strtol(cimm, &end_ptr, 0);
-	if (cimm == end_ptr) {
-		msg.err_no_int(l.line, l.params[1].c_str());
-		return -1;
-	}
 	loc l_new[3];
 
 	l_new[0].instr = "ldih";
@@ -191,7 +184,7 @@ int _replace_ldiw(loc& l) {
 	l_new[2].params.push_back(l.params[0]);
 	l_new[2].params.push_back(l.params[1]);
 	l.loc_replaced.push_back(l_new[2]);
-	return 0;
+	return 3;
 }
 
 int replace_pseudo_instructions(loc& l) {
@@ -199,6 +192,7 @@ int replace_pseudo_instructions(loc& l) {
 	if (f) {
 		return f(l);
 	}
+	return 1;
 }
 
 void load_pseudo_instructions() {

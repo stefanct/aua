@@ -5,31 +5,36 @@
 #include <vector>
 
 enum MSG_LEVEL {
-	ERR = 0, WARN = 1, WALL = 2, INFO = 3
+	FATAL = 0, ERR = 1, WARN = 2, WALL = 3, INFO = 4
 };
 
-static std::string err_lvl_names[] = { "Error", "Warning", "Warning", "Info" };
+static std::string err_lvl_names[] = { "Fatal", "Error", "Warning", "Warning", "Info" };
 
 class _msg {
 	friend bool operator<(const _msg&, const _msg&);
 private:
 	MSG_LEVEL lvl;
+	std::string file;
 	int line;
 	std::string msg;
 public:
-	_msg(MSG_LEVEL lvl, int line, const std::string& msg) :
-		lvl(lvl), line(line), msg(msg) {
+	_msg(MSG_LEVEL lvl, const std::string& file, int line, const std::string& msg) :
+		lvl(lvl), file(file), line(line), msg(msg) {
 	}
 
-	MSG_LEVEL get_level(){
+	MSG_LEVEL get_level() {
 		return lvl;
 	}
 
-	int get_line(){
+	std::string get_file(){
+		return file;
+	}
+
+	int get_line() {
 		return line;
 	}
 
-	std::string get_msg(){
+	std::string get_msg() {
 		return msg;
 	}
 };
@@ -55,22 +60,36 @@ public:
 		this->file = file;
 	}
 
-	void print_msg(MSG_LEVEL lvl, int line, const std::string& msg);
+	void print_msg(MSG_LEVEL lvl, const std::string& file, int line,
+			const std::string& msg);
 
 	void flush();
 
-	void err_syntax(int line, const std::string& instr_line);
-	void err_no_instr(int line, const std::string& instruction);
-	void err_number_args(int line, const std::string& instruction, int exp,
-			int found);
-	void err_no_int(int line, const std::string& value);
-	void err_no_signed(int line, int value);
-	void err_no_imm(int line, const std::string& value);
-	void err_out_of_range(int line, int value, int min, int max);
-	void err_no_reg(int line, const std::string& reg);
+	void fatal_configuration();
 
-	void warn_out_of_range_word(int line, int value);
+	void err_syntax(const std::string& file, int line,
+			const std::string& instr_line);
+	void err_no_instr(const std::string& file, int line,
+			const std::string& instruction);
+	void err_number_args(const std::string& file, int line,
+			const std::string& instruction, int exp, int found);
+	void
+			err_no_int(const std::string& file, int line,
+					const std::string& value);
+	void err_no_signed(const std::string& file, int line, int value);
+	void
+			err_no_imm(const std::string& file, int line,
+					const std::string& value);
+	void err_out_of_range(const std::string& file, int line, int value,
+			int min, int max);
+	void err_no_reg(const std::string& file, int line, const std::string& reg);
+	void err_no_const(const std::string& file, int line, int value);
 
+	void warn_out_of_range_word(const std::string& file, int line, int value);
+	void warn_const_as_offset(const std::string& file, int line);
+	void warn_illegal_const(const std::string& file, int line, const std::string& str_constant);
+
+	void wall_signed_overflow(const std::string& file, int line, int value);
 };
 
 #endif /* MSG_H_ */
