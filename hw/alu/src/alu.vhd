@@ -228,14 +228,14 @@ sync_carry: process (clk, reset)
 					end if;
 						
 				when "000000" => -- ldi
-					result <= (15 downto 8 =>'0') & opb(7 downto 0);
-					when "000001" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
-					when "000010" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
-					when "000011" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
-					when "000100" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
-					when "000101" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
-					when "000110" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
-					when "000111" => result <= (15 downto 8 =>'0') & opb(7 downto 0);-- ldi
+					result <= opa(15 downto 8) & opb(7 downto 0);
+					when "000001" => result <= opa(15 downto 8) & opb(7 downto 0);-- ldi
+					when "000010" => result <= opa(15 downto 8) & opb(7 downto 0);-- ldi
+					when "000011" => result <= opa(15 downto 8) & opb(7 downto 0);-- ldi
+					when "000100" => result <= opa(15 downto 8) & opb(7 downto 0);-- ldi
+					when "000101" => result <= opa(15 downto 8) & opb(7 downto 0);-- ldi
+					when "000110" => result <= opa(15 downto 8) & opb(7 downto 0);-- ldi
+					when "000111" => result <= opa(15 downto 8) & opb(7 downto 0);-- ldi
 				when "001101" => result <= x"0000";-- jmpl
 				when "001110" => result <= x"0000";-- brez
 				when "001111" => result <= x"0000";-- brnez
