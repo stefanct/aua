@@ -1,0 +1,7 @@
+mmu ordentlich machen :)
+sc test device... irgendwas zum testen von laengeren latencies
+jmpl/ret konkretisieren/durchdenken und dann implementieren
+uart blocking io
+alu optimieren
+ganz tolle neue instructions erfinden
+
