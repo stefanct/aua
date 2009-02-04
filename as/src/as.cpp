@@ -145,24 +145,32 @@ void As::_precompile(const string& file) {
 	regex reg_instr0("\\s*(\\w+)\\s*"); /* 0 Parameter */
 	regex reg_instr1("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*"); /* 1 Parameter */
 	regex reg_instr2("\\s*(\\w+)\\s+([\\$\\w-]+)\\s*,\\s*([\\$\\w-]+)\\s*"); /* 1 Parameter */
+	regex reg_eof("EOF\\s*");
 
 	cmatch tokens;
-	int cnt = 0;
 	int line_number = 0;
 	while (fgets(line, 1024, in) != NULL) {
 		line_number++;
-		removeComment(line);DBG("--------------\n\nPrecompiling: %s", line);
+		removeComment(line);
+		DBG("--------------\n\nPrecompiling: %s", line);
 		string instr;
 		string fields[3];
 		int type_len = 0;
 		bool copy_line = true;
 		if (regex_match(line, tokens, reg_empty)) {
 			continue;
+		} else if (regex_match(line, tokens, reg_eof)) {
+			break;
 		} else if (regex_match(line, tokens, reg_include)) {
 			string file_nxt(tokens[1].first, tokens[1].second);
 			_precompile(file_nxt);
 			continue;
 		} else if (regex_match(line, tokens, reg_label)) {
+			string label;
+			label.assign(tokens[1].first, tokens[1].second);
+			labels[label] = cnt_instr;
+			DBG("Found label: %s: %d", label.c_str(), cnt_instr);
+			continue;
 		} else if (regex_match(line, tokens, reg_define) || regex_match(line,
 				tokens, reg_assign)) {
 			string key(tokens[1].first, tokens[1].second);
@@ -186,18 +194,6 @@ void As::_precompile(const string& file) {
 			fields[i].assign(tokens[i + 1].first, tokens[i + 1].second);
 		}
 
-		if (regex_match(line, tokens, reg_label)) {
-			string label;
-			label.assign(tokens[1].first, tokens[1].second);
-			labels[label] = cnt;DBG("Found label: %s: %d", label.c_str(), cnt);
-			copy_line = false;
-		} else {
-			if (regex_match(line, tokens, reg_empty)) {
-				copy_line = false;
-			} else {
-				cnt += 2;
-			}
-		}
 		if (copy_line) {
 			shared_ptr<loc> l(new loc());
 			l->file = file;
@@ -212,10 +208,13 @@ void As::_precompile(const string& file) {
 			int result = replace_pseudo_instructions(*l);
 			if (result > 0) {
 				program.push_back(l);
-				cnt_instr += result;
+				cnt_instr += result * 2;
+				DBG("replace_pseudo_instr: %d", result);
 			}
 		}
-	}DBG("Precompile fertig");DBG("program.size(): %d", program.size());
+	}
+	DBG("Precompile fertig");
+	DBG("program.size(): %d", program.size());
 	fclose(in);
 }
 
@@ -244,7 +243,8 @@ int As::_compile_instr(loc& l) {
 	}
 	instruction& i = iter->second;
 	int type_len = l.params.size() * 3;
-	DBG("l.params.size(): %d", l.params.size());DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
+	DBG("l.params.size(): %d", l.params.size());
+	DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
 	if (type_len != i.type.length()) {
 		msg.err_number_args(l.file, l.line, l.instr, i.type.length(), type_len);
 		return -1;
@@ -285,7 +285,8 @@ int As::_compile_instr(loc& l) {
 						imm = iter->second - addr;
 					} else {
 						imm = iter->second;
-					}DBG("imm: %d", imm);
+					}
+					DBG("imm: %d", imm);
 					valid = true;
 				}
 			}
@@ -368,7 +369,8 @@ int As::_compile_instr(loc& l) {
 				int reg_num = strtol(reg, &end_ptr, 10);
 				if (reg == end_ptr) {
 					msg.err_no_reg(l.file, l.line, l.params[field_cnt]);
-				}DBG("reg_num: %d", reg_num);
+				}
+				DBG("reg_num: %d", reg_num);
 				assert(cur_field_len <= 5);
 				assert(reg_num >= 0);
 				assert(reg_num < (1 << cur_field_len));
