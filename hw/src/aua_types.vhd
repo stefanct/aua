@@ -11,6 +11,7 @@ package aua_types is
 	subtype word_t is std_logic_vector(15 downto 0);
 	subtype opcode_t is std_logic_vector(5 downto 0);
 	subtype reg_t is std_logic_vector(4 downto 0);
+	subtype pc_t is unsigned(15 downto 0);
 
 	constant RAM_ADDR_SIZE : integer := 14;
 

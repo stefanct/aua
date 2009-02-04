@@ -12,7 +12,7 @@ entity id is
 		-- pipeline register inputs
 		opcode_in	: in opcode_t;
 		dest_in		: in reg_t;
-		pc_in		: in word_t;
+		pc_in		: in pc_t;
 		rega_in		: in reg_t;
 		regb_in		: in reg_t;
 		imm_in		: in std_logic_vector(7 downto 0);
@@ -36,7 +36,7 @@ entity id is
 		regb_out	: out reg_t;
 
 		-- branch decision
-		pc_out		: out word_t;
+		pc_out		: out pc_t;
 		branch_out	: out std_logic;
 
 		-- interlock
@@ -86,21 +86,19 @@ begin
 		rega_nxt <= rega_in;
 		regb_nxt <= regb_in;
 
-		--~ opcode_out <= opcode;
-		--~ dest_out <= dest;
-		--~ opa_out <= opa;
-		--~ opb_out <= opb;
-
 branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
-		variable inv : std_ulogic;
-		variable brinstr : std_ulogic; -- set if op changes PC
+		variable inv : std_logic;
+		variable brinstr : std_logic; -- set if op changes PC
+		--~ variable pc_tmp : unsigned(pc_t'length downto 0); -- n.b. thats one bit larger
 	begin
 		inv := '0';
 		brinstr := '0';
 
 		opa_to_nop <= '0';
 		jmpl_op <= '0';
-		pc_out <= std_logic_vector(TO_INTEGER(unsigned(pc_in)) + signed(opb_nxt));
+		pc_out <= unsigned(to_integer(pc_in) + signed(opb_nxt));
+		--~ pc_tmp := unsigned(signed('0'&pc_in) + signed(opb_nxt));
+		--~ pc_out <= pc_tmp(pc_t'length-1 downto 0);
 
 		if opcode_in(5 downto 3)="010" then
 			inv := opcode_in(2);
@@ -124,32 +122,43 @@ branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
 			dest_nxt <= "11111";
 			jmpl_op <= '1';
 			-- jump is absolute!
-			pc_out <= opb_nxt;
+			pc_out <= pc_t(opb_nxt);
 		else
 			opcode_nxt <= opcode_in;
 			dest_nxt <= dest_in;
 		end if;
 		
-		if ((std_logic_vector(to_unsigned(0, 16)))=opa_nxt xor inv='1') and brinstr='1' then
+		if (x"0000"=opa_nxt xor inv='1') and brinstr='1' then
 			branch_out <= '1';
 		else
 			branch_out <= '0';
 		end if;
 	end process;
 
-	-- hide r0 changes
-r0readonly: process (rega_in, regb_in, vala, valb, opa_to_nop)
+	--~ -- hide r0 changes
+--~ r0readonly: process (rega_in, regb_in, vala, valb, opa_to_nop)
+	--~ begin
+		--~ if rega_in="00000" or opa_to_nop = '1' then
+			--~ opa_nxt <= (others => '0');
+		--~ else
+			--~ opa_nxt <= vala;
+		--~ end if;
+--~ 
+		--~ if regb_in=(4 downto 0=>'0') then
+			--~ regb_done <= (others => '0');
+		--~ else
+			--~ regb_done <= valb;
+		--~ end if;
+	--~ end process;
+	
+	regb_done <= valb;
+	-- inserts a nop (for branches etc.)
+insert_nop: process (vala, opa_to_nop)
 	begin
-		if rega_in="00000" or opa_to_nop = '1' then
+		if opa_to_nop = '1' then
 			opa_nxt <= (others => '0');
 		else
 			opa_nxt <= vala;
-		end if;
-
-		if regb_in=(4 downto 0=>'0') then
-			regb_done <= (others => '0');
-		else
-			regb_done <= valb;
 		end if;
 	end process;
 
@@ -165,7 +174,7 @@ extend: process (opcode_in, imm_in,regb_done, jmpl_op, pc_in)
 			--sign extend imm(6 downto 0)
 			opb_nxt <= (15 downto 7 => imm_in(6)) & imm_in(6 downto 0);
 		elsif jmpl_op='1' then
-			opb_nxt <= pc_in;
+			opb_nxt <= word_t(pc_in);
 		else
 			opb_nxt <= regb_done;
 		end if;

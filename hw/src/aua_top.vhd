@@ -36,7 +36,7 @@ architecture sat1 of aua is
 			-- pipeline register outputs
 			opcode_out	: out opcode_t;
 			dest_out	: out reg_t;
-			pc_out		: out word_t;
+			pc_out		: out pc_t;
 			rega_out	: out reg_t;
 			regb_out	: out reg_t;
 			imm_out		: out std_logic_vector(7 downto 0);
@@ -46,7 +46,7 @@ architecture sat1 of aua is
 			async_regb	: out reg_t;
 				
 			-- branches (from ID)
-			pc_in		: in word_t;
+			pc_in		: in pc_t;
 			branch		: in std_logic;
 
 			-- cache
@@ -67,7 +67,7 @@ architecture sat1 of aua is
 			-- pipeline register inputs
 			opcode_in	: in opcode_t;
 			dest_in		: in reg_t;
-			pc_in		: in word_t;
+			pc_in		: in pc_t;
 			rega_in		: in reg_t;
 			regb_in		: in reg_t;
 			imm_in		: in std_logic_vector(7 downto 0);
@@ -91,7 +91,7 @@ architecture sat1 of aua is
 			regb_out	: out reg_t;
 
 			-- branch decision
-			pc_out		: out word_t;
+			pc_out		: out pc_t;
 			branch_out	: out std_logic;
 
 			-- interlock
@@ -252,14 +252,14 @@ architecture sat1 of aua is
 	-- IF/ID
 	signal ifid_opcode_out		: opcode_t;
 	signal ifid_dest_out			: reg_t;
-	signal ifid_pc_out			: word_t;
+	signal ifid_pc_out			: pc_t;
 	signal ifid_rega_out			: reg_t;
 	signal ifid_regb_out			: reg_t;
 	signal ifid_async_rega_out	: reg_t;
 	signal ifid_async_regb_out	: reg_t;
 	signal ifid_imm_out			: std_logic_vector(7 downto 0);
 	-- ID/IF
-	signal idif_pc_out		: word_t;
+	signal idif_pc_out		: pc_t;
 	signal idif_branch_out	: std_logic;
 	-- ID/EX
 	signal idex_opcode_out	: opcode_t;
@@ -274,14 +274,14 @@ architecture sat1 of aua is
 	-- IF/ID
 	signal ifid_opcode_in		: opcode_t;
 	signal ifid_dest_in		: reg_t;
-	signal ifid_pc_in			: word_t;
+	signal ifid_pc_in			: pc_t;
 	signal ifid_rega_in		: reg_t;
 	signal ifid_regb_in		: reg_t;
 	signal ifid_async_rega_in	: reg_t;
 	signal ifid_async_regb_in	: reg_t;
 	signal ifid_imm_in			: std_logic_vector(7 downto 0);
 	-- ID/IF
-	signal idif_pc_in		: word_t;
+	signal idif_pc_in		: pc_t;
 	signal idif_branch_in	: std_logic;
 	-- ID/EX
 	signal idex_opcode_in	: opcode_t;
@@ -313,13 +313,13 @@ architecture sat1 of aua is
 	signal mmuio_in		: sc_in_t;
 	signal mmuio_ina	: sc_in_at;
 	-- MMU/SRAM
-	signal mmu_sram_addr	: std_logic_vector(17 downto 0);
-	signal mmu_sram_dq		: word_t;
-	signal mmu_sram_we		: std_logic;
-	signal mmu_sram_oe		: std_logic;
-	signal mmu_sram_ub		: std_logic;
-	signal mmu_sram_lb		: std_logic;
-	signal mmu_sram_ce		: std_logic;
+	--~ signal mmu_sram_addr	: std_logic_vector(17 downto 0);
+	--~ signal mmu_sram_dq		: word_t;
+	--~ signal mmu_sram_we		: std_logic;
+	--~ signal mmu_sram_oe		: std_logic;
+	--~ signal mmu_sram_ub		: std_logic;
+	--~ signal mmu_sram_lb		: std_logic;
+	--~ signal mmu_sram_ce		: std_logic;
 	-- IO stuff
 	signal sc_sel, sc_sel_reg		: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
 	signal sc_addr 			: sc_addr_t;

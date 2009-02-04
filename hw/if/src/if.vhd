@@ -12,7 +12,7 @@ entity ent_if is
 		-- pipeline register outputs
 		opcode_out	: out opcode_t;
 		dest_out	: out reg_t;
-		pc_out		: out word_t;
+		pc_out		: out pc_t;
 		rega_out	: out reg_t;
 		regb_out	: out reg_t;
 		imm_out		: out std_logic_vector(7 downto 0);
@@ -22,7 +22,7 @@ entity ent_if is
 		async_regb	: out reg_t;
 			
 		-- branches (from ID)
-		pc_in		: in word_t;
+		pc_in		: in pc_t;
 		branch		: in std_logic;
 
 		-- cache
@@ -41,17 +41,17 @@ architecture sat1 of ent_if is
 	signal rega_nxt		: reg_t;
 	signal regb_nxt		: reg_t;
 	signal imm_nxt		: std_logic_vector(7 downto 0);
-	signal pc_nxt		: word_t;
+	signal pc_nxt		: pc_t;
 	
 	signal opcode	: opcode_t;
 	signal dest		: reg_t;
 	signal rega		: reg_t;
 	signal regb		: reg_t;
 	signal imm		: std_logic_vector(7 downto 0);
-	signal pc	: word_t;
+	signal pc	: pc_t;
 begin
 
-	instr_addr <= pc;
+	instr_addr <= word_t(pc);
 
 	opcode_out <= opcode;
 	dest_out <= dest;
@@ -86,7 +86,7 @@ calc_pc_nxt: process(reset, pc, pc_in, branch, instr_valid)
 		elsif instr_valid /= '1' then
 			pc_nxt <= pc;
 		else
-			pc_nxt <= std_logic_vector(unsigned(pc) + 2);
+			pc_nxt <= pc + 2;
 		end if;
 	end process;
 
