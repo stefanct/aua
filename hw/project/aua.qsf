@@ -173,7 +173,19 @@ set_global_assignment -name END_TIME "5 ns"
 set_global_assignment -name EDA_TEST_BENCH_FILE ../if/sim/tb.vhd -section_id if
 set_global_assignment -name EDA_TEST_BENCH_FILE ../sim/tb.vhd -section_id "aua top" -library work
 set_global_assignment -name EDA_NETLIST_WRITER_OUTPUT_DIR ../sim/work -section_id eda_simulation
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[17]
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[16]
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[15]
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[14]
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING VCC" -to sram_oe
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ub
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_lb
+set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ce
+set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id clk
+set_instance_assignment -name CLOCK_SETTINGS clk -to clk
+
 set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
+set_global_assignment -name VHDL_FILE ../io/dummy/src/sc_dummy.vhd
 set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
 set_global_assignment -name VHDL_FILE ../io/digits/src/digits.vhd
 set_global_assignment -name VHDL_FILE ../mmu/src/rom.vhd
@@ -189,13 +201,3 @@ set_global_assignment -name QIP_FILE ../reg/src/ram.qip
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
 set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
 set_global_assignment -name CDF_FILE aua.cdf
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[17]
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[16]
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[15]
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[14]
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING VCC" -to sram_oe
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ub
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_lb
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ce
-set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id clk
-set_instance_assignment -name CLOCK_SETTINGS clk -to clk

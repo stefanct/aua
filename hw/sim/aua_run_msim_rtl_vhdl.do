@@ -43,7 +43,7 @@ vlib rtl_work
 vmap work rtl_work
 
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_types.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/io/test/src/test.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/dummy/src/sc_dummy.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/digits/src/digits.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/switches/src/switches.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/rom.vhd
@@ -56,7 +56,6 @@ vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/reg.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/id/src/id.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/ex/src/ex.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/alu.vhd
-#vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_top_ent.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_top.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_de2_config.vhd
 
@@ -144,18 +143,19 @@ add wave -dec	/aua_tb/aua1/mmuio_in.rd_data
 add wave -hex	/aua_tb/aua1/mmuio_in.rdy_cnt
 add wave -hex	/aua_tb/aua1/sc_sel_reg
 add wave -hex	/aua_tb/aua1/sc_addr
+
 add wave -divider IO-dummy
 add wave -hex /aua_tb/aua1/cmp_test/address
 add wave -hex /aua_tb/aua1/cmp_test/wr_data
 add wave /aua_tb/aua1/cmp_test/rd
 add wave /aua_tb/aua1/cmp_test/wr
 add wave -hex /aua_tb/aua1/cmp_test/rd_data
-add wave -dec /aua_tb/aua1/cmp_test/rdy_cnt
-add wave -dec /aua_tb/aua1/cmp_test/cycle_cnt
-add wave -dec /aua_tb/aua1/cmp_test/cycle_cnt_nxt
+add wave -uns /aua_tb/aua1/cmp_test/rdy_cnt
+add wave -uns /aua_tb/aua1/cmp_test/cycle_cnt
+add wave -uns /aua_tb/aua1/cmp_test/cycle_cnt_nxt
 add wave -hex /aua_tb/aua1/cmp_test/reg
 add wave -hex /aua_tb/aua1/cmp_test/reg_nxt
-add wave -hex /aua_tb/aua1/cmp_test/out_nxt
+add wave -hex /aua_tb/aua1/cmp_test/sc_out_nxt
 add wave /aua_tb/aua1/cmp_test/state
 add wave /aua_tb/aua1/cmp_test/state_nxt
 
