@@ -174,7 +174,6 @@ set_global_assignment -name EDA_TEST_BENCH_FILE ../if/sim/tb.vhd -section_id if
 set_global_assignment -name EDA_TEST_BENCH_FILE ../sim/tb.vhd -section_id "aua top" -library work
 set_global_assignment -name EDA_NETLIST_WRITER_OUTPUT_DIR ../sim/work -section_id eda_simulation
 set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
-set_global_assignment -name VHDL_FILE ../io/test/src/test.vhd
 set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
 set_global_assignment -name VHDL_FILE ../io/digits/src/digits.vhd
 set_global_assignment -name VHDL_FILE ../mmu/src/rom.vhd

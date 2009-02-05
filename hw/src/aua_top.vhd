@@ -182,7 +182,7 @@ architecture sat1 of aua is
 
 	component switches is
 		generic(
-			sc_addr	: sc_addr_t
+			sc_base_addr	: sc_addr_t
 		);
 		port (
 			clk     : in std_logic;
@@ -204,7 +204,7 @@ architecture sat1 of aua is
 	
 	component digits is
 	    generic(
-			sc_addr	: sc_addr_t
+			sc_base_addr	: sc_addr_t
 	    );
 	    port (
 			clk     : in std_logic;
@@ -230,7 +230,7 @@ architecture sat1 of aua is
 
 	component sc_test_slave is
 		generic(
-			sc_addr	: sc_addr_t
+			sc_base_addr	: sc_addr_t
 		);
 		port (
 				clk     : in std_logic;
@@ -424,7 +424,7 @@ sc_mux: process (mmuio_ina, sc_sel_reg)
 -- 11111111 0000* --> Switches 0xFF00/12
 -- 11111111 0001* --> Digits 0xFF10/12
 -- 
--- 11111111 11111111 --> Test 0xFFFF/16
+-- 11111111 1111111* --> Test 0xFFFF/15
 -- FEDCBA98 76543210
 sc_addr <= mmuio_out.address;
 sc_sc_selector: process (mmuio_out, sc_addr)
@@ -433,7 +433,7 @@ sc_sc_selector: process (mmuio_out, sc_addr)
 			sc_sel <= 0;
 		elsif((sc_addr and x"FFF0") = x"FF10") then
 			sc_sel <= 1;
-		elsif((sc_addr and x"FFFF") = x"FFFF") then
+		elsif((sc_addr and x"FFFE") = x"FFFE") then
 			sc_sel <= 2;
 		else
 			sc_sel <= SLAVE_CNT;
@@ -449,6 +449,6 @@ cmp_digits: digits
 	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(1).rd_data, mmuio_ina(1).rdy_cnt,
 		digit0_pins, digit1_pins, digit2_pins, digit3_pins, digit4_pins, digit5_pins);
 cmp_test: sc_test_slave
-	generic map(x"ffff")
+	generic map(x"fffe")
 	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(2).rd_data, mmuio_ina(2).rdy_cnt);
 end sat1;

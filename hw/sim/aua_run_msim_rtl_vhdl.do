@@ -144,7 +144,21 @@ add wave -dec	/aua_tb/aua1/mmuio_in.rd_data
 add wave -hex	/aua_tb/aua1/mmuio_in.rdy_cnt
 add wave -hex	/aua_tb/aua1/sc_sel_reg
 add wave -hex	/aua_tb/aua1/sc_addr
-     
+add wave -divider IO-dummy
+add wave -hex /aua_tb/aua1/cmp_test/address
+add wave -hex /aua_tb/aua1/cmp_test/wr_data
+add wave /aua_tb/aua1/cmp_test/rd
+add wave /aua_tb/aua1/cmp_test/wr
+add wave -hex /aua_tb/aua1/cmp_test/rd_data
+add wave -dec /aua_tb/aua1/cmp_test/rdy_cnt
+add wave -dec /aua_tb/aua1/cmp_test/cycle_cnt
+add wave -dec /aua_tb/aua1/cmp_test/cycle_cnt_nxt
+add wave -hex /aua_tb/aua1/cmp_test/reg
+add wave -hex /aua_tb/aua1/cmp_test/reg_nxt
+add wave -hex /aua_tb/aua1/cmp_test/out_nxt
+add wave /aua_tb/aua1/cmp_test/state
+add wave /aua_tb/aua1/cmp_test/state_nxt
+
 view structure
 view signals
 run -all

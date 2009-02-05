@@ -6,7 +6,7 @@ use work.aua_types.all;
 
 entity switches is
 	generic(
-		sc_addr	: sc_addr_t
+		sc_base_addr	: sc_addr_t
 	);
 	port (
 		clk     : in std_logic;
@@ -43,7 +43,7 @@ begin
 			led_reg <= (others => '1');
 
 		elsif rising_edge(clk) then
-			if address = sc_addr then
+			if address = sc_base_addr then
 				if rd = '1' then
 					switch_reg <= switch_pins;
 				end if;

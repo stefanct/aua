@@ -1,7 +1,9 @@
 sc test device... irgendwas zum testen von laengeren latencies
-mmu ordentlich machen :) inkl sram controller
+mmu ordentlich machen :) inkl sram controller, rom in ram
 jmpl/ret konkretisieren/durchdenken und dann implementieren
+ex fwd nochmal ueberdenken
 uart blocking io
 alu optimieren
 ganz tolle neue instructions erfinden
 bootloader
+i-cache
