@@ -3,6 +3,13 @@
 ldiw $1, SC_DIGITS
 
 ldiw $2, SEGS
+
+ldiw $20, SC_DIGITS
+
+addi $20, 1
+ldi $21, 0x0f
+st $21, $20
+
 mov $6, $2
 
 ldi $4, 10 -- Top value
@@ -22,7 +29,7 @@ count:
 	nop
 	nop
 
-	st $3, $1 -- Wert auf Digit schreiben
+	st $21, $1 -- Wert auf Digit schreiben
 
 	addi $3, 1 -- Counter erhöhen
 
