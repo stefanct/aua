@@ -246,7 +246,7 @@ int As::_compile_instr(loc& l) {
 	DBG("l.params.size(): %d", l.params.size());
 	DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
 	if (type_len != i.type.length()) {
-		msg.err_number_args(l.file, l.line, l.instr, i.type.length(), type_len);
+		msg.err_number_args(l.file, l.line, l.instr, i.type.length()/3, type_len/3); // TODO: das /3 geht schöner...
 		return -1;
 	}
 
