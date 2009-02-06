@@ -21,7 +21,10 @@ architecture aua_test of aua_tb is
 			digit5_pins	: out std_logic_vector(6 downto 0);
 			sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
 			sram_dq		: inout word_t;
-			sram_we		: out std_logic
+			sram_we		: out std_logic;
+			txd			: out std_logic;
+			rxd			: in std_logic
+
 		);
     end component;
     
@@ -38,6 +41,8 @@ architecture aua_test of aua_tb is
 	signal sram_addr	: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
 	signal sram_dq		: word_t;
 	signal sram_we		: std_logic;
+	signal txd		: std_logic;
+	signal rxd		: std_logic;
 begin
     
     aua1: aua
@@ -54,7 +59,9 @@ begin
 		digit5_pins => digit5_pins,
 		sram_addr => sram_addr,
 		sram_dq => sram_dq,
-		sram_we => sram_we
+		sram_we => sram_we,
+		txd => txd,
+		rxd => rxd
     );
     
     CLKGEN: process
@@ -76,6 +83,7 @@ begin
         reset_pin <= '0';
         switch_pins <= x"DEAD";
         sram_dq <= (others => '0');
+        rxd <= '0';
         
         icwait(2);
         reset_pin <= '1';

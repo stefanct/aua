@@ -44,6 +44,8 @@ vmap work rtl_work
 
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_types.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/dummy/src/sc_dummy.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/uart/src/sc_uart.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/uart/src/fifo.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/digits/src/digits.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/switches/src/switches.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/rom.vhd

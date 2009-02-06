@@ -19,11 +19,15 @@ port (
 	digit5_pins	: out std_logic_vector(6 downto 0);
 	sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1  downto 0);
 	sram_dq		: inout word_t;
-	sram_we		: out std_logic
+	sram_we		: out std_logic;
 --	sram_oe		: out std_logic;
 --	sram_ub		: out std_logic;
 --	sram_lb		: out std_logic;
 --	sram_ce		: out std_logic
+	txd			: out std_logic;
+	rxd			: in std_logic
+	--~ ncts		: in std_logic;
+	--~ nrts		: out std_logic
 );
 end aua;
 
@@ -228,6 +232,37 @@ architecture sat1 of aua is
 	    );
 	end component;
 
+	component sc_uart is
+		generic(
+			base_addr	: sc_addr_t;
+			addr_bits	: integer;
+			clk_freq	: integer;
+			baud_rate	: integer;
+			txf_depth	: integer;
+			txf_thres	: integer;
+			rxf_depth	: integer;
+			rxf_thres	: integer
+		);
+		port (
+			clk		: in std_logic;
+			reset	: in std_logic;
+
+			-- SimpCon slave interface to IO ctrl
+			address	: in sc_addr_t;
+			wr_data	: in sc_data_t;
+			rd		: in std_logic;
+			wr		: in std_logic;
+			rd_data	: out sc_data_t;
+			rdy_cnt	: out sc_rdy_cnt_t;
+
+			-- pins
+			txd		: out std_logic;
+			rxd		: in std_logic;
+			ncts	: in std_logic;
+			nrts	: out std_logic
+		);
+	end component;
+
 	component sc_test_slave is
 		generic(
 			sc_base_addr	: sc_addr_t
@@ -336,6 +371,7 @@ architecture sat1 of aua is
 	signal lock_if			: std_logic;
 	signal lock_id			: std_logic;
 
+constant CLK_FREQ	: integer := 50000000;
 
 begin
 cmp_if: ent_if
@@ -423,8 +459,9 @@ sc_mux: process (mmuio_ina, sc_sel_reg)
 -- 11111111 * --> Blöcke 0xFF00/8 (I/O Devices)
 -- 11111111 0000* --> Switches 0xFF00/12
 -- 11111111 0001* --> Digits 0xFF10/12
+-- 11111111 0002* --> uart 0XFF20/12
 -- 
--- 11111111 1111111* --> Test 0xFFFF/15
+-- 11111111 1111111* --> Test 0xFFFE/15
 -- FEDCBA98 76543210
 sc_addr <= mmuio_out.address;
 sc_sc_selector: process (mmuio_out, sc_addr)
@@ -433,8 +470,10 @@ sc_sc_selector: process (mmuio_out, sc_addr)
 			sc_sel <= 0;
 		elsif((sc_addr and x"FFF0") = x"FF10") then
 			sc_sel <= 1;
-		elsif((sc_addr and x"FFFE") = x"FFFE") then
+		elsif((sc_addr and x"FFF0") = x"FFF2") then
 			sc_sel <= 2;
+		elsif((sc_addr and x"FFFF") = x"FFFE") then
+			sc_sel <= 3;
 		else
 			sc_sel <= SLAVE_CNT;
 		end if;
@@ -448,7 +487,11 @@ cmp_digits: digits
 	generic map(x"ff10")
 	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(1).rd_data, mmuio_ina(1).rdy_cnt,
 		digit0_pins, digit1_pins, digit2_pins, digit3_pins, digit4_pins, digit5_pins);
+cmp_uart: sc_uart
+	generic map(x"ff20", sc_addr'length, CLK_FREQ, 115200, 4, 2, 4, 2)
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(2).rd_data, mmuio_ina(2).rdy_cnt,
+		txd, rxd, '0', open);
 cmp_test: sc_test_slave
 	generic map(x"fffe")
-	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(2).rd_data, mmuio_ina(2).rdy_cnt);
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(3).rd_data, mmuio_ina(3).rdy_cnt);
 end sat1;

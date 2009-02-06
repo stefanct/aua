@@ -164,6 +164,8 @@ set_location_assignment PIN_AE9 -to sram_lb
 set_location_assignment PIN_AD10 -to sram_oe
 set_location_assignment PIN_AF9 -to sram_ub
 set_location_assignment PIN_AE10 -to sram_we
+set_location_assignment PIN_C25 -to rxd
+set_location_assignment PIN_B25 -to txd
 set_global_assignment -name EDA_TEST_BENCH_NAME "aua top" -section_id eda_simulation
 set_global_assignment -name EDA_DESIGN_INSTANCE_NAME aua1 -section_id "aua top"
 set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME aua_tb -section_id "aua top"
@@ -185,6 +187,8 @@ set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id clk
 set_instance_assignment -name CLOCK_SETTINGS clk -to clk
 
 set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
+set_global_assignment -name VHDL_FILE ../io/uart/src/fifo.vhd
+set_global_assignment -name VHDL_FILE ../io/uart/src/sc_uart.vhd
 set_global_assignment -name VHDL_FILE ../io/dummy/src/sc_dummy.vhd
 set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
 set_global_assignment -name VHDL_FILE ../io/digits/src/digits.vhd

@@ -1,4 +1,3 @@
-sc test device... irgendwas zum testen von laengeren latencies
 mmu ordentlich machen :) inkl sram controller, rom in ram
 jmpl/ret konkretisieren/durchdenken und dann implementieren
 ex fwd nochmal ueberdenken
