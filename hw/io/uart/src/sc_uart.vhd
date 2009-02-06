@@ -6,14 +6,14 @@ use work.aua_types.all;
 
 entity sc_uart is
 	generic(
-		base_addr	: sc_addr_t;
-		addr_bits	: integer;
-		clk_freq	: integer;
-		baud_rate	: integer;
-		txf_depth	: integer;
-		txf_thres	: integer;
-		rxf_depth	: integer;
-		rxf_thres	: integer
+		sc_base_addr	: sc_addr_t;
+		addr_bits		: integer;
+		clk_freq		: integer;
+		baud_rate		: integer;
+		txf_depth		: integer;
+		txf_thres		: integer;
+		rxf_depth		: integer;
+		rxf_thres		: integer
 	);
 	port (
 		clk		: in std_logic;
@@ -115,22 +115,27 @@ begin
 	elsif rising_edge(clk) then
 
 		ua_rd <= '0';
-		if rd='1' then
-			-- that's our very simple address decoder
-			if address(0)='0' then
-				rd_data(7 downto 0) <= "000000" & rdrf & tdre; -- drf/e == rcv/tramsmit data reg full/empty
-			else
-				rd_data(7 downto 0) <= ua_dout;
-				--rd_data(7 downto 0) <= "00110001"; -- DEBUG FOO
-				ua_rd <= rd; --CHANGE: ua_rd <= rd;
+		rd_data(7 downto 0) <= (others => '0');
+		if sc_base_addr(addr_bits-1 downto 1) = address(addr_bits-1 downto 1) then
+			if rd='1' then
+				-- that's our very simple address decoder
+				if address(0)='0' then
+					rd_data(7 downto 0) <= "000000" & rdrf & tdre; -- drf/e == rcv/transmit data reg full/empty
+				else
+					rd_data(7 downto 0) <= ua_dout;
+					ua_rd <= rd;
+				end if;
 			end if;
+			ua_wr <= wr and address(0); -- does this work in synced process?
 		end if;
 	end if;
 
 end process;
 
 	-- write is on address offest 1
-	ua_wr <= wr and address(0);
+	--~ if sc_base_addr(addr_bits-1 downto 1) = address(addr_bits-1 downto 1) then
+		--~ ua_wr <= wr and address(0);
+	--~ end if;
 
 --
 --	serial clock

@@ -234,14 +234,14 @@ architecture sat1 of aua is
 
 	component sc_uart is
 		generic(
-			base_addr	: sc_addr_t;
-			addr_bits	: integer;
-			clk_freq	: integer;
-			baud_rate	: integer;
-			txf_depth	: integer;
-			txf_thres	: integer;
-			rxf_depth	: integer;
-			rxf_thres	: integer
+			sc_base_addr	: sc_addr_t;
+			addr_bits		: integer;
+			clk_freq		: integer;
+			baud_rate		: integer;
+			txf_depth		: integer;
+			txf_thres		: integer;
+			rxf_depth		: integer;
+			rxf_thres		: integer
 		);
 		port (
 			clk		: in std_logic;

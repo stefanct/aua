@@ -86,7 +86,7 @@ begin
 		rega_nxt <= rega_in;
 		regb_nxt <= regb_in;
 
-branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
+branch: process (opcode_in, pc_in, vala, dest_in, opb_nxt)
 		variable inv : std_logic;
 		variable brinstr : std_logic; -- set if op changes PC
 		--~ variable pc_tmp : unsigned(pc_t'length downto 0); -- n.b. thats one bit larger
@@ -100,7 +100,7 @@ branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
 		--~ pc_tmp := unsigned(signed('0'&pc_in) + signed(opb_nxt));
 		--~ pc_out <= pc_tmp(pc_t'length-1 downto 0);
 
-		if opcode_in(5 downto 3)="010" then
+		if opcode_in(5 downto 3)="010" then -- branch imm
 			inv := opcode_in(2);
 			brinstr := '1';
 			-- schedule nop
@@ -128,7 +128,7 @@ branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
 			dest_nxt <= dest_in;
 		end if;
 		
-		if (x"0000"=opa_nxt xor inv='1') and brinstr='1' then
+		if (x"0000"=vala xor inv='1') and brinstr='1' then
 			branch_out <= '1';
 		else
 			branch_out <= '0';
