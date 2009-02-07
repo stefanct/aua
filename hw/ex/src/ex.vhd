@@ -52,17 +52,18 @@ architecture sat1 of ex is
 	signal ex_locks_nxt	: std_logic;
 begin
 	
+	dest_out <= dest_nxt;
 	ex_locks_async <= ex_locks_nxt;
 
 	cmp_alu: alu
 		port map(clk, reset, opcode, opa, opb, alu_result);
 
-ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_done, alu_result)
+ldst_n_mux: process(opcode, opa, opb, dest_in, dest_nxt, mmu_result, mmu_done, alu_result)
 	begin
 		mmu_address <= opb;
 		mmu_st_data <= opa;
 		mmu_opcode <= opcode(1 downto 0);
-		dest_out <= dest_in;
+		dest_nxt <= dest_in;
 
 		if opcode(5 downto 2) = "1111" then
 			mmu_enable <= '1';
@@ -70,7 +71,7 @@ ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_done, alu_result)
 			result_out <= mmu_result;
 			-- stores and incomplete mmu ops should not alter registers
 			if opcode(1) = '1' or mmu_done /= '1' then
-				dest_out <= (others => '0');
+				dest_nxt <= (others => '0');
 			end if;
 		else
 			mmu_enable <= '0';
@@ -79,7 +80,7 @@ ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_done, alu_result)
 		end if;
 
 		-- hide r0 changes
-		if dest_in="00000" then
+		if dest_nxt="00000" then
 			result_out <= (others => '0');
 		end if;
 	end process;

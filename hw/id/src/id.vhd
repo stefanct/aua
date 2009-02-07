@@ -40,7 +40,8 @@ entity id is
 		branch_out	: out std_logic;
 
 		-- interlock
-		lock	: in std_logic
+		lock		: in std_logic;
+		id_locks	: out std_logic
 	);
 end id;
 
@@ -79,21 +80,27 @@ architecture sat1 of id is
 	signal jmpl_op		: std_logic; -- set if instr is jmpl. used to propagate $ra to EX
 	signal opa_to_nop	: std_logic; -- set if we need opa to be all 0s for idle EX
 
+	signal br_data_hz_nxt	: std_logic;
+	signal br_data_hz		: std_logic;
+
 begin
 	cmp_reg : reg
 		port map(clk, reset, async_rega, async_regb, rega_in, regb_in, regr, valr, vala, valb);
 		
+		dest_out <= dest;
 		rega_nxt <= rega_in;
 		regb_nxt <= regb_in;
+		id_locks <= br_data_hz_nxt;
 
-branch: process (opcode_in, pc_in, vala, dest_in, opb_nxt)
-		variable inv : std_logic;
+branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_in, br_data_hz)
+		variable inv : std_logic; -- set if op is a "not branch"
 		variable brinstr : std_logic; -- set if op changes PC
 		--~ variable pc_tmp : unsigned(pc_t'length downto 0); -- n.b. thats one bit larger
 	begin
 		inv := '0';
 		brinstr := '0';
 
+		br_data_hz_nxt <= '0';
 		opa_to_nop <= '0';
 		jmpl_op <= '0';
 		pc_out <= unsigned(to_integer(pc_in) + signed(opb_nxt));
@@ -128,10 +135,13 @@ branch: process (opcode_in, pc_in, vala, dest_in, opb_nxt)
 			dest_nxt <= dest_in;
 		end if;
 		
-		if (x"0000"=vala xor inv='1') and brinstr='1' then
-			branch_out <= '1';
-		else
-			branch_out <= '0';
+		branch_out <= '0';
+		if brinstr='1' then
+			if (dest=rega_in or dest=regb_in) and br_data_hz='0' then
+				br_data_hz_nxt <= '1';
+			elsif (x"0000"=vala xor inv='1') then
+				branch_out <= '1';
+			end if;
 		end if;
 	end process;
 
@@ -184,16 +194,19 @@ sync: process (clk, reset)
 	begin
 		if reset = '1' then
 			opcode_out <= (others => '0');
-			dest_out <= (others => '0');
+			--~ dest_out <= (others => '0');
+			dest <= (others => '0');
 			opa_out <= (others => '0');
 			opb_out <= (others => '0');
 
 			rega_out <= (others => '0');
 			regb_out <= (others => '0');
+			br_data_hz <= '0';
 		elsif rising_edge(clk) then
 			if lock/='1' then
 				opcode_out <= opcode_nxt;
-				dest_out <= dest_nxt;
+				--~ dest_out <= dest_nxt;
+				dest <= dest_nxt;
 				opa_out <= opa_nxt;
 				opb_out <= opb_nxt;
 			--~ else
@@ -201,8 +214,9 @@ sync: process (clk, reset)
 				--~ dest <= dest;
 				--~ opa <= opa;
 				--~ opb <= opb;
-			rega_out <= rega_nxt;
-			regb_out <= regb_nxt;
+				rega_out <= rega_nxt;
+				regb_out <= regb_nxt;
+				br_data_hz <= br_data_hz_nxt;
 			end if;
 		end if;
 	end process;

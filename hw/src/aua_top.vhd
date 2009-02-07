@@ -99,7 +99,8 @@ architecture sat1 of aua is
 			branch_out	: out std_logic;
 
 			-- interlock
-			lock	: in std_logic
+			lock		: in std_logic;
+			id_locks	: out std_logic
 		);
 	end component;
 
@@ -370,6 +371,7 @@ architecture sat1 of aua is
 	signal ex_locks_async	: std_logic;
 	signal lock_if			: std_logic;
 	signal lock_id			: std_logic;
+	signal id_locks_async	: std_logic;
 
 constant CLK_FREQ	: integer := 50000000;
 
@@ -377,7 +379,7 @@ begin
 cmp_if: ent_if
 	port map(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_imm_in, ifid_async_rega_in, ifid_async_regb_in, idif_pc_out, idif_branch_out, ifcache_addr, ifcache_valid, ifcache_data, lock_if);
 cmp_id: id
-	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, id_rega_in, id_regb_in, idif_pc_in, idif_branch_in, lock_id);
+	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, id_rega_in, id_regb_in, idif_pc_in, idif_branch_in, lock_id, id_locks_async);
 cmp_ex: ex
 	port map(clk, reset, idex_opcode_out, idex_dest_out, idex_opa_out, idex_opb_out, exid_dest_in, exid_result_in, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid, ex_locks, ex_locks_async);
 cmp_icache: instr_cache
@@ -406,7 +408,7 @@ cmp_mmu: mmu
 	exid_dest_out <= exid_dest_in;
 	exid_result_out <= exid_result_in;
 	
-	lock_if <= ex_locks_async;
+	lock_if <= ex_locks_async or id_locks_async;
 	lock_id <= ex_locks_async;
 
 ex_fw: process(id_rega_in, id_regb_in, exid_dest, exid_result, idex_opa_in, idex_opb_in, ex_locks)

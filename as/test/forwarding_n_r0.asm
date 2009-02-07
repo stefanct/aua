@@ -1,3 +1,7 @@
+ldi $2, 23
+sub $5, $2
+brnezi $5, 4 -- this should jump over the nop
+nop
 ldi $0, 23
 mov $1, $0
 mov $3, $0

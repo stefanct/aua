@@ -87,8 +87,10 @@ add wave		/aua_tb/aua1/cmp_mmu/instr_valid
 add wave -divider ID
 add wave -hex	/aua_tb/aua1/cmp_id/opcode_in
 add wave -hex	/aua_tb/aua1/cmp_id/pc_in
-#add wave		/aua_tb/aua1/cmp_id/branch/brinstr
-#add wave		/aua_tb/aua1/cmp_id/branch/inv
+add wave		/aua_tb/aua1/cmp_id/branch/brinstr
+add wave		/aua_tb/aua1/cmp_id/branch/inv
+add wave		/aua_tb/aua1/cmp_id/br_data_hz_nxt
+add wave		/aua_tb/aua1/cmp_id/br_data_hz
 add wave -dec	/aua_tb/aua1/cmp_id/rega_in
 add wave -hex	/aua_tb/aua1/cmp_id/vala
 add wave -dec	/aua_tb/aua1/cmp_id/regb_in
