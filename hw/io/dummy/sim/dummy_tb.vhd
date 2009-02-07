@@ -74,15 +74,18 @@ begin
         icwait(2);
         reset <= '0';
 
+-- test obs eh nix tut, wenn adress nicht aus dem bereich
         wr_data <= x"12345678";
         wr <= '1';
         rd <= '1';
         icwait(2);
-        
+
+-- schreibt "8" ins cycle control register (lowest 4 bits of wr_data)
         rd <= '0';
         address <= x"FFFE";
         icwait(1);
 
+-- schreibt ins daten register (transaction 8 cycles long)
         wr <= '0';
         wr_data <= x"12345678";
         address <= x"FFFF";
@@ -91,12 +94,16 @@ begin
 
         wr <= '0';
         icwait(10);
+        
+-- das ganze wieder auslesen (auch 8 cycles)
         wr_data <= x"00000000";
         rd <= '1';
         icwait(1);
 
         rd <= '0';
         icwait(9);
+        
+-- cycle control register auslesen
         address <= x"FFFE";
         rd <= '1';
         icwait(1);
