@@ -112,7 +112,7 @@ sc_addr_sync: process(clk, reset)
 	    end if;
 	end process;
 
-sc_addr_write: process(sc_addr, sc_addr_nxt)
+sc_addr_write: process(clk, reset)
 	begin
 		if reset = '1' then
 		    sc_addr_out <= (others => '0');
