@@ -121,7 +121,7 @@ sc_addr_write: process(sc_addr, sc_addr_nxt)
 		end if;
 	end process;
 
-mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, sc_rd, sc_rdy_cnt, sc_rd_data, sc_rd_state)
+mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, sc_rd, sc_rdy_cnt, sc_rd_data, sc_rd_state, sc_addr)
 	begin
 		sram_addr <= (others => '0');
 		sram_dq <= (others => 'Z'); -- tri-state, 'Z' unless writing to SRAM
@@ -141,6 +141,7 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
 		
 		done <= '0';
 		sc_rd_state_nxt <= '0';
+		sc_addr_nxt <= x"0000";
 		
 		if sc_rd_state = '1' then
 			if sc_rdy_cnt > 0 then
