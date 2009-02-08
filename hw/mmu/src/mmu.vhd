@@ -112,16 +112,12 @@ sc_addr_sync: process(clk, reset)
 	    end if;
 	end process;
 
-sc_addr_write: process(clk, reset)
+sc_addr_write: process(sc_addr, sc_addr_nxt)
 	begin
-		if reset = '1' then
-		    sc_addr_out <= (others => '0');
-		elsif rising_edge(clk) then
-		    if sc_addr = x"0000" then
-		    	sc_addr_out <= sc_addr_nxt;
-		   	else
-		   	    sc_addr_out <= sc_addr;
-		   	end if;
+	    if sc_addr = x"0000" then
+	    	sc_addr_out <= sc_addr_nxt;
+	   	else
+	   	    sc_addr_out <= sc_addr;
 		end if;
 	end process;
 
