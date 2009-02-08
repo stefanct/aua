@@ -472,9 +472,9 @@ sc_sc_selector: process (mmuio_out, sc_addr)
 			sc_sel <= 0;
 		elsif((sc_addr and x"FFF0") = x"FF10") then
 			sc_sel <= 1;
-		elsif((sc_addr and x"FFF0") = x"FFF2") then
+		elsif((sc_addr and x"FFF0") = x"FF20") then
 			sc_sel <= 2;
-		elsif((sc_addr and x"FFFF") = x"FFFE") then
+		elsif((sc_addr and x"FFFE") = x"FFFE") then
 			sc_sel <= 3;
 		else
 			sc_sel <= SLAVE_CNT;
