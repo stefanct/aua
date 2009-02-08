@@ -48,7 +48,8 @@ architecture sat1 of ent_if is
 	signal rega		: reg_t;
 	signal regb		: reg_t;
 	signal imm		: std_logic_vector(7 downto 0);
-	signal pc	: pc_t;
+	signal pc		: pc_t;
+	signal pc_id	: pc_t;
 begin
 
 	instr_addr <= word_t(pc);
@@ -58,6 +59,7 @@ begin
 	rega_out <= rega;
 	regb_out <= regb;
 	imm_out <= imm;
+	pc_out <= pc_id;
 
 instr_dec: process(reset, instr_data, branch, instr_valid)
 	begin
@@ -114,7 +116,7 @@ sync: process(clk, reset)
 			--~ pc <= x"7FFE";
 			--~ pc <= pc_nxt;
 			--~ instr_addr <= (others => '0');
-			pc_out <= (others => '0');
+			pc_id <= (others => '0');
 		elsif rising_edge(clk) then
 			if lock='1' then
 				opcode <= opcode;
@@ -124,6 +126,7 @@ sync: process(clk, reset)
 				imm <= imm;
 
 				pc <= pc;
+				pc_id <= pc_id;
 			else
 				opcode <= opcode_nxt;
 				dest <= dest_nxt;
@@ -132,9 +135,8 @@ sync: process(clk, reset)
 				imm <= imm_nxt;
 
 				pc <= pc_nxt;
+				pc_id <= pc;
 			end if;
-
-			pc_out <= pc;
 		end if;
 	end process;
 end sat1;

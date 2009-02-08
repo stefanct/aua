@@ -59,17 +59,35 @@
 \usepackage{relsize}
 
 \begin{document}
-\chapter{Instruction Set Architecture}
-\section{Registers}
-\section{Instructions}
-% \subsection{Addressing modes}
-% \subsection{Special instructions}
 
-\chapter{Assembler}
-\section{Syntax}
-\subsection{Example program}
-\chapter{Pipeline stages}
-blub
+\author {Jakob Wilhelm, Stefan Rottensteiner, Stefan Tauner\\Group 4}
+\date \today
+%\thanks 
+\title \dokutitle
+
+\maketitle 
+
+\chapter{Architecture}
+AUA is a 16bit RISC architecture with 32 Registers that can't hide its similarities to MIPS.
+Like MIPS branches are supported by individual compare and branch instructions (e.g. you have
+to compare two values/registers and use the result as input for the branch decision).
+The branch delay is 0 for untaken and 1 cycle for taken branches. The branch decision and branch
+address calculation is done in the ID stage. An additional cycle is lost, if the branch uses
+the result of the instruction directly before it. It is not possible to circumvent this stall
+with forwarding or it would introduce a new longest path (from the ID/EX pipeline registers,
+through the alu, through the branch decision unit in ID, to the PC register in IF).
+The EX stage forwards its results to resolve data hazards in all other instruction sequences though
+(e.g. if instruction $n+1$ uses the (EX) result of instruction $n$ as (EX) input).
+We used on-chip memory of the FPGA (M4K blocks) for the register file.
+Because the memory requires registered inputs,
+this registers can be thought as the pipeline registers for the WB stage.
+To be able to read two registers (the two operands) and write one (the result of the previous instruction),
+we had to duplicate the register file into two "simple dual-port mode" memories.
+Another possibility would be to clock the memory twice as fast, but we did prefer a single clock domain.
+In dual-port mode the on-chip memory has a latency of 1.5 cycles, which
+made another forwarding necessary if instr. $n+2$ uses the result of instr. $n$.
+Beside the branch stall, where IF and (partially) ID get locked, the EX stage needs to lock
+all stages, when a load/store operation takes more than one cycle.
 
 \begin{figure}[h!]
 	\centerline { % relativ zur gesamten seite, fuer grosse figures!
@@ -80,6 +98,29 @@ blub
 	{Schematic of the AUA pipeline
 	\label{label-schematic} }
 \end{figure}
+\section{Memory and I/O}
+Instructions, data and memory-mapped I/O devices all share the same address space.
+The MMU is responsible for handling all memory transactions and transfers the data
+to the instruction cache and from/to the load/store unit in the EX stage.
+LD/ST transactions have priority over instruction fetches, so that the pipeline can
+progress normally. IF will schedule a nop, if it is blocked because the current instr.
+is not available.
+The MMU can access on-board SRAM, on-chip ROM (e.g. for a bootloader) and an unlimited
+number of SimpCon devices. <fixme mag der sack was hinzufuegen?>
+\section{Pipeline stages}
+
+\chapter{Instruction Set Architecture}
+bissi bla was ma erreichen wollten usw.
+\section{Application Binary Interface \& Registers}
+\section{Instructions}
+rotti stuff...
+% \subsection{Addressing modes}
+% \subsection{Special instructions}
+
+\chapter{Assembler}
+paar allg worte... c++, boost, vl schreib ich noch was zu archc
+\section{Syntax}
+\subsection{Example program}
 
 \chapter{rottiold}
 \textbf{ldi - Load Immediate (signed)}
