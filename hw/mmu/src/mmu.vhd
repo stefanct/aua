@@ -53,9 +53,9 @@ architecture sat1 of mmu is
 	signal sc_rd_data		: sc_data_t;
 	signal sc_rdy_cnt		: sc_rdy_cnt_t;
 
-	type sc_state_t is (st_sc_init, st_sc_sc, st_sc_idle); -- Request selbst, Simpcon, kein Simpcon
-	signal sc_rd_state		: sc_state_t;
-	signal sc_rd_state_nxt	: sc_state_t;
+	type sc_state_t is (scst_idle, scst_init_rd, scst_rd, scst_init_wr, scst_wr); -- Request selbst, Simpcon, kein Simpcon
+	signal sc_state		: sc_state_t;
+	signal sc_state_nxt	: sc_state_t;
 	--signal sc_rd_state		: std_logic;
 	--signal sc_rd_state_nxt	: std_logic;
 
@@ -104,15 +104,6 @@ mmu_get_addr: process(instr_addr, ex_address, ex_enable, ex_opcode)
 	    end if;
 	end process;
 
-sc_addr_sync: process(clk, reset)
-	begin
-	    if reset = '1' then
-	        sc_addr <= (others => '0');
-	    elsif rising_edge(clk) then
-	        sc_addr <= sc_addr_nxt;
-	    end if;
-	end process;
-
 sc_addr_write: process(sc_addr, sc_addr_nxt)
 	begin
 	    if sc_addr = x"0000" then
@@ -122,7 +113,7 @@ sc_addr_write: process(sc_addr, sc_addr_nxt)
 		end if;
 	end process;
 
-mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, sc_rd, sc_rdy_cnt, sc_rd_data, sc_rd_state, sc_addr)
+mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, sc_rd, sc_rdy_cnt, sc_rd_data, sc_state, sc_addr)
 	begin
 		sram_addr <= (others => '0');
 		sram_dq <= (others => 'Z'); -- tri-state, 'Z' unless writing to SRAM
@@ -141,57 +132,69 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
 		q <= (others => '0');
 		
 		done <= '0';
-		sc_rd_state_nxt <= sc_rd_state;
+		sc_state_nxt <= sc_state;
 		sc_addr_nxt <= x"0000";
 		
-		case sc_rd_state is
+		case sc_state is
 		    
-		    when st_sc_sc =>
+			when scst_idle =>
+     		if(address(15) = '0') then -- SRAM
+     			sram_addr(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
+     			if(write = '1') then
+     			    sram_we <= '0';
+     			    sram_dq <= ex_wr_data;
+     			    done <= '1';
+     			else
+     				q <= sram_dq;
+     				done <= '1';
+     			end if;
+     		else
+     		    if(address(14) = '0') then -- non-Simpcon
+     		    	if(address(13) = '0') then -- ROM (write wird ignoriert)
+     		    		rom_addr <= address;
+     		    		q <= rom_q;
+     		    		done <= '1';
+     		    	end if;
+     			else -- Simpcon
+     		    	sc_addr_nxt <= address;
+     		    	if(write = '1') then
+     		    	    sc_wr <= '1';
+     		    	    sc_wr_data(15 downto 0) <= ex_wr_data;
+     		    	    sc_state_nxt <= scst_init_rd;
+     				else
+     					sc_rd <= '1';
+     					sc_state_nxt <= scst_init_rd;
+     				end if;
+     		    end if;
+     	    end if;
+
+		    when scst_init_rd =>
+		    	sc_state_nxt <= scst_rd;
+		    	sc_addr_nxt <= sc_addr;
+		    
+		    when scst_rd =>
 			if sc_rdy_cnt > 0 then
 			    sc_addr_nxt <= sc_addr;
 			else
-			    sc_rd_state_nxt <= st_sc_idle;
+			    sc_state_nxt <= scst_idle;
 			    done <= '1';
 			    q <= sc_rd_data(15 downto 0);
-			    sc_rd_state_nxt <= st_sc_idle;
 			 end if;
 
-
-		    when st_sc_init =>
-		    	sc_rd_state_nxt <= st_sc_sc;
-		    	sc_addr_nxt <= sc_addr;
-		    
-			when st_sc_idle =>
-					
-    		if(address(15) = '0') then -- SRAM
-    			sram_addr(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
-    			if(write = '1') then
-    			    sram_we <= '0';
-    			    sram_dq <= ex_wr_data;
-    			    done <= '1';
-    			else
-    				q <= sram_dq;
-    				done <= '1';
-    			end if;
-    		else
-    		    if(address(14) = '0') then -- non-Simpcon
-    		    	if(address(13) = '0') then -- ROM (write wird ignoriert)
-    		    		rom_addr <= address;
-    		    		q <= rom_q;
-    		    		done <= '1';
-    		    	end if;
-    			else -- Simpcon
-    		    	sc_addr_nxt <= address;
-    		    	if(write = '1') then
-    		    	    sc_wr <= '1';
-    		    	    sc_wr_data(15 downto 0) <= ex_wr_data;
-    					done <= '1'; -- assumes that writes complete instantly
-    				else
-    					sc_rd <= '1';
-    					sc_rd_state_nxt <= st_sc_init;
-    				end if;
-    		    end if;
-    	    end if;
+			when scst_init_wr =>
+				sc_state_nxt <= scst_wr;
+				sc_addr_nxt <= sc_addr;
+			
+			when scst_wr =>
+				if sc_rdy_cnt > 0 then
+				    sc_addr_nxt <= sc_addr;
+				else
+				    sc_state_nxt <= scst_idle;
+				    done <= '1';
+				end if;
+				
+			when others =>
+				sc_state_nxt <= scst_idle;
     	end case;
  	end process;
 	
@@ -215,9 +218,11 @@ mmu_return_result: process(ex_enable, q, done)
 sync: process (clk, reset)
 	begin
 		if reset = '1' then
-			sc_rd_state <= st_sc_idle;
+			sc_state <= scst_idle;
+		    sc_addr <= (others => '0');
 		elsif rising_edge(clk) then
-			sc_rd_state <= sc_rd_state_nxt;
+			sc_state <= sc_state_nxt;
+		    sc_addr <= sc_addr_nxt;
 		end if;
 	end process;
 	
