@@ -73,6 +73,12 @@ string to_dual(const string& str, int len) {
 	return result;
 }
 
+string to_hex(int number){
+	char result[10];
+	sprintf(result, "%x", number);
+	return result;
+}
+
 As::As(const string& inputfile) :
 	inputfile(inputfile), addr(0), cnt_instr(0), error(0) {
 	_load_config();
@@ -135,6 +141,10 @@ int As::_add_constant(const std::string& key, const std::string& str_const) {
 
 void As::_precompile(const string& file) {
 	FILE* in = fopen(file.c_str(), "r");
+	if(!in){
+		msg.err_open_file(file);
+		return;
+	}
 	char line[1024];
 
 	regex reg_empty("\\s*");
@@ -495,6 +505,7 @@ string As::_gen_rom_line(int addr, const loc& l, bool hex,
 		ss << (l.opcode[1] & (1 << i) ? '1' : '0');
 	}
 	ss << "\";\t-- ";
+	ss << "0x" << to_hex(addr) << ": ";
 	ss << trim(l.src, " \t\n");
 	if (orig_src) {
 		ss << l.instr << " ";

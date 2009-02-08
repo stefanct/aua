@@ -84,6 +84,7 @@ public:
 			int min, int max);
 	void err_no_reg(const std::string& file, int line, const std::string& reg);
 	void err_no_const(const std::string& file, int line, int value);
+	void err_open_file(const std::string& file);
 
 	void warn_out_of_range_word(const std::string& file, int line, int value);
 	void warn_const_as_offset(const std::string& file, int line);
