@@ -46,11 +46,15 @@ architecture sat1 of mmu is
 --	constant io_devs_name : io_devs := ("bla", "blu");
 
 	signal sc_addr			: sc_addr_t;
+	signal sc_addr_nxt		: sc_addr_t;
+	signal sc_addr_out 		: sc_addr_t;
 	signal sc_wr_data		: sc_data_t;
 	signal sc_rd, sc_wr		: std_logic;
 	signal sc_rd_data		: sc_data_t;
 	signal sc_rdy_cnt		: sc_rdy_cnt_t;
 
+	--type sc_state_t is (st_init, st_sc, st_idle); -- Request selbst, Simpcon, kein Simpcon
+	--signal sc_rd_state		: sc_state_t;
 	signal sc_rd_state		: std_logic;
 	signal sc_rd_state_nxt	: std_logic;
 
@@ -75,7 +79,7 @@ begin
     cmp_rom: rom
 	port map(clk, rom_addr, rom_q);
     
-	sc_io_out.address <= sc_addr;
+	sc_io_out.address <= sc_addr_out;
 	sc_io_out.wr_data <= sc_wr_data;
 	sc_io_out.rd <= sc_rd;
 	sc_io_out.wr <= sc_wr;
@@ -99,6 +103,28 @@ mmu_get_addr: process(instr_addr, ex_address, ex_enable, ex_opcode)
 	    end if;
 	end process;
 
+sc_addr_sync: process(clk, reset)
+	begin
+	    if reset = '1' then
+	        sc_addr <= (others => '0');
+	    elsif rising_edge(clk) then
+	        sc_addr <= sc_addr_nxt;
+	    end if;
+	end process;
+
+sc_addr_write: process(sc_addr, sc_addr_nxt)
+	begin
+		if reset = '1' then
+		    sc_addr_out <= (others => '0');
+		elsif rising_edge(clk) then
+		    if sc_addr = x"0000" then
+		    	sc_addr_out <= sc_addr_nxt;
+		   	else
+		   	    sc_addr_out <= sc_addr;
+		   	end if;
+		end if;
+	end process;
+
 mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, sc_rd, sc_rdy_cnt, sc_rd_data, sc_rd_state)
 	begin
 		sram_addr <= (others => '0');
@@ -109,7 +135,6 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
 		--~ sram_lb <= '0';
 		--~ sram_ce <= '0';
 		
-		sc_addr <= (others => '0');
 		sc_wr_data <= (others => '0');
 		sc_rd <= '0';
 		sc_wr <= '0';
@@ -121,40 +146,52 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
 		done <= '0';
 		sc_rd_state_nxt <= '0';
 		
-		if(address(15) = '0') then -- SRAM
-			sram_addr(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
-			if(write = '1') then
-			    sram_we <= '0';
-			    sram_dq <= ex_wr_data;
-			    done <= '1';
+		if sc_rd_state = '1' then
+			if sc_rdy_cnt > 0 then
+			    sc_rd_state_nxt <= '1';
+			    sc_addr_nxt <= sc_addr;
 			else
-				q <= sram_dq;
-				done <= '1';
-			end if;
+			    sc_rd_state_nxt <= '0';
+			    done <= '1';
+			    q <= sc_rd_data(15 downto 0);
+			 end if;
 		else
-		    if(address(14) = '0') then -- non-Simpcon
-		    	if(address(13) = '0') then -- ROM (write wird ignoriert)
-		    		rom_addr <= address;
-		    		q <= rom_q;
-		    		done <= '1';
-		    	end if;
-			else -- Simpcon
-		    	sc_addr <= address;
-		    	if(write = '1') then
-		    	    sc_wr <= '1';
-		    	    sc_wr_data(15 downto 0) <= ex_wr_data;
-					done <= '1'; -- assumes that writes complete instantly
-				else
-					if sc_rdy_cnt > 0 or sc_rd_state = '0' then
-						sc_rd <= '1';
-						sc_rd_state_nxt <= '1';
-					else
-						q <= sc_rd_data(15 downto 0);
-						done <= '1';
-					end if;
-				end if;
-		    end if;
-	    end if;
+		
+    		if(address(15) = '0') then -- SRAM
+    			sram_addr(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
+    			if(write = '1') then
+    			    sram_we <= '0';
+    			    sram_dq <= ex_wr_data;
+    			    done <= '1';
+    			else
+    				q <= sram_dq;
+    				done <= '1';
+    			end if;
+    		else
+    		    if(address(14) = '0') then -- non-Simpcon
+    		    	if(address(13) = '0') then -- ROM (write wird ignoriert)
+    		    		rom_addr <= address;
+    		    		q <= rom_q;
+    		    		done <= '1';
+    		    	end if;
+    			else -- Simpcon
+    		    	sc_addr_nxt <= address;
+    		    	if(write = '1') then
+    		    	    sc_wr <= '1';
+    		    	    sc_wr_data(15 downto 0) <= ex_wr_data;
+    					done <= '1'; -- assumes that writes complete instantly
+    				else
+    					if sc_rdy_cnt > 0 or sc_rd_state = '0' then
+    						sc_rd <= '1';
+    						sc_rd_state_nxt <= '1';
+    					else
+    						q <= sc_rd_data(15 downto 0);
+    						done <= '1';
+    					end if;
+    				end if;
+    		    end if;
+    	    end if;
+ 	    end if;
 	end process;
 	
 mmu_return_result: process(ex_enable, q, done)
