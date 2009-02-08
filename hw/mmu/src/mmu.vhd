@@ -53,10 +53,11 @@ architecture sat1 of mmu is
 	signal sc_rd_data		: sc_data_t;
 	signal sc_rdy_cnt		: sc_rdy_cnt_t;
 
-	--type sc_state_t is (st_init, st_sc, st_idle); -- Request selbst, Simpcon, kein Simpcon
-	--signal sc_rd_state		: sc_state_t;
-	signal sc_rd_state		: std_logic;
-	signal sc_rd_state_nxt	: std_logic;
+	type sc_state_t is (st_sc_init, st_sc_sc, st_sc_idle); -- Request selbst, Simpcon, kein Simpcon
+	signal sc_rd_state		: sc_state_t;
+	signal sc_rd_state_nxt	: sc_state_t;
+	--signal sc_rd_state		: std_logic;
+	--signal sc_rd_state_nxt	: std_logic;
 
 	signal address	: word_t; -- Addresse zu lesen (gemuxt Ex - Instr)
 	signal write	: std_logic; -- schreiben=1, lesen=0 (gemuxt Ex - Instr)
@@ -140,20 +141,28 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
 		q <= (others => '0');
 		
 		done <= '0';
-		sc_rd_state_nxt <= '0';
+		sc_rd_state_nxt <= sc_rd_state;
 		sc_addr_nxt <= x"0000";
 		
-		if sc_rd_state = '1' then
+		case sc_rd_state is
+		    
+		    when st_sc_sc =>
 			if sc_rdy_cnt > 0 then
-			    sc_rd_state_nxt <= '1';
 			    sc_addr_nxt <= sc_addr;
 			else
-			    sc_rd_state_nxt <= '0';
+			    sc_rd_state_nxt <= st_sc_idle;
 			    done <= '1';
 			    q <= sc_rd_data(15 downto 0);
+			    sc_rd_state_nxt <= st_sc_idle;
 			 end if;
-		else
-		
+
+
+		    when st_sc_init =>
+		    	sc_rd_state_nxt <= st_sc_sc;
+		    	sc_addr_nxt <= sc_addr;
+		    
+			when st_sc_idle =>
+					
     		if(address(15) = '0') then -- SRAM
     			sram_addr(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
     			if(write = '1') then
@@ -178,18 +187,13 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
     		    	    sc_wr_data(15 downto 0) <= ex_wr_data;
     					done <= '1'; -- assumes that writes complete instantly
     				else
-    					if sc_rdy_cnt > 0 or sc_rd_state = '0' then
-    						sc_rd <= '1';
-    						sc_rd_state_nxt <= '1';
-    					else
-    						q <= sc_rd_data(15 downto 0);
-    						done <= '1';
-    					end if;
+    					sc_rd <= '1';
+    					sc_rd_state_nxt <= st_sc_init;
     				end if;
     		    end if;
     	    end if;
- 	    end if;
-	end process;
+    	end case;
+ 	end process;
 	
 mmu_return_result: process(ex_enable, q, done)
 	begin
@@ -211,7 +215,7 @@ mmu_return_result: process(ex_enable, q, done)
 sync: process (clk, reset)
 	begin
 		if reset = '1' then
-			sc_rd_state <= '0';
+			sc_rd_state <= st_sc_idle;
 		elsif rising_edge(clk) then
 			sc_rd_state <= sc_rd_state_nxt;
 		end if;
