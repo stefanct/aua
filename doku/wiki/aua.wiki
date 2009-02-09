@@ -1,73 +1,9 @@
-\documentclass[%
-	pdftex,
-	a4paper,
-	oneside,
-%	twoside,
-%	openany,
-	bibtotoc,%	bib in die toc
-	%~ makeidx,
-	idxtotoc,%		index in die toc
-	bibtotocnumbered,
-	halfparskip,%         Europäischer Satz mit abstand zwischen Absätzen
-%	chapterprefix,%
-%	headsepline,%         Linie nach Kopfzeile
-%	footsepline,%         Linie vor Fusszeile
-%	12pt%                 Größere Schrift, besser lesbar am bildschrim
-]{scrbook}
-\usepackage[german, english]{babel} % greek for euro symbol with \textgreek{\euro}
-%\usepackage{eurosans} % geht ned
-\usepackage[german]{isodate} % dd.mm.yyyy
-%\usepackage[latin1]{inputenc} % umlaute im quellcode
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc} % umlaute im output als single chars
-\usepackage{aeguill} % schöne (vektor?)schriften in verbindung mit umlauten
-\usepackage[pdftex]{color,graphicx} % graphics import
-\graphicspath{{./images/}}
-\usepackage{epstopdf} % converts eps to automagically
-%\epstopdfsetup{update,prepend,verbose} % does not work yet in ubuntu -> so wie rm all pdfs in the makefile
-\usepackage{array} % mehr table options
-\usepackage{booktabs} % \toprule \midrule \bottomrule etc
-\usepackage{setspace}
-\usepackage{amsmath} % für \begin{align} für multiline equations
-\usepackage{amssymb}
+'''Another Useless Architecture''' ('''AUA''') is a [[w:Reduced Instruction Set Computing|RISC]] [[w:Microprocessor|microprocessor]] architecture
+developed by Jakob Wilhelm, Stefan Rottensteiner and Stefan Tauner as a course project for the [[Computer Architecture Lab]]
+at the [[w:Vienna_University_of_Technology|Vienna University of Technology]] in winter 2008/2009.
+It was implemented in [[w:VHDL|VHDL]] and tested in a Cyclone II [[w:FPGA|FPGA]] from [[w:Altera|Altera]] on a DE2 development board from Terasic Technology.
 
-\newcommand{\dokutitle}{AUA - Another Useless Architecture}
-
-\usepackage[
-	pdfauthor={grp4},
-	pdftitle={\dokutitle},
-	unicode=true,
-	bookmarksnumbered=true,
-	hyperindex=true,
-	plainpages=false
-]{hyperref} % underlined links
-\hypersetup{
-	colorlinks=true,	% false: boxed links; true: colored links
-	linkcolor=black,	% color of internal links
-	citecolor=black,	% color of links to bibliography
-	filecolor=black,	% color of file links
-	urlcolor=black,		% color of external links
-	citebordercolor=0 0 0,	% hmpf!
-	filebordercolor=0 0 0,
-	linkbordercolor=0 0 0,
-	menubordercolor=0 0 0,
-	urlbordercolor=0 0 0,
-	pdfborderstyle={/S/U/W 1},
-	pdfstartview={FitV},
-	bookmarksopen=true,
-}
-\usepackage{relsize}
-
-\begin{document}
-
-\author {Jakob Wilhelm, Stefan Rottensteiner, Stefan Tauner\\Group 4}
-\date \today
-%\thanks 
-\title \dokutitle
-
-\maketitle 
-
-\chapter{Architecture}
+= Description =
 AUA is a 16bit RISC architecture with 32 Registers that can't hide its similarities to MIPS.
 Like MIPS branches are supported by individual compare and branch instructions (e.g. you have
 to compare two values/registers and use the result as input for the branch decision).
@@ -77,7 +13,7 @@ the result of the instruction directly before it. It is not possible to circumve
 with forwarding or it would introduce a new longest path (from the ID/EX pipeline registers,
 through the alu, through the branch decision unit in ID, to the PC register in IF).
 The EX stage forwards its results to resolve data hazards in all other instruction sequences though
-(e.g. if instruction $n+1$ uses the (EX) result of instruction $n$ as (EX) input).
+(e.g. if instruction ''n+1'' uses the (EX) result of instruction ''n'' as (EX) input).
 We used on-chip memory of the FPGA (M4K blocks) for the register file.
 Because the memory requires registered inputs,
 this registers can be thought as the pipeline registers for the WB stage.
@@ -85,20 +21,13 @@ To be able to read two registers (the two operands) and write one (the result of
 we had to duplicate the register file into two "simple dual-port mode" memories.
 Another possibility would be to clock the memory twice as fast, but we did prefer a single clock domain.
 In dual-port mode the on-chip memory has a latency of 1.5 cycles, which
-made another forwarding necessary if instr. $n+2$ uses the result of instr. $n$.
+made another forwarding necessary if instr. ''n+2'' uses the result of instr. ''n''.
 Beside the branch stall, where IF and (partially) ID get locked, the EX stage needs to lock
 all stages, when a load/store operation takes more than one cycle.
 
-\begin{figure}[h!]
-	\centerline { % relativ zur gesamten seite, fuer grosse figures!
-	%~ \centering % relativ zur text area fuer figures <= textwidth
-	\includegraphics[width=1.2\textwidth]{schematic}
-	}
-	\caption[Schematic of the AUA pipeline]
-	{Schematic of the AUA pipeline
-	\label{label-schematic} }
-\end{figure}
-\section{Memory and I/O}
+[[Image:AUA-Pipeline.png|thumb|right|link=AUA-Pipeline.png|[[Media:AUA-Pipeline.png|Schematic]] of the AUA pipeline]]
+
+== Memory and I/O ==
 Instructions, data and memory-mapped I/O devices all share the same address space.
 The MMU is responsible for handling all memory transactions and transfers the data
 to the instruction cache and from/to the load/store unit in the EX stage.
@@ -107,22 +36,46 @@ progress normally. IF will schedule a nop, if it is blocked because the current 
 is not available.
 The MMU can access on-board SRAM, on-chip ROM (e.g. for a bootloader) and an unlimited
 number of SimpCon devices. <fixme mag der sack was hinzufuegen?>
-\section{Pipeline stages}
 
-\chapter{Instruction Set Architecture}
+== Pipeline stages ==
+AUA has three stages (four if you include write-back): IF, ID, EX/MEM.
+IF requests the instruction at the current address/PC from the cache/MMU and extracts
+the various fields (opcode, immediate, operand and destinstation register addresses).
+These fields get registered and feed into ID.
+The immediate field gets expanded ''and'' sign extended before
+a logic block controls a mux according to the current opcode to choose the correct
+form of immediate or drop it altogether in favor of a value read from the register file.
+ID also decides, if a branch is taken and if so, which address is next to be fetched
+by IF. It is not possible to read the PC directly, but to support returning from functions,
+ID can store the PC into a register by scheduling an ordinary MOV and overriding the source
+operand with the current PC value.
+EX contains the ALU and a small control curcuit to process LD/ST instructions in cooperation
+with the MMU. The result of either the ALU or the MMU is selected and transfered to the register
+file (through the ID unit). If the destination is the zero register, EX enforces a value of
+0 to not alter the register.
+
+= Instruction Set Architecture =
 bissi bla was ma erreichen wollten usw.
-\section{Application Binary Interface \& Registers}
-\section{Instructions}
+
+== Application Binary Interface & Registers ==
+
+== Instructions ==
 rotti stuff...
-% \subsection{Addressing modes}
-% \subsection{Special instructions}
+<!--  \subsection{Addressing modes}
+% \subsection{Special instructions} -->
 
-\chapter{Assembler}
+= Assembler =
 paar allg worte... c++, boost, vl schreib ich noch was zu archc
-\section{Syntax}
-\subsection{Example program}
 
-\chapter{rottiold}
+== Pseudo Instrcutions ==
+so wie oben die normalen als table + beschreibung
+
+== Syntax ==
+
+== Example program ==
+
+
+<!--- rotti's latex:
 \textbf{ldi - Load Immediate (signed)}
 
 Description:
@@ -1252,6 +1205,17 @@ Addr $\leftarrow $ Rs (byte) & STB \ \ Addr, Rs &  &  \\ \hline
 & \multicolumn{1}{|l|}{s} \\ \hline
 \end{tabular}
 
-\bigskip
+--->
 
-\end{document}
+
+
+
+
+
+
+
+
+
+
+
+[[Category:Computer Architecture]]

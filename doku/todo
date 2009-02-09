@@ -7,5 +7,6 @@ alu optimieren
 ganz tolle neue instructions erfinden
 bootloader
 i-cache
+branch (und andere?) adressen muessen nur words adressieren... 1 bit mehr aufloesung? as und vhdl changes...
 
 doku (siehe http://en.wikiversity.org/wiki/Computer_Architecture_Lab#Documentation)
