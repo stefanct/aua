@@ -185,10 +185,7 @@ architecture sat1 of aua is
 		);
 	end component;
 
-	component switches is
-		generic(
-			sc_base_addr	: sc_addr_t
-		);
+	component sc_de2_switches is
 		port (
 			clk     : in std_logic;
 			reset	: in std_logic;
@@ -207,10 +204,7 @@ architecture sat1 of aua is
 		);
 	end component;
 	
-	component digits is
-	    generic(
-			sc_base_addr	: sc_addr_t
-	    );
+	component sc_de2_digits is
 	    port (
 			clk     : in std_logic;
 			reset	: in std_logic;
@@ -235,7 +229,6 @@ architecture sat1 of aua is
 
 	component sc_uart is
 		generic(
-			sc_base_addr	: sc_addr_t;
 			addr_bits		: integer;
 			clk_freq		: integer;
 			baud_rate		: integer;
@@ -265,9 +258,6 @@ architecture sat1 of aua is
 	end component;
 
 	component sc_test_slave is
-		generic(
-			sc_base_addr	: sc_addr_t
-		);
 		port (
 				clk     : in std_logic;
 				reset	: in std_logic;
@@ -346,6 +336,7 @@ architecture sat1 of aua is
 	signal exmmu_valid		: std_logic;
 	-- MMU/IO
 	signal mmuio_out	: sc_out_t;
+	signal mmuio_outa	: sc_out_at;
 	signal mmuio_in		: sc_in_t;
 	signal mmuio_ina	: sc_in_at;
 	-- MMU/SRAM
@@ -356,12 +347,9 @@ architecture sat1 of aua is
 	--~ signal mmu_sram_ub		: std_logic;
 	--~ signal mmu_sram_lb		: std_logic;
 	--~ signal mmu_sram_ce		: std_logic;
-	-- IO stuff
-	signal sc_sel, sc_sel_reg		: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
-	signal sc_addr 			: sc_addr_t;
+	
 
-
-	--forwarding stuff
+	--forwarding
 	signal id_rega_in			: reg_t;
 	signal id_regb_in			: reg_t;
 	signal exid_dest			: reg_t;
@@ -373,7 +361,11 @@ architecture sat1 of aua is
 	signal lock_id			: std_logic;
 	signal id_locks_async	: std_logic;
 
-constant CLK_FREQ	: integer := 50000000;
+	-- IO helpers
+	signal sc_sel, sc_sel_reg		: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
+	signal sc_addr 			: sc_addr_t;
+
+	constant CLK_FREQ	: integer := 50000000; --fixme right location for this?
 
 begin
 cmp_if: ent_if
@@ -446,7 +438,7 @@ sc_sync: process(clk, reset)
 		end if;
 	end process;
 
-sc_mux: process (mmuio_ina, sc_sel_reg)
+sc_in_mux: process (mmuio_ina, sc_sel_reg)
 	begin
 		if sc_sel_reg /= SLAVE_CNT then
 			mmuio_in.rd_data <= mmuio_ina(sc_sel_reg).rd_data;
@@ -456,6 +448,11 @@ sc_mux: process (mmuio_ina, sc_sel_reg)
 			mmuio_in.rdy_cnt <= (others => '0');
 		end if;
 	end process;
+
+sc_rdwr_mux: for i in 0 to SLAVE_CNT-1 generate
+		mmuio_outa(i).rd <= mmuio_out.rd when i=sc_sel else '0';
+		mmuio_outa(i).wr <= mmuio_out.wr when i=sc_sel else '0';
+	end generate;
 
 -- 1111* --> Blöcke 0xF000/4
 -- 11111111 * --> Blöcke 0xFF00/8 (I/O Devices)
@@ -482,18 +479,15 @@ sc_sc_selector: process (mmuio_out, sc_addr)
 	end process;
 
 --IO devices below
-cmp_switches: switches
-	generic map(x"ff00")
-	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(0).rd_data, mmuio_ina(0).rdy_cnt, switch_pins, led_pins);
-cmp_digits: digits
-	generic map(x"ff10")
-	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(1).rd_data, mmuio_ina(1).rdy_cnt,
+cmp_switches: sc_de2_switches
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_outa(0).rd, mmuio_outa(0).wr, mmuio_ina(0).rd_data, mmuio_ina(0).rdy_cnt, switch_pins, led_pins);
+cmp_digits: sc_de2_digits
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_outa(1).rd, mmuio_outa(1).wr, mmuio_ina(1).rd_data, mmuio_ina(1).rdy_cnt,
 		digit0_pins, digit1_pins, digit2_pins, digit3_pins, digit4_pins, digit5_pins);
 cmp_uart: sc_uart
-	generic map(x"ff20", sc_addr'length, CLK_FREQ, 115200, 4, 2, 4, 2)
-	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(2).rd_data, mmuio_ina(2).rdy_cnt,
+	generic map(sc_addr'length, CLK_FREQ, 115200, 4, 2, 4, 2)
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_outa(2).rd, mmuio_outa(2).wr, mmuio_ina(2).rd_data, mmuio_ina(2).rdy_cnt,
 		txd, rxd, '0', open);
 cmp_test: sc_test_slave
-	generic map(x"fffe")
-	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_out.rd, mmuio_out.wr, mmuio_ina(3).rd_data, mmuio_ina(3).rdy_cnt);
+	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_outa(3).rd, mmuio_outa(3).wr, mmuio_ina(3).rd_data, mmuio_ina(3).rdy_cnt);
 end sat1;

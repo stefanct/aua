@@ -25,7 +25,7 @@ entity sc_de2_digits is
 		digit4_pins	: out std_logic_vector(6 downto 0);
 		digit5_pins	: out std_logic_vector(6 downto 0)
 	);
-end digits;
+end sc_de2_digits;
 
 architecture rtl of sc_de2_digits is
 

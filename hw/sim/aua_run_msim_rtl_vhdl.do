@@ -43,11 +43,11 @@ vlib rtl_work
 vmap work rtl_work
 
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_types.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/io/dummy/src/sc_dummy.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/io/uart/src/sc_uart.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/io/uart/src/fifo.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/io/digits/src/digits.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/io/switches/src/switches.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_dummy/src/sc_dummy.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_uart/src/sc_uart.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_uart/src/fifo.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_de2_digits/src/sc_de2_digits.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_de2_switches/src/sc_de2_switches.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/rom.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/ram.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_ent.vhd
@@ -140,7 +140,7 @@ add wave -hex	/aua_tb/aua1/cmp_mmu/sc_rd_data
 add wave		/aua_tb/aua1/cmp_ex/mmu_done
 add wave -hex	/aua_tb/aua1/cmp_mmu/ex_rd_data
 add wave		/aua_tb/aua1/cmp_mmu/sc_rdy_cnt
-add wave 		/aua_tb/aua1/cmp_mmu/sc_rd_state
+add wave 		/aua_tb/aua1/cmp_mmu/sc_state
 add wave -hex	/aua_tb/aua1/mmuio_out.address
 add wave -hex	/aua_tb/aua1/mmuio_out.wr_data 
 add wave -hex	/aua_tb/aua1/mmuio_out.rd 
@@ -151,19 +151,27 @@ add wave -hex	/aua_tb/aua1/sc_sel_reg
 add wave -hex	/aua_tb/aua1/sc_addr
 
 add wave -divider IO-dummy
-add wave -hex /aua_tb/aua1/cmp_test/address
-add wave -hex /aua_tb/aua1/cmp_test/wr_data
-add wave /aua_tb/aua1/cmp_test/rd
-add wave /aua_tb/aua1/cmp_test/wr
-add wave -hex /aua_tb/aua1/cmp_test/rd_data
-add wave -uns /aua_tb/aua1/cmp_test/rdy_cnt
-add wave -uns /aua_tb/aua1/cmp_test/cycle_cnt
-add wave -uns /aua_tb/aua1/cmp_test/cycle_cnt_nxt
-add wave -hex /aua_tb/aua1/cmp_test/reg
-add wave -hex /aua_tb/aua1/cmp_test/reg_nxt
-add wave -hex /aua_tb/aua1/cmp_test/sc_out_nxt
-add wave /aua_tb/aua1/cmp_test/state
-add wave /aua_tb/aua1/cmp_test/state_nxt
+add wave -hex	/aua_tb/aua1/cmp_test/address
+add wave -hex	/aua_tb/aua1/cmp_test/wr_data
+add wave		/aua_tb/aua1/cmp_test/rd
+add wave		/aua_tb/aua1/cmp_test/wr
+add wave -hex	/aua_tb/aua1/cmp_test/rd_data
+add wave -uns	/aua_tb/aua1/cmp_test/rdy_cnt
+add wave -uns	/aua_tb/aua1/cmp_test/cycle_cnt
+add wave -uns	/aua_tb/aua1/cmp_test/cycle_cnt_nxt
+add wave -hex	/aua_tb/aua1/cmp_test/reg
+add wave -hex	/aua_tb/aua1/cmp_test/reg_nxt
+add wave -hex	/aua_tb/aua1/cmp_test/sc_out_nxt
+add wave		/aua_tb/aua1/cmp_test/state
+add wave		/aua_tb/aua1/cmp_test/state_nxt
+
+add wave -divider UART
+add wave -hex	/aua_tb/aua1/cmp_uart/address
+add wave -hex	/aua_tb/aua1/cmp_uart/wr_data
+add wave		/aua_tb/aua1/cmp_uart/rd
+add wave		/aua_tb/aua1/cmp_uart/wr
+add wave -hex	/aua_tb/aua1/cmp_uart/rd_data
+add wave -uns	/aua_tb/aua1/cmp_uart/rdy_cnt
 
 view structure
 view signals

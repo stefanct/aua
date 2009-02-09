@@ -187,11 +187,11 @@ set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id clk
 set_instance_assignment -name CLOCK_SETTINGS clk -to clk
 
 set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
-set_global_assignment -name VHDL_FILE ../io/uart/src/fifo.vhd
-set_global_assignment -name VHDL_FILE ../io/uart/src/sc_uart.vhd
-set_global_assignment -name VHDL_FILE ../io/dummy/src/sc_dummy.vhd
-set_global_assignment -name VHDL_FILE ../io/switches/src/switches.vhd
-set_global_assignment -name VHDL_FILE ../io/digits/src/digits.vhd
+set_global_assignment -name VHDL_FILE ../io/sc_uart/src/fifo.vhd
+set_global_assignment -name VHDL_FILE ../io/sc_uart/src/sc_uart.vhd
+set_global_assignment -name VHDL_FILE ../io/sc_dummy/src/sc_dummy.vhd
+set_global_assignment -name VHDL_FILE ../io/sc_de2_switches/src/sc_de2_switches.vhd
+set_global_assignment -name VHDL_FILE ../io/sc_de2_digits/src/sc_de2_digits.vhd
 set_global_assignment -name VHDL_FILE ../mmu/src/rom.vhd
 set_global_assignment -name VHDL_FILE ../caches/src/cache_ent.vhd
 set_global_assignment -name VHDL_FILE ../caches/src/cache_null.vhd

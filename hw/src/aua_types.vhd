@@ -30,6 +30,7 @@ package aua_types is
 		rd			: std_logic;
 		wr			: std_logic;
 	end record;
+	type sc_out_at is array (0 to SLAVE_CNT-1) of sc_out_t;
 
 	type sc_in_t is record
 		rd_data		: std_logic_vector(SC_DATA_SIZE-1 downto 0);
