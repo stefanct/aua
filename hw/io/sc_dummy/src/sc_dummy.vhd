@@ -5,9 +5,6 @@ use ieee.numeric_std.all;
 use work.aua_types.all;
 
 entity sc_test_slave is
-	generic(
-		sc_base_addr	: sc_addr_t -- base = cycle setup register, base+1 = rd/wr test register
-	);
 	port (
 		clk     : in std_logic;
 		reset	: in std_logic;
@@ -47,28 +44,25 @@ begin
 	state_nxt <= st_done;
 	
 	if state=st_done then
-		case address is
-			when sc_base_addr =>
-				if(wr='1') then
-					cycle_cnt_nxt <= unsigned(wr_data(3 downto 0));
-				end if;
-				if rd='1' then
-					sc_out_nxt <= (sc_out_nxt'length-1 downto cycle_cnt'length => '0')&std_logic_vector(cycle_cnt);
-				end if;
-			when sc_addr_t(unsigned(sc_base_addr)+1) =>
-				if(wr='1') then
-					reg_nxt <= wr_data;
-					state_nxt <= st_wait;
-					ready_nxt <= cycle_cnt;
-				end if;
-				if(rd='1') then
-					sc_out_nxt <= reg;
-					state_nxt <= st_wait;
-					ready_nxt <= cycle_cnt;
-				end if;
-			when others =>
-				null;
-		end case;
+		if address(0)='0' then
+			if(wr='1') then
+				cycle_cnt_nxt <= unsigned(wr_data(3 downto 0));
+			end if;
+			if rd='1' then
+				sc_out_nxt <= (sc_out_nxt'length-1 downto cycle_cnt'length => '0')&std_logic_vector(cycle_cnt);
+			end if;
+		else
+			if(wr='1') then
+				reg_nxt <= wr_data;
+				state_nxt <= st_wait;
+				ready_nxt <= cycle_cnt;
+			end if;
+			if(rd='1') then
+				sc_out_nxt <= reg;
+				state_nxt <= st_wait;
+				ready_nxt <= cycle_cnt;
+			end if;
+		end if;
 	else
 		ready_nxt <= ready-1;
 		sc_out_nxt <= reg;

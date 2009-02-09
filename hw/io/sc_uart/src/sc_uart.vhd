@@ -6,7 +6,6 @@ use work.aua_types.all;
 
 entity sc_uart is
 	generic(
-		sc_base_addr	: sc_addr_t;
 		addr_bits		: integer;
 		clk_freq		: integer;
 		baud_rate		: integer;
@@ -101,43 +100,65 @@ end component;
 
 begin
 
+	--rdy_cnt <= "00";	-- no wait states
+	--rd_data(31 downto 8) <= std_logic_vector(to_unsigned(0, 24));
+----
+----	The registered MUX is all we need for a SimpCon read.
+----	The read data is stored in registered rd_data.
+----
+--process(clk, reset)
+--begin
+
+	--if (reset='1') then
+		--rd_data(7 downto 0) <= (others => '0');
+	--elsif rising_edge(clk) then
+
+		--ua_rd <= '0';
+		--rd_data(7 downto 0) <= (others => '0');
+		--if sc_base_addr(addr_bits-1 downto 1) = address(addr_bits-1 downto 1) then
+			--if rd='1' then
+				---- that's our very simple address decoder
+				--if address(0)='0' then
+					--rd_data(7 downto 0) <= "000000" & rdrf & tdre; -- drf/e == rcv/transmit data reg full/empty
+				--else
+					--rd_data(7 downto 0) <= ua_dout;
+					--ua_rd <= rd;
+				--end if;
+			--end if;
+			--ua_wr <= wr and address(0); -- does this work in synced process?
+		--end if;
+	--end if;
+
+--end process;
+
 	rdy_cnt <= "00";	-- no wait states
 	rd_data(31 downto 8) <= std_logic_vector(to_unsigned(0, 24));
 --
 --	The registered MUX is all we need for a SimpCon read.
 --	The read data is stored in registered rd_data.
 --
-process(clk, reset)
+sc: process(clk, reset)
 begin
-
 	if (reset='1') then
 		rd_data(7 downto 0) <= (others => '0');
 	elsif rising_edge(clk) then
-
 		ua_rd <= '0';
-		rd_data(7 downto 0) <= (others => '0');
-		if sc_base_addr(addr_bits-1 downto 1) = address(addr_bits-1 downto 1) then
-			if rd='1' then
-				-- that's our very simple address decoder
-				if address(0)='0' then
-					rd_data(7 downto 0) <= "000000" & rdrf & tdre; -- drf/e == rcv/transmit data reg full/empty
-				else
-					rd_data(7 downto 0) <= ua_dout;
-					ua_rd <= rd;
-				end if;
+		if rd='1' then
+			-- that's our very simple address decoder
+			if address(0)='0' then
+				rd_data(7 downto 0) <= "000000" & rdrf & tdre;
+			else
+				rd_data(7 downto 0) <= ua_dout;
+				ua_rd <= rd;
 			end if;
-			ua_wr <= wr and address(0); -- does this work in synced process?
 		end if;
 	end if;
-
 end process;
 
 	-- write is on address offest 1
-	--~ if sc_base_addr(addr_bits-1 downto 1) = address(addr_bits-1 downto 1) then
-		--~ ua_wr <= wr and address(0);
-	--~ end if;
+	ua_wr <= wr and address(0);
 
---
+
 --	serial clock
 --
 process(clk, reset)

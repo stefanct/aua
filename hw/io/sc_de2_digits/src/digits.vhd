@@ -4,10 +4,7 @@ use ieee.numeric_std.all;
 
 use work.aua_types.all;
 
-entity digits is
-	generic(
-		sc_base_addr	: sc_addr_t
-	);
+entity sc_de2_digits is
 	port (
 		clk     : in std_logic;
 		reset	: in std_logic;
@@ -30,7 +27,7 @@ entity digits is
 	);
 end digits;
 
-architecture rtl of digits is
+architecture rtl of sc_de2_digits is
 
 	signal digit0_nxt	: std_logic_vector(6 downto 0);
 	signal digit1_nxt	: std_logic_vector(6 downto 0);
@@ -49,8 +46,8 @@ architecture rtl of digits is
 begin
 
 	
-	rd_data(31 downto 0) <= (others => '0');
-	rdy_cnt <= "00";	-- no wait states
+	rd_data <= (others => '0');
+	rdy_cnt <= (others => '0');	-- no wait states
 
 	digit0_pins <= digit0;
 	digit1_pins <= digit1;
@@ -67,7 +64,7 @@ begin
 		digit3_nxt <= digit3; 	    	
 		digit4_nxt <= digit4; 	    	
 		digit5_nxt <= digit5; 	    	
-		if wr = '1' and address(15 downto 4) = sc_base_addr(15 downto 4) then -- Block /12
+		if wr = '1' then
 			case address(3 downto 0) is
 			    when x"0" => digit0_nxt <= wr_data(6 downto 0); 
 			    when x"1" => digit1_nxt <= wr_data(6 downto 0); 
