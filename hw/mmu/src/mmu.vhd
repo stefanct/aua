@@ -11,7 +11,6 @@ use work.aua_types.all;
 entity mmu is
 	generic (
 		CLK_FREQ		: natural;
-		SC_SLAVE_CNT	: natural := 0;
 		SRAM_RD_FREQ	: natural;
 		SRAM_WR_FREQ	: natural
 	);

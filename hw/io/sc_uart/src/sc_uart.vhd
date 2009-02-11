@@ -6,7 +6,6 @@ use work.aua_types.all;
 
 entity sc_uart is
 	generic(
-		addr_bits		: integer;
 		clk_freq		: integer;
 		baud_rate		: integer;
 		txf_depth		: integer;

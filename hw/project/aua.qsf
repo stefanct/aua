@@ -168,7 +168,6 @@ set_global_assignment -name EDA_TEST_BENCH_MODULE_NAME aua_tb -section_id "aua t
 set_global_assignment -name EDA_MAINTAIN_DESIGN_HIERARCHY OFF -section_id eda_simulation
 set_global_assignment -name END_TIME "5 ns"
 set_global_assignment -name EDA_NETLIST_WRITER_OUTPUT_DIR ../sim/work -section_id eda_simulation
-set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS INPUT TRI-STATED"
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[17]
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[16]
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[15]
@@ -178,7 +177,10 @@ set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ub
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_lb
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ce
 
-set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
+set_global_assignment -name ENABLE_CLOCK_LATENCY ON
+
+
+set_global_assignment -name VHDL_FILE ../src/aua_types_de2.vhd
 set_global_assignment -name VHDL_FILE ../io/sc_uart/src/fifo.vhd
 set_global_assignment -name VHDL_FILE ../io/sc_uart/src/sc_uart.vhd
 set_global_assignment -name VHDL_FILE ../io/sc_dummy/src/sc_dummy.vhd
@@ -196,5 +198,5 @@ set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
 set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
 set_global_assignment -name QIP_FILE ../src/aua_pll.qip
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
-set_global_assignment -name ENABLE_CLOCK_LATENCY ON
-
+set_global_assignment -name USE_CONFIGURATION_DEVICE ON
+set_global_assignment -name HDL_MESSAGE_LEVEL LEVEL2

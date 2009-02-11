@@ -5,7 +5,6 @@ use ieee.numeric_std.all;
 use work.aua_types.all;
 
 entity aua is
-
 port (
 	clk_in		: in std_logic;
 	reset_pin	: in std_logic;
@@ -129,12 +128,12 @@ architecture sat1 of aua is
 			result_out	: out word_t;
 
 			-- interface to MMU
-			mmu_address		: out word_t;
-			mmu_result		: in word_t;
-			mmu_st_data		: out word_t;
-			mmu_enable		: out std_logic;
-			mmu_opcode		: out std_logic_vector(1 downto 0);
-			mmu_done		: in std_logic;
+			mmu_address	: out word_t;
+			mmu_result	: in word_t;
+			mmu_st_data	: out word_t;
+			mmu_enable	: out std_logic;
+			mmu_opcode	: out std_logic_vector(1 downto 0);
+			mmu_done	: in std_logic;
 			
 			-- pipeline interlock
 			ex_locks		: out std_ulogic;
@@ -161,7 +160,6 @@ architecture sat1 of aua is
 	component mmu is
 		generic (
 			CLK_FREQ		: natural;
-			SC_SLAVE_CNT	: natural;
 			SRAM_RD_FREQ	: natural;
 			SRAM_WR_FREQ	: natural
 		);
@@ -183,8 +181,8 @@ architecture sat1 of aua is
 			ex_done		: out std_logic;
 
 			-- SimpCon interface to IO devices
-			sc_io_in		: in sc_in_t;
-			sc_io_out		: out sc_out_t;
+			sc_io_in	: in sc_in_t;
+			sc_io_out	: out sc_out_t;
 			
 			-- interface to SRAM
 			sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1  downto 0);
@@ -241,13 +239,12 @@ architecture sat1 of aua is
 
 	component sc_uart is
 		generic(
-			addr_bits		: integer;
-			clk_freq		: integer;
-			baud_rate		: integer;
-			txf_depth		: integer;
-			txf_thres		: integer;
-			rxf_depth		: integer;
-			rxf_thres		: integer
+			clk_freq	: integer;
+			baud_rate	: integer;
+			txf_depth	: integer;
+			txf_thres	: integer;
+			rxf_depth	: integer;
+			rxf_thres	: integer
 		);
 		port (
 			clk		: in std_logic;
@@ -271,16 +268,16 @@ architecture sat1 of aua is
 
 	component sc_test_slave is
 		port (
-				clk     : in std_logic;
-				reset	: in std_logic;
+			clk     : in std_logic;
+			reset	: in std_logic;
 
-				-- SimpCon slave interface to IO ctrl
-				address	: in sc_addr_t;
-				wr_data	: in sc_data_t;
-				rd		: in std_logic;
-				wr		: in std_logic;
-				rd_data	: out sc_data_t;
-				rdy_cnt	: out sc_rdy_cnt_t
+			-- SimpCon slave interface to IO ctrl
+			address	: in sc_addr_t;
+			wr_data	: in sc_data_t;
+			rd		: in std_logic;
+			wr		: in std_logic;
+			rd_data	: out sc_data_t;
+			rdy_cnt	: out sc_rdy_cnt_t
 		);
 	end component;
 
@@ -292,10 +289,10 @@ architecture sat1 of aua is
 	-- pipeline registers (written by top)
 	-- IF/ID
 	signal ifid_opcode_out		: opcode_t;
-	signal ifid_dest_out			: reg_t;
+	signal ifid_dest_out		: reg_t;
 	signal ifid_pc_out			: pc_t;
-	signal ifid_rega_out			: reg_t;
-	signal ifid_regb_out			: reg_t;
+	signal ifid_rega_out		: reg_t;
+	signal ifid_regb_out		: reg_t;
 	signal ifid_async_rega_out	: reg_t;
 	signal ifid_async_regb_out	: reg_t;
 	signal ifid_imm_out			: std_logic_vector(7 downto 0);
@@ -304,20 +301,20 @@ architecture sat1 of aua is
 	signal idif_branch_out	: std_logic;
 	-- ID/EX
 	signal idex_opcode_out	: opcode_t;
-	signal idex_dest_out		: reg_t;
+	signal idex_dest_out	: reg_t;
 	signal idex_opa_out		: word_t;
 	signal idex_opb_out		: word_t;
 	-- EX/ID (for WB)
-	signal exid_dest_out		: reg_t;
+	signal exid_dest_out	: reg_t;
 	signal exid_result_out	: word_t;
 
 	-- pipeline registers (read by top)
 	-- IF/ID
 	signal ifid_opcode_in		: opcode_t;
-	signal ifid_dest_in		: reg_t;
+	signal ifid_dest_in			: reg_t;
 	signal ifid_pc_in			: pc_t;
-	signal ifid_rega_in		: reg_t;
-	signal ifid_regb_in		: reg_t;
+	signal ifid_rega_in			: reg_t;
+	signal ifid_regb_in			: reg_t;
 	signal ifid_async_rega_in	: reg_t;
 	signal ifid_async_regb_in	: reg_t;
 	signal ifid_imm_in			: std_logic_vector(7 downto 0);
@@ -326,11 +323,11 @@ architecture sat1 of aua is
 	signal idif_branch_in	: std_logic;
 	-- ID/EX
 	signal idex_opcode_in	: opcode_t;
-	signal idex_dest_in	: reg_t;
+	signal idex_dest_in		: reg_t;
 	signal idex_opa_in		: word_t;
 	signal idex_opb_in		: word_t;
 	-- EX/ID (for WB)
-	signal exid_dest_in	: reg_t;
+	signal exid_dest_in		: reg_t;
 	signal exid_result_in	: word_t;
 
 	-- IF/CACHE/MMU
@@ -353,22 +350,13 @@ architecture sat1 of aua is
 	signal mmuio_out	: sc_out_t;
 	signal mmuio_outa	: sc_out_at;
 	signal mmuio_in		: sc_in_t;
-	signal mmuio_ina	: sc_in_at;
-	-- MMU/SRAM
-	--~ signal mmu_sram_addr	: std_logic_vector(17 downto 0);
-	--~ signal mmu_sram_dq		: word_t;
-	--~ signal mmu_sram_we		: std_logic;
-	--~ signal mmu_sram_oe		: std_logic;
-	--~ signal mmu_sram_ub		: std_logic;
-	--~ signal mmu_sram_lb		: std_logic;
-	--~ signal mmu_sram_ce		: std_logic;
-	
+	signal mmuio_ina	: sc_in_at;	
 
 	--forwarding
-	signal id_rega_in			: reg_t;
-	signal id_regb_in			: reg_t;
-	signal exid_dest			: reg_t;
-	signal exid_result			: word_t;
+	signal id_rega_in	: reg_t;
+	signal id_regb_in	: reg_t;
+	signal exid_dest	: reg_t;
+	signal exid_result	: word_t;
 	--interlocks
 	signal ex_locks			: std_logic;
 	signal ex_locks_async	: std_logic;
@@ -377,8 +365,8 @@ architecture sat1 of aua is
 	signal id_locks_async	: std_logic;
 
 	-- IO helpers
-	signal sc_sel, sc_sel_reg		: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
-	signal sc_addr 			: sc_addr_t;
+	signal sc_sel, sc_sel_reg	: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
+	signal sc_addr 				: sc_addr_t;
 
 begin
 cmp_pll: aua_pll
@@ -392,7 +380,7 @@ cmp_ex: ex
 cmp_icache: instr_cache
 	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
-	generic map(CLK_FREQ, 1, SRAM_RD_FREQ, SRAM_WR_FREQ)
+	generic map(CLK_FREQ, SRAM_RD_FREQ, SRAM_WR_FREQ)
 	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid,
 		exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_in, mmuio_out,
@@ -455,7 +443,7 @@ sc_sync: process(clk, reset)
 
 sc_in_mux: process (mmuio_ina, sc_sel_reg)
 	begin
-		if sc_sel_reg /= SLAVE_CNT then
+		if sc_sel_reg /= SC_SLAVE_CNT then
 			mmuio_in.rd_data <= mmuio_ina(sc_sel_reg).rd_data;
 			mmuio_in.rdy_cnt <= mmuio_ina(sc_sel_reg).rdy_cnt;
 		else
@@ -464,7 +452,7 @@ sc_in_mux: process (mmuio_ina, sc_sel_reg)
 		end if;
 	end process;
 
-sc_rdwr_mux: for i in 0 to SLAVE_CNT-1 generate
+sc_rdwr_mux: for i in 0 to SC_SLAVE_CNT-1 generate
 		mmuio_outa(i).rd <= mmuio_out.rd when i=sc_sel else '0';
 		mmuio_outa(i).wr <= mmuio_out.wr when i=sc_sel else '0';
 	end generate;
@@ -489,7 +477,7 @@ sc_sc_selector: process (mmuio_out, sc_addr)
 		elsif((sc_addr and x"FFFE") = x"FFFE") then
 			sc_sel <= 3;
 		else
-			sc_sel <= SLAVE_CNT;
+			sc_sel <= SC_SLAVE_CNT;
 		end if;
 	end process;
 
@@ -500,7 +488,7 @@ cmp_digits: sc_de2_digits
 	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_outa(1).rd, mmuio_outa(1).wr, mmuio_ina(1).rd_data, mmuio_ina(1).rdy_cnt,
 		digit0_pins, digit1_pins, digit2_pins, digit3_pins, digit4_pins, digit5_pins);
 cmp_uart: sc_uart
-	generic map(sc_addr'length, CLK_FREQ, 115200, 4, 2, 4, 2)
+	generic map(CLK_FREQ, UART_RATE, 4, 2, 4, 2)
 	port map(clk, reset, mmuio_out.address, mmuio_out.wr_data, mmuio_outa(2).rd, mmuio_outa(2).wr, mmuio_ina(2).rd_data, mmuio_ina(2).rdy_cnt,
 		txd, rxd, '0', open);
 cmp_test: sc_test_slave
