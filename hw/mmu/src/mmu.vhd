@@ -39,11 +39,11 @@ entity mmu is
 		-- interface to SRAM
 		sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1  downto 0);
 		sram_dq		: inout word_t;
-		sram_we		: out std_logic -- write enable, low active, 0=enable, 1=disable
+		sram_we		: out std_logic; -- write enable, low active, 0=enable, 1=disable
 		
 		--~ sram_oe		: out std_logic; -- output enable, low active
-		--~ sram_ub		: out std_logic; -- upper byte, low active
-		--~ sram_lb		: out std_logic; -- lower byte, low active
+		sram_ub		: out std_logic; -- upper byte, low active
+		sram_lb		: out std_logic -- lower byte, low active
 		--~ sram_ce		: out std_logic -- chip enable, low active
 	);
 end mmu;
@@ -54,7 +54,7 @@ architecture sat1 of mmu is
 	constant SRAM_RD_RATIO : real := real(CLK_FREQ)/real(SRAM_RD_FREQ);
 	constant SRAM_WR_RATIO : real := real(CLK_FREQ)/real(SRAM_WR_FREQ);
 --	constant SRAM_WAIT_WIDTH	: integer := integer(ceil(log2(max(real(5), real(7))))); 
-	constant SRAM_WAIT_WIDTH	: integer := integer(ceil(log2(max(SRAM_RD_RATIO, SRAM_WR_RATIO)))); 
+	constant SRAM_WAIT_WIDTH	: integer := integer(ceil(log2(max(SRAM_RD_RATIO, SRAM_WR_RATIO)))) + 1; 
 
 	signal sc_addr			: sc_addr_t;
 	signal sc_addr_nxt		: sc_addr_t;
@@ -85,6 +85,12 @@ architecture sat1 of mmu is
 	
 	signal sram_wait	: unsigned(SRAM_WAIT_WIDTH-1 downto 0);
 	signal sram_wait_nxt	: unsigned(SRAM_WAIT_WIDTH-1 downto 0);
+	
+	signal sram_writing	: std_logic;
+	signal sram_writing_nxt	: std_logic;
+	
+	signal sram_b_en	: std_logic_vector(1 downto 0);
+	signal sram_b_en_nxt	: std_logic_vector(1 downto 0);
 
 	component rom is
 		port (
@@ -109,11 +115,6 @@ begin
 	sc_rd_data <= sc_io_in.rd_data;
 	sc_rdy_cnt <= sc_io_in.rdy_cnt;
 	
-	sram_addr <= sram_a_nxt;
-	sram_dq <= sram_d_nxt;
-	sram_we <= sram_w_nxt;
-		
-		
 	-- Speicher 16bit Adressen
 	-- 0* --> SRAM
 	-- 10* --> non-Simpcon
@@ -140,16 +141,24 @@ sc_addr_write: process(sc_addr, sc_addr_nxt)
 		end if;
 	end process;
 
-mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, sc_rd, sc_rdy_cnt, sc_rd_data, mmu_state, sc_addr, sram_wait, sram_a, sram_d, sram_w)
+sram: process(sram_a_nxt, sram_w_nxt, sram_b_en_nxt)
+	begin
+	    sram_addr <= sram_a_nxt;
+	    sram_we <= sram_w_nxt;
+	    sram_ub <= sram_b_en_nxt(0);
+	    sram_lb <= sram_b_en_nxt(1);
+	end process;
+
+mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, sram_b_en, rom_q, sc_rd, sc_rdy_cnt, sc_rd_data, mmu_state, sc_addr, sram_wait, sram_a, sram_d, sram_w, sram_writing, ex_opcode)
 	begin
 		sram_a_nxt <= (others => '0');
-		sram_d_nxt <= (others => 'Z'); -- tri-state, 'Z' unless writing to SRAM
+		sram_d_nxt <= (others => '0'); -- tri-state, 'Z' unless writing to SRAM
 		sram_w_nxt <= '1';
-		--~ sram_oe <= '1'; -- why not...
-		--~ sram_ub <= '0';
-		--~ sram_lb <= '0';
-		--~ sram_ce <= '0';
 		sram_wait_nxt <= TO_UNSIGNED(10, SRAM_WAIT_WIDTH);
+		sram_writing_nxt <= sram_writing;
+		sram_b_en_nxt <= "00";
+		
+		sram_dq <= (others => 'Z');
 		
 		sc_wr_data <= (others => '0');
 		sc_rd <= '0';
@@ -168,18 +177,27 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
 			when mmu_idle =>
      		if(address(15) = '0') then -- SRAM
      			sram_a_nxt(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
+     			if(ex_opcode(1) = '1') then
+     			    if(address(0) = '0') then
+     			        sram_b_en_nxt <= "01";
+     			    else
+     			        sram_b_en_nxt <= "10";
+     			    end if;
+     			end if;
      			if(write = '1') then
      			    sram_w_nxt <= '0';
      			    sram_d_nxt <= ex_wr_data;
+     			    sram_dq <= ex_wr_data;
      			    if(CLK_FREQ > SRAM_WR_FREQ) then
-     			        sram_wait_nxt <= TO_UNSIGNED(natural(floor(SRAM_WR_RATIO)), SRAM_WAIT_WIDTH) - 1;
+     			        sram_wait_nxt <= TO_UNSIGNED(0, 2);--TO_UNSIGNED(natural(floor(SRAM_WR_RATIO)), SRAM_WAIT_WIDTH) - 1;
      			        mmu_state_nxt <= st_sram;
+     			        sram_writing_nxt <= '1';
      				else
 	     			    done <= '1';
      			    end if;
      			else
      			    if(CLK_FREQ > SRAM_RD_FREQ) then
-     			        sram_wait_nxt <= TO_UNSIGNED(natural(floor(SRAM_RD_RATIO)), SRAM_WAIT_WIDTH) - 1;
+     			        sram_wait_nxt <= TO_UNSIGNED(0, 2);--TO_UNSIGNED(natural(floor(SRAM_RD_RATIO)), SRAM_WAIT_WIDTH) - 1;
      			        mmu_state_nxt <= st_sram;
      			    else
      					q <= sram_dq;
@@ -213,10 +231,16 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, rom_q, s
 				if sram_wait = 0 then
 				    done <= '1';
 				    mmu_state_nxt <= mmu_idle;
+				    sram_writing_nxt <= '0';
+				    if sram_writing = '0' then
+				        q <= sram_dq;
+				    end if;
 				else
 				    sram_wait_nxt <= sram_wait - 1;
 				    mmu_state_nxt <= st_sram;
+				    sram_writing_nxt <= sram_writing;
 				end if;
+				sram_b_en_nxt <= sram_b_en;
 
 		    when scst_init_rd =>
 		    	mmu_state_nxt <= scst_rd;
@@ -278,7 +302,9 @@ sync: process (clk, reset)
 		    sram_a <= sram_a_nxt;
 		    sram_d <= sram_d_nxt;
 		    sram_w <= sram_w_nxt;
+		    sram_writing <= sram_writing_nxt;
 		    sram_wait <= sram_wait_nxt;
+		    sram_b_en <= sram_b_en_nxt;
 		end if;
 	end process;
 	

@@ -7,7 +7,7 @@ use ieee.math_real.ceil;
 
 package aua_types is
 
-	constant CLK_FREQ		: natural := 100000000; -- main clock frequency
+	constant CLK_FREQ		: natural := 70000000; -- main clock frequency
 	constant SRAM_RD_FREQ	: natural :=  50000000; -- ram clock when reading
 	constant SRAM_WR_FREQ	: natural :=  50000000; -- ram clock when writing
 	constant UART_RATE		: natural := 115200; -- uart baud rate

@@ -20,8 +20,8 @@ port (
 	sram_dq		: inout word_t;
 	sram_we		: out std_logic;
 --	sram_oe		: out std_logic;
---	sram_ub		: out std_logic;
---	sram_lb		: out std_logic;
+	sram_ub		: out std_logic;
+	sram_lb		: out std_logic;
 --	sram_ce		: out std_logic
 	txd			: out std_logic;
 	rxd			: in std_logic
@@ -189,10 +189,10 @@ architecture sat1 of aua is
 			-- interface to SRAM
 			sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1  downto 0);
 			sram_dq		: inout word_t;
-			sram_we		: out std_logic -- write enable, low active, 0=enable, 1=disable
+			sram_we		: out std_logic; -- write enable, low active, 0=enable, 1=disable
 --			sram_oe		: out std_logic; -- output enable, low active
---			sram_ub		: out std_logic; -- upper byte, low active
---			sram_lb		: out std_logic; -- lower byte, low active
+			sram_ub		: out std_logic; -- upper byte, low active
+			sram_lb		: out std_logic -- lower byte, low active
 --			sram_ce		: out std_logic -- chip enable, low active
 		);
 	end component;
@@ -387,7 +387,7 @@ cmp_mmu: mmu
 	port map(clk, reset, cachemmu_addr, cachemmu_enable, cachemmu_data, cachemmu_valid, 
 		exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_in, mmuio_out,
-		sram_addr, sram_dq, sram_we);
+		sram_addr, sram_dq, sram_we, sram_ub, sram_lb);
 
 	reset <= not reset_pin; -- in case we need to invert... should be "calculated" with help of a constant
 

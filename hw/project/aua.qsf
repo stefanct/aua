@@ -173,8 +173,6 @@ set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ad
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[15]
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_addr[14]
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING VCC" -to sram_oe
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ub
-set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_lb
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ce
 
 set_global_assignment -name ENABLE_CLOCK_LATENCY ON
@@ -200,3 +198,4 @@ set_global_assignment -name QIP_FILE ../src/aua_pll.qip
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
 set_global_assignment -name USE_CONFIGURATION_DEVICE ON
 set_global_assignment -name HDL_MESSAGE_LEVEL LEVEL2
+set_global_assignment -name RESERVE_ALL_UNUSED_PINS_NO_OUTPUT_GND "AS OUTPUT DRIVING AN UNSPECIFIED SIGNAL"
