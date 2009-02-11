@@ -160,8 +160,8 @@ architecture sat1 of aua is
 
 	component mmu is
 		generic (
-			irq_cnt	: natural;
-			CLK_FREQ	: natural;
+			CLK_FREQ		: natural;
+			SC_SLAVE_CNT	: natural;
 			SRAM_RD_FREQ	: natural;
 			SRAM_WR_FREQ	: natural
 		);
@@ -380,8 +380,6 @@ architecture sat1 of aua is
 	signal sc_sel, sc_sel_reg		: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
 	signal sc_addr 			: sc_addr_t;
 
-	constant CLK_FREQ	: integer := 50000000; --fixme right location for this?
-
 begin
 cmp_pll: aua_pll
 	port map(reset, clk_in, clk);
@@ -394,7 +392,7 @@ cmp_ex: ex
 cmp_icache: instr_cache
 	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
-	generic map(1, CLK_FREQ, SRAM_RD_FREQ, SRAM_WR_FREQ)
+	generic map(CLK_FREQ, 1, SRAM_RD_FREQ, SRAM_WR_FREQ)
 	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid,
 		exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_in, mmuio_out,

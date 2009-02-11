@@ -10,10 +10,8 @@ use work.aua_types.all;
 
 entity mmu is
 	generic (
-		SLAVE_CNT	: natural := 0;
-		SC_ADDR_BITS	: natural := 0;
-		irq_cnt	: natural := 0;
-		CLK_FREQ	: natural;
+		CLK_FREQ		: natural;
+		SC_SLAVE_CNT	: natural := 0;
 		SRAM_RD_FREQ	: natural;
 		SRAM_WR_FREQ	: natural
 	);

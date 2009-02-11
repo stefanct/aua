@@ -7,9 +7,9 @@ use ieee.math_real.ceil;
 
 package aua_types is
 
-	constant CPU_FREQ	: natural := 100000;
-	constant SRAM_RD_FREQ	: natural := 50000;
-	constant SRAM_WR_FREQ	: natural := 50000;
+	constant CLK_FREQ	: natural := 100000000;
+	constant SRAM_RD_FREQ	: natural := 50000000;
+	constant SRAM_WR_FREQ	: natural := 50000000;
 
 --	type io_devs is array(natural range <>) of component;
 	subtype word_t is std_logic_vector(15 downto 0);
