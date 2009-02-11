@@ -4,6 +4,7 @@ ex fwd nochmal ueberdenken
 alu optimieren
 ganz tolle neue instructions erfinden
 bootloader
+sc_timer
 i-cache
 branch (und andere?) adressen muessen nur words adressieren... 1 bit mehr aufloesung? as und vhdl changes...
 
