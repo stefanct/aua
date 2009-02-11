@@ -152,6 +152,7 @@ architecture sat1 of aua is
 			id_instr		: out word_t;
 			-- cache/mmu
 			mmu_instr_addr	: out word_t;
+			mmu_enable		: out std_logic;
 			mmu_instr_valid	: in std_logic;
 			mmu_instr		: in word_t
 		);
@@ -169,6 +170,7 @@ architecture sat1 of aua is
 
 			-- IF stage
 			instr_addr	: in word_t;
+			instr_enable: in std_logic;
 			instr_data	: out word_t;
 			instr_valid	: out std_logic;
 
@@ -337,6 +339,7 @@ architecture sat1 of aua is
 	signal cachemmu_addr	: word_t;
 	signal cachemmu_data	: word_t;
 	signal cachemmu_valid	: std_logic;
+	signal cachemmu_enable	: std_logic;
               
 	-- MMU interfaces
 	-- EX/MMU
@@ -378,10 +381,10 @@ cmp_id: id
 cmp_ex: ex
 	port map(clk, reset, idex_opcode_out, idex_dest_out, idex_opa_out, idex_opb_out, exid_dest_in, exid_result_in, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid, ex_locks, ex_locks_async);
 cmp_icache: instr_cache
-	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
+	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_enable, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
 	generic map(CLK_FREQ, SRAM_RD_FREQ, SRAM_WR_FREQ)
-	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid,
+	port map(clk, reset, cachemmu_addr, cachemmu_enable, cachemmu_data, cachemmu_valid, 
 		exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_in, mmuio_out,
 		sram_addr, sram_dq, sram_we);

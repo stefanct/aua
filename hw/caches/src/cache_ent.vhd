@@ -15,6 +15,7 @@ entity instr_cache is
 		id_instr		: out word_t;
 		-- cache/mmu
 		mmu_instr_addr	: out word_t;
+		mmu_enable		: out std_logic;
 		mmu_instr_valid	: in std_logic;
 		mmu_instr		: in word_t
 	);

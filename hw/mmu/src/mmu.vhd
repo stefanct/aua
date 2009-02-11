@@ -18,8 +18,9 @@ entity mmu is
 		clk     : in std_logic;
 		reset	: in std_logic;
 
-		-- IF stage
+		-- IF stage/cache
 		instr_addr	: in word_t;
+		instr_enable: in std_logic;
 		instr_data	: out word_t;
 		instr_valid	: out std_logic;
 
