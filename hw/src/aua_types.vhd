@@ -7,6 +7,10 @@ use ieee.math_real.ceil;
 
 package aua_types is
 
+	constant CPU_FREQ	: natural := 100000;
+	constant SRAM_RD_FREQ	: natural := 50000;
+	constant SRAM_WR_FREQ	: natural := 50000;
+
 --	type io_devs is array(natural range <>) of component;
 	subtype word_t is std_logic_vector(15 downto 0);
 	subtype opcode_t is std_logic_vector(5 downto 0);
@@ -44,9 +48,17 @@ package aua_types is
 	subtype sc_rdy_cnt_t is unsigned(1 downto 0);
 	type sc_rdy_cnt_at is array(0 to SLAVE_CNT-1) of sc_rdy_cnt_t;
 
+	function max (L, R: real) return real;
 
 end aua_types;
 
---~ package body aua_types is
---~ 
---~ end aua_types;
+package body aua_types is
+   	function max (L, R: real) return real IS
+	begin
+	    if L > R then
+	        return L;
+	    else
+	        return R;
+	    end if;
+	end function max;
+end aua_types;

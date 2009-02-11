@@ -31,7 +31,6 @@ set_global_assignment -name PROJECT_CREATION_TIME_DATE "09:18:26  NOVEMBER 01, 2
 set_global_assignment -name LAST_QUARTUS_VERSION 8.1
 set_global_assignment -name FITTER_EFFORT "STANDARD FIT"
 set_global_assignment -name STRATIX_DEVICE_IO_STANDARD "3.3-V LVCMOS"
-set_location_assignment PIN_N2 -to clk
 set_global_assignment -name GENERATE_RBF_FILE ON
 set_global_assignment -name ON_CHIP_BITSTREAM_DECOMPRESSION OFF
 set_global_assignment -name RESERVE_ALL_UNUSED_PINS "AS INPUT TRI-STATED"
@@ -184,7 +183,6 @@ set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ub
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_lb
 set_instance_assignment -name RESERVE_PIN "AS OUTPUT DRIVING GROUND" -to sram_ce
 set_global_assignment -name FMAX_REQUIREMENT "50 MHz" -section_id clk
-set_instance_assignment -name CLOCK_SETTINGS clk -to clk
 
 set_global_assignment -name VHDL_FILE ../src/aua_types.vhd
 set_global_assignment -name VHDL_FILE ../io/sc_uart/src/fifo.vhd
@@ -205,3 +203,6 @@ set_global_assignment -name QIP_FILE ../reg/src/ram.qip
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
 set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
 set_global_assignment -name CDF_FILE aua.cdf
+
+set_global_assignment -name QIP_FILE ../src/aua_pll.qip
+set_location_assignment PIN_N2 -to clk_in

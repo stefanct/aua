@@ -7,7 +7,7 @@ use work.aua_types.all;
 entity aua is
 
 port (
-	clk			: in std_logic;
+	clk_in		: in std_logic;
 	reset_pin	: in std_logic;
 	switch_pins	: in std_logic_vector(15 downto 0);
 	led_pins	: out std_logic_vector(15 downto 0);
@@ -32,6 +32,15 @@ port (
 end aua;
 
 architecture sat1 of aua is
+    
+    component aua_pll is
+        port(
+         	areset	: in std_logic;
+         	inclk0	: in std_logic;
+         	c0	: out std_logic
+        );
+    end component;
+    
 	component ent_if is
 		port (
 			clk     : in std_logic;
@@ -151,7 +160,10 @@ architecture sat1 of aua is
 
 	component mmu is
 		generic (
-			irq_cnt	: natural
+			irq_cnt	: natural;
+			CLK_FREQ	: natural;
+			SRAM_RD_FREQ	: natural;
+			SRAM_WR_FREQ	: natural
 		);
 		port (
 			clk     : in std_logic;
@@ -274,6 +286,9 @@ architecture sat1 of aua is
 
 	signal reset	: std_logic;
 
+	-- clk Signal aus PLL
+	signal clk	: std_logic;
+	
 	-- pipeline registers (written by top)
 	-- IF/ID
 	signal ifid_opcode_out		: opcode_t;
@@ -368,6 +383,8 @@ architecture sat1 of aua is
 	constant CLK_FREQ	: integer := 50000000; --fixme right location for this?
 
 begin
+cmp_pll: aua_pll
+	port map(reset, clk_in, clk);
 cmp_if: ent_if
 	port map(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_imm_in, ifid_async_rega_in, ifid_async_regb_in, idif_pc_out, idif_branch_out, ifcache_addr, ifcache_valid, ifcache_data, lock_if);
 cmp_id: id
@@ -377,7 +394,7 @@ cmp_ex: ex
 cmp_icache: instr_cache
 	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
-	generic map(1)
+	generic map(1, CLK_FREQ, SRAM_RD_FREQ, SRAM_WR_FREQ)
 	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid,
 		exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_in, mmuio_out,
