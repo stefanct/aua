@@ -1,8 +1,6 @@
 mmu ordentlich machen :) inkl sram controller, rom in ram
 jmpl/ret konkretisieren/durchdenken und dann implementieren (as only. abi (argument registers, caller/callee saves etc))
 ex fwd nochmal ueberdenken
-sc mux im top umschreiben, damit die SC slaves keine base address checks mehr machen müssen...
-(uart blocking io - fuer unnoetig befunden)
 alu optimieren
 ganz tolle neue instructions erfinden
 bootloader

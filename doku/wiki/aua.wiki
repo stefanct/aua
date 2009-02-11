@@ -60,6 +60,118 @@ bissi bla was ma erreichen wollten usw.
 == Application Binary Interface & Registers ==
 
 == Instructions ==
+{| class="wikitable" style="text-align:center; border:1px solid; line-height:100%" cellpadding="5" cellspacing="0"
+|+ Table of mnemonics and their encoding
+!Mnemo.
+!Imm.
+!colspan="6"|
+!colspan="5"|OP B
+!colspan="5"|OP A
+!hex op
+!notes
+|- style="font-size:70%;background:#f2f2f2;line-height:100%"
+|  colspan="2"| ||width=15px|15||width=15px|14||width=15px|13||width=15px|12||width=15px|11||width=15px|10||width=15px|9||width=15px|8||width=15px|7||width=15px|6||width=15px|5||width=15px|4||width=15px|3||width=15px|2||width=15px|1||width=15px|0|| colspan="2"|
+|-
+| style="text-align: left"| ldi|| unsigned|| 0||0||0||i||i||i||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x00-0x07||
+|-
+| ||||0||0||1||0||0||0||||||||||||||||||||||style="text-align: right"|0x08||
+|-
+| ||||0||0||1||0||0||1||||||||||||||||||||||style="text-align: right"|0x09||
+|-
+| ||||0||0||1||0||1||0||||||||||||||||||||||style="text-align: right"|0x0A||
+|-
+| ||||0||0||1||0||1||1||||||||||||||||||||||style="text-align: right"|0x0B||
+|-
+| ||||0||0||1||1||0||0||||||||||||||||||||||style="text-align: right"|0x0C||
+|-
+| style="text-align: left"| jmpl||||0||0||1||1||0||1||a||a||a||a||a||||||||||||style="text-align: right"|0x0D||
+|-
+| style="text-align: left"| brez||||0||0||1||1||1||0||a||a||a||a||a||s||s||s||s||s||style="text-align: right"|0x0E||
+|-
+| style="text-align: left"| brnez||||0||0||1||1||1||1||a||a||a||a||a||s||s||s||s||s||style="text-align: right"|0x0F||
+|-
+| style="text-align: left"| brezi||signed||0||1||0||0||i||i||i||i||i||i||i||s||s||s||s||s||style="text-align: right"|0x10-0x13||
+|-
+| style="text-align: left"| brnezi||signed||0||1||0||1||i||i||i||i||i||i||i||s||s||s||s||s||style="text-align: right"|0x14-0x17||
+|-
+| style="text-align: left"| addi||signed||0||1||1||0||i||i||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x18-0x1B||carry
+|-
+| style="text-align: left"| muli||signed||0||1||1||1||i||i||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x1C-0x1F||
+|-
+| style="text-align: left"| add||||1||0||0||0||0||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x20|||
+|-
+| style="text-align: left"| addc||||1||0||0||0||0||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x21||carry
+|-
+| style="text-align: left"| sub||||1||0||0||0||1||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x22||carry
+|-
+| style="text-align: left"| subc||||1||0||0||0||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x23||carry
+|-
+| style="text-align: left"| mul||||1||0||0||1||0||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x24||
+|-
+| style="text-align: left"| mulu||||1||0||0||1||0||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x25||
+|-
+| style="text-align: left"| mulh||||1||0||0||1||1||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x26||
+|-
+| style="text-align: left"| mulhu||||1||0||0||1||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x27||
+|-
+| style="text-align: left"| or||||1||0||1||0||0||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x28||
+|-
+| style="text-align: left"| and||||1||0||1||0||0||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x29||
+|-
+| style="text-align: left"| xor||||1||0||1||0||1||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x2A||
+|-
+| style="text-align: left"| not||||1||0||1||0||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x2B||
+|-
+| style="text-align: left"| neg||||1||0||1||1||0||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x2C||
+|-
+| style="text-align: left"| asr||||1||0||1||1||0||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x2D||
+|-
+| style="text-align: left"| lsl||||1||0||1||1||1||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x2E||
+|-
+| style="text-align: left"| lsr||||1||0||1||1||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x2F||
+|-
+| style="text-align: left"| lsli||unsigned||1||1||0||0||0||0||||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x30||
+|-
+| style="text-align: left"| lsri||unsigned||1||1||0||0||0||1||||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x31||
+|-
+| style="text-align: left"| scb||unsigned||1||1||0||0||1||0||d||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x32||d=set/!clear
+|-
+| style="text-align: left"| roti||unsigned||1||1||0||0||1||1||d||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x33||d=left/!left
+|-
+| style="text-align: left"| ||||1||1||0||1||0||0||||||||||||||||||||||style="text-align: right"|0x34||
+|-
+| style="text-align: left"| cmplt||||1||1||0||1||0||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x35||
+|-
+| style="text-align: left"| cmpltu||||1||1||0||1||1||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x36||
+|-
+| style="text-align: left"| cmplte||||1||1||0||1||1||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x37||
+|-
+| style="text-align: left"| cmplteu||||1||1||1||0||0||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x38||
+|-
+| style="text-align: left"| cmpe||||1||1||1||0||0||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x39||
+|-
+| style="text-align: left"| cmpei||unsigned||1||1||1||0||1||0||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x3A||
+|-
+| style="text-align: left"| mov||||1||1||1||0||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x3B||
+|-
+| style="text-align: left"| ld||||1||1||1||1||0||0||a||a||a||a||a||d||d||d||d||d||style="text-align: right"|0x3C||
+|-
+| style="text-align: left"| ldb||||1||1||1||1||0||1||a||a||a||a||a||d||d||d||d||d||style="text-align: right"|0x3D||
+|-
+| style="text-align: left"| st||||1||1||1||1||1||0||a||a||a||a||a||s||s||s||s||s||style="text-align: right"|0x3E||
+|- 
+| style="text-align: left"| stb||||1||1||1||1||1||1||a||a||a||a||a||s||s||s||s||s||style="text-align: right"|0x3F||
+|- style="font-size:70%;background:#f2f2f2;line-height:100%"
+|  colspan="2"| ||width=15px|15||width=15px|14||width=15px|13||width=15px|12||width=15px|11||width=15px|10||width=15px|9||width=15px|8||width=15px|7||width=15px|6||width=15px|5||width=15px|4||width=15px|3||width=15px|2||width=15px|1||width=15px|0|| colspan="2"|
+|-
+! colspan="8"|
+! colspan="5"|OP B
+! colspan="5"|OP A
+! colspan="2"|
+|}
+
+
+
 rotti stuff...
 <!--  \subsection{Addressing modes}
 % \subsection{Special instructions} -->
