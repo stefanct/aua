@@ -5,6 +5,9 @@ use ieee.numeric_std.all;
 use work.aua_types.all;
 
 entity ent_if is
+	generic (
+		INIT_VECTOR	: pc_t
+	);
 	port (
 		clk     : in std_logic;
 		reset	: in std_logic;
@@ -82,7 +85,6 @@ calc_pc_nxt: process(reset, pc, pc_in, branch, instr_valid)
 	begin
 		if reset = '1' then
 			pc_nxt <= (others => '0');
-			--~ pc_nxt <= x"8000"; -- direkt in ROM
 		elsif branch='1' then
 			pc_nxt <= pc_in;
 		elsif instr_valid /= '1' then
@@ -112,7 +114,7 @@ sync: process(clk, reset)
 			regb <= (others => '0');
 			imm <= (others => '0');
 			--~ pc <= (others => '0');
-			pc <= x"8000";
+			pc <= INIT_VECTOR;
 			--~ pc <= x"7FFE";
 			--~ pc <= pc_nxt;
 			--~ instr_addr <= (others => '0');

@@ -6,14 +6,22 @@ use ieee.math_real.log2;
 use ieee.math_real.ceil;
 
 package aua_types is
+	constant ADDR_SIZE		: natural := 16;
 
-	constant CLK_FREQ		: natural := 70000000; -- main clock frequency
+	subtype word_t is std_logic_vector(ADDR_SIZE-1 downto 0);
+	subtype pc_t is unsigned(ADDR_SIZE-1 downto 0);
+	subtype opcode_t is std_logic_vector(5 downto 0);
+	subtype reg_t is std_logic_vector(4 downto 0);
+
+--
+
+	constant CLK_FREQ		: natural :=  70000000; -- main clock frequency
 	constant SRAM_RD_FREQ	: natural :=  50000000; -- ram clock when reading
 	constant SRAM_WR_FREQ	: natural :=  50000000; -- ram clock when writing
 	constant UART_RATE		: natural := 115200; -- uart baud rate
 
+	constant RST_VECTOR		: pc_t := x"8000";
 
-	constant ADDR_SIZE		: natural := 16;
 	constant RAM_ADDR_SIZE	: natural := 14;
 	constant SC_SLAVE_CNT	: natural := 4; -- count of simpcon slaves
 	constant SC_ADDR_SIZE	: natural := ADDR_SIZE;
@@ -21,11 +29,6 @@ package aua_types is
 	constant SC_RDY_CNT_SIZE : natural := 2;
 
 --
-
-	subtype word_t is std_logic_vector(ADDR_SIZE-1 downto 0);
-	subtype opcode_t is std_logic_vector(5 downto 0);
-	subtype reg_t is std_logic_vector(4 downto 0);
-	subtype pc_t is unsigned(15 downto 0);
 
 	-- number of bits needed to address all slaves (2**SC_ADDR_BITS >= SLAVE_CNT)
 	constant SC_ADDR_BITS : integer := integer(ceil(log2(real(SC_SLAVE_CNT))));

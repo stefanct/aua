@@ -41,6 +41,9 @@ architecture sat1 of aua is
     end component;
     
 	component ent_if is
+		generic (
+			INIT_VECTOR	: pc_t
+		);
 		port (
 			clk     : in std_logic;
 			reset	: in std_logic;
@@ -375,6 +378,7 @@ begin
 cmp_pll: aua_pll
 	port map(reset, clk_in, clk);
 cmp_if: ent_if
+	generic map(RST_VECTOR)
 	port map(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_imm_in, ifid_async_rega_in, ifid_async_regb_in, idif_pc_out, idif_branch_out, ifcache_addr, ifcache_valid, ifcache_data, lock_if);
 cmp_id: id
 	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, id_rega_in, id_regb_in, idif_pc_in, idif_branch_in, lock_id, id_locks_async);
