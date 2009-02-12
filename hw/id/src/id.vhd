@@ -104,6 +104,7 @@ branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_i
 		opa_to_nop <= '0';
 		jmpl_op <= '0';
 		pc_out <= unsigned(to_integer(pc_in) + signed(opb_nxt));
+		opcode_nxt <= opcode_in;
 		--~ pc_tmp := unsigned(signed('0'&pc_in) + signed(opb_nxt));
 		--~ pc_out <= pc_tmp(pc_t'length-1 downto 0);
 
@@ -130,8 +131,9 @@ branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_i
 			jmpl_op <= '1';
 			-- jump is absolute!
 			pc_out <= pc_t(opb_nxt);
+		elsif opcode_in(5 downto 2) = "1101" or opcode_in(5 downto 1) = "11100" then
+			dest_nxt <= "11011";
 		else
-			opcode_nxt <= opcode_in;
 			dest_nxt <= dest_in;
 		end if;
 		

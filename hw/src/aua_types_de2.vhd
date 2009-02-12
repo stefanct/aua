@@ -7,6 +7,7 @@ use ieee.math_real.ceil;
 
 package aua_types is
 	constant ADDR_SIZE		: natural := 16;
+	constant WORD_SIZE		: natural := ADDR_SIZE;
 
 	subtype word_t is std_logic_vector(ADDR_SIZE-1 downto 0);
 	subtype pc_t is unsigned(ADDR_SIZE-1 downto 0);
