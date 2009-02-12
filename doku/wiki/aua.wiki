@@ -158,19 +158,19 @@ The ''Imm.'' column indicates how immediates are interpreted (e.g. the values us
 |-
 | style="text-align: left"| roti||unsigned||1||1||0||0||1||1||d||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x33||d=left/!left
 |-
-| style="text-align: left"| ||||1||1||0||1||0||0||||||||||||||||||||||style="text-align: right"|0x34||
+| style="text-align: left"| cmplt||||1||1||0||1||0||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x34||
 |-
-| style="text-align: left"| cmplt||||1||1||0||1||0||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x35||
+| style="text-align: left"| cmpltu||||1||1||0||1||0||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x35||
 |-
-| style="text-align: left"| cmpltu||||1||1||0||1||1||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x36||
+| style="text-align: left"| cmplte||||1||1||0||1||1||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x36||
 |-
-| style="text-align: left"| cmplte||||1||1||0||1||1||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x37||
+| style="text-align: left"| cmplteu||||1||1||0||1||1||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x37||
 |-
-| style="text-align: left"| cmplteu||||1||1||1||0||0||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x38||
+| style="text-align: left"| cmpe||||1||1||1||0||0||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x38||
 |-
-| style="text-align: left"| cmpe||||1||1||1||0||0||1||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x39||
+| style="text-align: left"| cmpei||unsigned||1||1||1||0||0||1||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x39||
 |-
-| style="text-align: left"| cmpei||unsigned||1||1||1||0||1||0||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x3A||
+| style="text-align: left"| ||||1||1||1||0||1||0||||||||||||||||||||||style="text-align: right"|0x3A||
 |-
 | style="text-align: left"| mov||||1||1||1||0||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x3B||
 |-
