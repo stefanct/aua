@@ -1,22 +1,22 @@
-'''Another Useless Architecture''' ('''AUA''') is a [[w:Reduced Instruction Set Computing|RISC]] [[w:Microprocessor|microprocessor]] architecture
+﻿'''Another Useless Architecture''' ('''AUA''') is a [[w:Reduced Instruction Set Computing|RISC]] [[w:Microprocessor|microprocessor]] architecture
 developed by Jakob Wilhelm, Stefan Rottensteiner and Stefan Tauner as a course project for the [[Computer Architecture Lab]]
 at the [[w:Vienna_University_of_Technology|Vienna University of Technology]] in winter 2008/2009.
-It was implemented in [[w:VHDL|VHDL]] and tested in a Cyclone II [[w:FPGA|FPGA]] from [[w:Altera|Altera]] on a DE2 development board from Terasic Technology.
+It has been implemented in [[w:VHDL|VHDL]] and tested in a Cyclone II [[w:FPGA|FPGA]] from [[w:Altera|Altera]] on a DE2 development board from Terasic Technology.
 
 = Description =
-AUA is a 16bit RISC architecture with 32 Registers that can't hide its similarities to MIPS.
-Like MIPS branches are supported by individual compare and branch instructions (e.g. you have
+AUA is a 16bit RISC architecture providing 32 registers apparently having similarities to MIPS.
+E.g. MIPS branches are supported by individual compare and branch instructions (i.e. you have
 to compare two values/registers and use the result as input for the branch decision).
 The branch delay is 0 for untaken and 1 cycle for taken branches. The branch decision and branch
-address calculation is done in the ID stage. An additional cycle is lost, if the branch uses
-the result of the instruction directly before it. It is not possible to circumvent this stall
-with forwarding or it would introduce a new longest path (from the ID/EX pipeline registers,
+address calculation is done in the ID stage. An additional cycle is lost if the branch uses
+the result of the preceding instruction. It is not possible to circumvent this stall
+with forwarding as this would introduce a new longest path (from the ID/EX pipeline registers
 through the alu, through the branch decision unit in ID, to the PC register in IF).
 The EX stage forwards its results to resolve data hazards in all other instruction sequences though
-(e.g. if instruction <math>n+1</math> uses the (EX) result of instruction <math>n</math> as (EX) input).
+(i.e. if instruction <math>n+1</math> uses the (EX) result of instruction <math>n</math> as (EX) input).
 We used on-chip memory of the FPGA (M4K blocks) for the register file.
-Because the memory requires registered inputs,
-this registers can be thought as the pipeline registers for the WB stage.
+As the memory requires registered inputs,
+this registers can be regarded as pipeline registers for the WB stage.
 To be able to read two registers (the two operands) and write one (the result of the previous instruction),
 we had to duplicate the register file into two "simple dual-port mode" memories.
 Another possibility would be to clock the memory twice as fast, but we did prefer a single clock domain.
@@ -32,10 +32,10 @@ Instructions, data and memory-mapped I/O devices all share the same address spac
 The MMU is responsible for handling all memory transactions and transfers the data
 to the instruction cache and from/to the load/store unit in the EX stage.
 LD/ST transactions have priority over instruction fetches, so that the pipeline can
-progress normally. IF will schedule a nop, if it is blocked because the current instr.
+progress normally. IF will schedule a nop if it is blocked because the current instr.
 is not available.
 The MMU can access on-board SRAM, on-chip ROM (e.g. for a bootloader) and an unlimited
-number of SimpCon devices. <fixme mag der sack was hinzufuegen?>
+number of SimpCon devices. <fixme mag der sack was hinzufuegen? -- weiss auch ned>
 
 == Pipeline stages ==
 AUA has three stages (four if you include write-back): IF, ID, EX/MEM.
