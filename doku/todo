@@ -1,6 +1,6 @@
-mmu ordentlich machen :) inkl sram controller, rom in ram
 jmpl/ret konkretisieren/durchdenken und dann implementieren (as only. abi (argument registers, caller/callee saves etc))
 ex fwd nochmal ueberdenken
+COMPARES IMPLEMENTIEREN UND OPCODES VERSCHIEBEN
 alu optimieren
 ganz tolle neue instructions erfinden
 bootloader

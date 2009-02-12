@@ -79,6 +79,7 @@ So the total number of instructions is limited to <math>2^6 - (2^3-1) - 4*(2^2-1
 The following table lists all instructions currently implemented in hardware (see the [[#Pseudo_Instructions|pseudo instruction section]] below for the rest).
 There are still some white spots, which are reserved for later use. Cells filled with a '''s''' form an encoded source register. '''d''', '''i''' likewise
 for destination registers and immediates. '''a''' denotes that the memory address (e.g. for a branch) is taken from the register encoded by these cells.
+The ''Imm.'' column indicates how immediates are interpreted (e.g. the values used with branches get sign-extended and can represent forward as well as backward (=negative) jumps).
 {| class="wikitable" style="text-align:center; border:1px solid; line-height:100%" cellspacing="0"
 |+ Table of AUA instructions and their encoding
 !Mnemo.
