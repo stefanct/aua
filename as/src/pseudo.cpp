@@ -187,6 +187,68 @@ int _replace_ldiw(loc& l) {
 	return 3;
 }
 
+int _replace_push(loc& l) {
+	loc l_new[2];
+
+	l_new[0].instr = "st";
+	l_new[0].params.push_back(l.params[0]);
+	l_new[0].params.push_back("$sp");
+	l.loc_replaced.push_back(l_new[0]);
+
+	l_new[1].instr = "addi";
+	l_new[1].params.push_back("$sp");
+	l_new[1].params.push_back("-2");
+	l.loc_replaced.push_back(l_new[1]);
+
+	return 2;
+}
+
+int _replace_pop(loc& l){
+	loc l_new[2];
+
+	l_new[0].instr = "addi";
+	l_new[0].params.push_back("$sp");
+	l_new[0].params.push_back("2");
+	l.loc_replaced.push_back(l_new[0]);
+
+	l_new[1].instr = "ld";
+	l_new[1].params.push_back(l.params[0]);
+	l_new[1].params.push_back("$sp");
+	l.loc_replaced.push_back(l_new[1]);
+
+	return 2;
+}
+
+int _replace_call(loc& l){
+	loc l_new[5];
+
+	l_new[0].instr = "st";
+	l_new[0].params.push_back("$ra");
+	l_new[0].params.push_back("$sp");
+	l.loc_replaced.push_back(l_new[0]);
+
+	l_new[1].instr = "addi";
+	l_new[1].params.push_back("$sp");
+	l_new[1].params.push_back("-2");
+	l.loc_replaced.push_back(l_new[1]);
+
+	l_new[2].instr = "jmpl";
+	l_new[2].params.push_back(l.params[0]);
+	l.loc_replaced.push_back(l_new[2]);
+
+	l_new[3].instr = "addi";
+	l_new[3].params.push_back("$sp");
+	l_new[3].params.push_back("2");
+	l.loc_replaced.push_back(l_new[3]);
+
+	l_new[4].instr = "ld";
+	l_new[4].params.push_back("$ra");
+	l_new[4].params.push_back("$sp");
+	l.loc_replaced.push_back(l_new[4]);
+
+	return 5;
+}
+
 int replace_pseudo_instructions(loc& l) {
 	replace_fun f = replace_functions[l.instr];
 	if (f) {
@@ -214,4 +276,7 @@ void load_pseudo_instructions() {
 	replace_functions["inc"] = &_replace_inc;
 	replace_functions["dec"] = &_replace_dec;
 	replace_functions["ldiw"] = &_replace_ldiw;
+	replace_functions["push"] = &_replace_push;
+	replace_functions["pop"] = &_replace_pop;
+	replace_functions["call"] = &_replace_call;
 }

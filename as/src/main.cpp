@@ -29,8 +29,18 @@ int main(int argc, char** argv) {
 		}
 	}
 
-	string file_in = argv[optind];
-	string file_out = argv[optind + 1];
+	string file_in;
+	if(argc>optind){
+		file_in = argv[optind];
+	}
+	else{
+		void fatal_noinput();
+	}
+
+	string file_out("a.out");
+	if(argc>optind+1){
+		file_out = argv[optind + 1];
+	}
 	string file_rom = "../hw/mmu/src/rom.vhd";
 
 	As p(file_in);

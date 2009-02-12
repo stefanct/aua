@@ -66,6 +66,7 @@ public:
 	void flush();
 
 	void fatal_configuration();
+	void fatal_noinput();
 
 	void err_syntax(const std::string& file, int line,
 			const std::string& instr_line);

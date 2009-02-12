@@ -73,7 +73,7 @@ string to_dual(const string& str, int len) {
 	return result;
 }
 
-string to_hex(int number){
+string to_hex(int number) {
 	char result[10];
 	sprintf(result, "%x", number);
 	return result;
@@ -90,6 +90,7 @@ void As::_load_config() {
 	char line[1024];
 	regex reg_instr("(\\w+)\\s+(\\w+)\\s+(\\w+)\\s*");
 	regex reg_setting("\\s*(\\w+)\\s*=\\s*(\\w+)\\s*");
+	regex reg_register("\\s*(\\$\\w+)\\s*=\\s*(\\$\\w+)\\s*");
 	regex reg_empty("\\s*");
 	cmatch tokens;
 	while (fgets(line, 1024, file) != NULL) {
@@ -105,8 +106,12 @@ void As::_load_config() {
 			i.type.assign(tokens[3].first, tokens[3].second);
 			string iname(tokens[1].first, tokens[1].second);
 			instructions[iname] = i;
+		} else if (regex_match(line, tokens, reg_register)) {
+			string alias(tokens[1].first, tokens[1].second);
+			string reg(tokens[2].first, tokens[2].second);
+			registers[alias] = reg;
 		} else if (!regex_match(line, tokens, reg_empty)) {
-			cerr << "Invalid instruction configuration: \"" << line
+			cerr << "Invalid instruction configuration: \"" << trim(line, "\n")
 					<< "\", ignoring. " << endl;
 		}
 	}
@@ -141,7 +146,7 @@ int As::_add_constant(const std::string& key, const std::string& str_const) {
 
 void As::_precompile(const string& file) {
 	FILE* in = fopen(file.c_str(), "r");
-	if(!in){
+	if (!in) {
 		msg.err_open_file(file);
 		return;
 	}
@@ -161,8 +166,7 @@ void As::_precompile(const string& file) {
 	int line_number = 0;
 	while (fgets(line, 1024, in) != NULL) {
 		line_number++;
-		removeComment(line);
-		DBG("--------------\n\nPrecompiling: %s", line);
+		removeComment(line);DBG("--------------\n\nPrecompiling: %s", line);
 		string instr;
 		string fields[3];
 		int type_len = 0;
@@ -178,8 +182,7 @@ void As::_precompile(const string& file) {
 		} else if (regex_match(line, tokens, reg_label)) {
 			string label;
 			label.assign(tokens[1].first, tokens[1].second);
-			labels[label] = cnt_instr;
-			DBG("Found label: %s: %d", label.c_str(), cnt_instr);
+			labels[label] = cnt_instr;DBG("Found label: %s: %d", label.c_str(), cnt_instr);
 			continue;
 		} else if (regex_match(line, tokens, reg_define) || regex_match(line,
 				tokens, reg_assign)) {
@@ -218,13 +221,10 @@ void As::_precompile(const string& file) {
 			int result = replace_pseudo_instructions(*l);
 			if (result > 0) {
 				program.push_back(l);
-				cnt_instr += result * 2;
-				DBG("replace_pseudo_instr: %d", result);
+				cnt_instr += result * 2;DBG("replace_pseudo_instr: %d", result);
 			}
 		}
-	}
-	DBG("Precompile fertig");
-	DBG("program.size(): %d", program.size());
+	}DBG("Precompile fertig");DBG("program.size(): %d", program.size());
 	fclose(in);
 }
 
@@ -253,10 +253,10 @@ int As::_compile_instr(loc& l) {
 	}
 	instruction& i = iter->second;
 	int type_len = l.params.size() * 3;
-	DBG("l.params.size(): %d", l.params.size());
-	DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
+	DBG("l.params.size(): %d", l.params.size());DBG("type_len: %d, i.type.length: %d", type_len, i.type.length());
 	if (type_len != i.type.length()) {
-		msg.err_number_args(l.file, l.line, l.instr, i.type.length()/3, type_len/3); // TODO: das /3 geht schöner...
+		msg.err_number_args(l.file, l.line, l.instr, i.type.length() / 3,
+				type_len / 3); // TODO: das /3 geht schöner...
 		return -1;
 	}
 
@@ -295,8 +295,7 @@ int As::_compile_instr(loc& l) {
 						imm = iter->second - addr;
 					} else {
 						imm = iter->second;
-					}
-					DBG("imm: %d", imm);
+					}DBG("imm: %d", imm);
 					valid = true;
 				}
 			}
@@ -308,9 +307,9 @@ int As::_compile_instr(loc& l) {
 					if (isupper(type)) {
 						msg.warn_const_as_offset(l.file, l.line);
 						if (iter->second.type) {
-							imm = iter->second.address - addr;
+							imm = (iter->second.address - addr) >> 1;
 						} else {
-							imm = iter->second.i_value - addr;
+							imm = (iter->second.i_value - addr) >> 1;
 						}
 					} else {
 						if (iter->second.type) {
@@ -375,12 +374,15 @@ int As::_compile_instr(loc& l) {
 		case 'r':
 			if (l.params[field_cnt][0] == '$') {
 				char* end_ptr;
-				const char* reg = l.params[field_cnt].c_str() + 1;
+				string sreg = registers[l.params[field_cnt]];
+				if(!sreg.size()){
+					sreg = l.params[field_cnt];
+				}
+				const char* reg = sreg.c_str() + 1;
 				int reg_num = strtol(reg, &end_ptr, 10);
 				if (reg == end_ptr) {
 					msg.err_no_reg(l.file, l.line, l.params[field_cnt]);
-				}
-				DBG("reg_num: %d", reg_num);
+				}DBG("reg_num: %d", reg_num);
 				assert(cur_field_len <= 5);
 				assert(reg_num >= 0);
 				assert(reg_num < (1 << cur_field_len));

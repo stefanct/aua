@@ -42,7 +42,12 @@ void Msg::flush() {
 }
 
 void Msg::fatal_configuration() {
-	cerr << "ASM Configuration error. Abort" << endl;
+	cerr << "ASM Configuration error. Aborting" << endl;
+	exit(EXIT_FAILURE);
+}
+
+void Msg::fatal_noinput(){
+	cerr << "No inputfile specified. Aborting" << endl;
 	exit(EXIT_FAILURE);
 }
 

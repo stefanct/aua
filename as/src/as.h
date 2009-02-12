@@ -73,6 +73,7 @@ class As {
 	std::map<string, int> labels;
 	std::map<string, constant> constants;
 	std::vector<shared_ptr<loc> > program;
+	std::map<std::string, std::string> registers;
 
 	void _load_config();
 	int _add_constant(const std::string& key, const std::string& constant);
