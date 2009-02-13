@@ -15,248 +15,329 @@ entity alu is
 end alu;
 
 architecture sat1 of alu is
+	component Mux32to1 is
+		port(	
+			i01: in std_logic_vector(15 downto 0);
+			i02: in std_logic_vector(15 downto 0);
+			i03: in std_logic_vector(15 downto 0);
+			i04: in std_logic_vector(15 downto 0);
+			i05: in std_logic_vector(15 downto 0);
+			i06: in std_logic_vector(15 downto 0);
+			i07: in std_logic_vector(15 downto 0);
+			i08: in std_logic_vector(15 downto 0);
+			i09: in std_logic_vector(15 downto 0);
+			i10: in std_logic_vector(15 downto 0);
+			i11: in std_logic_vector(15 downto 0);
+			i12: in std_logic_vector(15 downto 0);
+			i13: in std_logic_vector(15 downto 0);
+			i14: in std_logic_vector(15 downto 0);
+			i15: in std_logic_vector(15 downto 0);
+			i16: in std_logic_vector(15 downto 0);
+			i17: in std_logic_vector(15 downto 0);
+			i18: in std_logic_vector(15 downto 0);
+			i19: in std_logic_vector(15 downto 0);
+			i20: in std_logic_vector(15 downto 0);
+			i21: in std_logic_vector(15 downto 0);
+			i22: in std_logic_vector(15 downto 0);
+			i23: in std_logic_vector(15 downto 0);
+			i24: in std_logic_vector(15 downto 0);
+			i25: in std_logic_vector(15 downto 0);
+			i26: in std_logic_vector(15 downto 0);
+			i27: in std_logic_vector(15 downto 0);
+			i28: in std_logic_vector(15 downto 0);
+			i29: in std_logic_vector(15 downto 0);
+			i30: in std_logic_vector(15 downto 0);
+			i31: in std_logic_vector(15 downto 0);
+			i32: in std_logic_vector(15 downto 0);
+			sel: in std_logic_vector(4 downto 0);
+			mux_out: out std_logic_vector(15 downto 0)
+		);
+	end component;
+	
 	signal carry: 		std_logic;
 	signal carry_nxt:	std_logic;
+	signal mux_sel:		std_logic_vector(4 downto 0);
+	signal mux1_o:		word_t;
 	
-	begin
+	signal res_ldi: 	word_t;
+	signal res_addi:	word_t;
+	signal res_muli:	word_t;
+	signal res_add:		word_t;
+	signal res_addc:	word_t;
+	signal res_sub:		word_t;
+	signal res_subc:	word_t;
+	signal res_mul:		word_t;
+	signal res_mulu:	word_t;
+	signal res_mulh:	word_t;
+	signal res_mulhu:	word_t;
+	signal res_or:		word_t;
+	signal res_and:		word_t;
+	signal res_xor:		word_t;
+	signal res_not:		word_t;
+	signal res_neg:		word_t;
+	signal res_asr:		word_t;
+	signal res_lsl:		word_t;
+	signal res_lsr:		word_t;
+	signal res_lsli:	word_t;
+	signal res_lsri:	word_t;
+	signal res_scb:		word_t;
+	signal res_roti:	word_t;
+	signal res_cmplt:	word_t;
+	signal res_cmpltu:	word_t;
+	signal res_cmplte:	word_t;
+	signal res_cmplteu:	word_t;
+	signal res_cmpe:	word_t;
+	signal res_cmpei:	word_t;
+	signal res_mov:		word_t;
+	signal res_ignore:	word_t;
+	
+begin
+	mux1: Mux32to1 port map
+	(	res_ldi, 
+		res_add, 
+		res_mul, 
+		res_add, 
+		res_addc, 
+		res_sub, 
+		res_subc, 
+		res_mul, 
+		res_mulu,
+		res_mulh, 
+		res_mulhu, 
+		res_or, 
+		res_and, 
+		res_xor, 
+		res_not, 
+		res_neg, 
+		res_asr, 
+		res_lsl, 
+		res_lsr,
+		res_lsli, 
+		res_lsri, 
+		res_scb, 
+		res_roti, 
+		res_cmplt, 
+		res_cmpltu, 
+		res_cmplte, 
+		res_cmplteu,
+		res_cmpe, 
+		res_cmpei, 
+		res_mov, 
+		res_ignore, 
+		res_ignore, 
+		mux_sel, 
+		mux1_o
+	);
 	
 sync_carry: process (clk, reset)
-	begin
-		if reset = '1' then
-			carry <= '0';
-		elsif rising_edge(clk) then
-			carry <= carry_nxt;
+begin
+	if reset = '1' then
+		carry <= '0';
+	elsif rising_edge(clk) then
+		carry <= carry_nxt;
+	end if;
+end process;
+
+process(opcode, opa, opb, carry, mux1_o)
+	variable tmp_sel: std_logic_vector(4 downto 0);
+	
+	variable tmp_opa: 	std_logic_vector(16 downto 0);
+	variable tmp_opb: 	std_logic_vector(16 downto 0);
+	variable tmp_addc:	std_logic_vector(16 downto 0);
+	variable tmp_subc:	std_logic_vector(16 downto 0);
+	variable tmp_carry: std_logic_vector(16 downto 0);
+	variable carry_addc:std_logic;
+	variable carry_subc:std_logic;
+	variable tmp_muls:	std_logic_vector(31 downto 0);
+	variable tmp_mulu:	std_logic_vector(31 downto 0);
+	variable tmp_scb:	word_t;
+	variable tmp_sll:	word_t;
+	variable tmp_srl:	word_t;
+	
+begin 
+		res_ldi <= opa(15 downto 8) & opb(7 downto 0); 
+--------------------------------------------------------------------------------------------------
+		tmp_opa := std_logic_vector(('0' & opa));
+		tmp_opb := std_logic_vector(('0' & opb));
+		
+		if (opcode = "100001") or (opcode = "100011") then
+			tmp_carry := (x"0000"&carry);
+		else
+			tmp_carry := (16 downto 0 => '0');
 		end if;
+
+		tmp_addc := std_logic_vector(unsigned(tmp_opa) + unsigned(tmp_opb) + unsigned(tmp_carry));
+		tmp_subc := std_logic_vector(unsigned(tmp_opa) - unsigned(tmp_opb) - unsigned(tmp_carry));
+		carry_addc := tmp_addc(16);
+		carry_subc := tmp_subc(16);
+		res_add <= tmp_addc(15 downto 0);
+		res_addc <= tmp_addc(15 downto 0);
+		res_sub <= tmp_subc(15 downto 0);
+		res_subc <= tmp_subc(15 downto 0);
+
+		if opcode = "100001" or opcode = "011000" or opcode = "100000" then
+			carry_nxt <= carry_addc;
+		elsif opcode = "100011" or opcode = "100010" then
+			carry_nxt <= carry_subc;
+		else
+			carry_nxt <= '0';
+		end if;
+--------------------------------------------------------------------------------------------------
+--		tmp_add := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)));
+--		tmp_addc := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)) + (x"0000"&carry));
+--		carry_add := tmp_add(16);
+--		carry_addc := tmp_addc(16);
+--		
+--		res_add <= tmp_add(15 downto 0);
+--		res_addc <= tmp_addc(15 downto 0);
+--		
+--		tmp_sub := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)));
+--		tmp_subc := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)) - (x"0000"&carry));
+--		carry_sub := tmp_sub(16);
+--		carry_subc := tmp_subc(16);
+--		
+--		res_sub <= tmp_sub(15 downto 0);
+--		res_subc <= tmp_subc(15 downto 0); 
+--------------------------------------------------------------------------------------------------
+		tmp_muls := std_logic_vector(signed(opa) * signed(opb));
+		tmp_mulu := std_logic_vector(unsigned(opa) * unsigned(opb));
+		
+		res_mul <= tmp_muls(15 downto 0);
+		res_mulu <= tmp_mulu(15 downto 0);
+		res_mulh <= tmp_muls(31 downto 16);
+		res_mulhu <= tmp_mulu(31 downto 16);
+		
+		res_or <= opa or opb;
+		res_and <= opa and opb;
+		res_xor <= opa xor opb;
+		res_not <= not opb;
+		res_neg <= std_logic_vector(unsigned(not opb) + 1);
+		res_asr <= to_stdlogicvector(to_bitvector(opb) sra 1);
+		res_lsl <= std_logic_vector(unsigned(opb) sll 1);
+		res_lsr <= std_logic_vector(unsigned(opb) srl 1);
+		
+		res_lsli <= std_logic_vector(unsigned(opa) sll to_integer(unsigned(opb(3 downto 0))));
+		res_lsri <= std_logic_vector(unsigned(opa) srl to_integer(unsigned(opb(3 downto 0))));
+		
+		tmp_scb := opa;
+		tmp_scb(to_integer(unsigned(opb(3 downto 0)))) := opb(4);
+		res_scb <= tmp_scb;
+		
+		if opb(4) = '0' then -- rotl
+			res_roti <= std_logic_vector(unsigned(opa) rol to_integer(unsigned(opb(3 downto 0))));
+		else -- rotr
+			res_roti <= std_logic_vector(unsigned(opa) ror to_integer(unsigned(opb(3 downto 0))));
+		end if;
+		
+		if signed(opa) < signed(opb) then
+			res_cmplt <= x"0001"; 
+		else
+			res_cmplt <= x"0000";
+		end if;
+		
+		if unsigned(opa) < unsigned(opb) then
+			res_cmpltu <= x"0001";
+		else
+			res_cmpltu <= x"0000";
+		end if;
+		
+		if signed(opa) <= signed(opb) then
+			res_cmplte <= x"0001";
+		else
+			res_cmplte <= x"0000";
+		end if;
+		
+		if unsigned(opa) <= unsigned(opb) then
+			res_cmplteu <= x"0001";
+		else
+			res_cmplteu <= x"0000";
+		end if;
+		 
+		if opa = opb then
+			res_cmpe <= x"0001";
+		else
+			res_cmpe <= x"0000";
+		end if;
+		
+		if opa = ((15 downto 5 => '0')&opb(4 downto 0))  then
+			res_cmpei <= x"0001";
+		else
+			res_cmpei <= x"0000";
+		end if;
+		
+		res_mov <= opb;
+		
+		res_ignore <= x"0000";
+		
+		case opcode(5 downto 3) is
+			when "000" => tmp_sel := "00000"; --ldi
+			--when "001" => tmp_sel := "11110"; --ignore
+			--when "010" => tmp_sel := "11110"; --ignore
+			when "011" =>
+				case opcode(2 downto 0) is
+					when "000" => tmp_sel := "00001"; --addi
+					when "001" => tmp_sel := "00001"; --addi
+					when "010" => tmp_sel := "00001"; --addi
+					when "011" => tmp_sel := "00001"; --addi
+					when "100" => tmp_sel := "00010"; --muli
+					when "101" => tmp_sel := "00010"; --muli
+					when "110" => tmp_sel := "00010"; --muli
+					when "111" => tmp_sel := "00010"; --muli
+					when others => tmp_sel := "11110"; --ignore
+				end case;
+			when "100" =>
+				case opcode(2 downto 0) is
+					when "000" => tmp_sel := "00011"; --add
+					when "001" => tmp_sel := "00100"; --addc
+					when "010" => tmp_sel := "00101"; --sub
+					when "011" => tmp_sel := "00110"; --subc
+					when "100" => tmp_sel := "00111"; --mul
+					when "101" => tmp_sel := "01000"; --mulu
+					when "110" => tmp_sel := "01001"; --mulh
+					when "111" => tmp_sel := "01010"; --mulhu
+					when others => tmp_sel := "11110"; --ignore
+				end case;
+			when "101" =>
+				case opcode(2 downto 0) is
+					when "000" => tmp_sel := "01011"; --or
+					when "001" => tmp_sel := "01100"; --and
+					when "010" => tmp_sel := "01101"; --xor
+					when "011" => tmp_sel := "01110"; --not
+					when "100" => tmp_sel := "01111"; --neg
+					when "101" => tmp_sel := "10000"; --asr
+					when "110" => tmp_sel := "10001"; --lsl
+					when "111" => tmp_sel := "10010"; --lsr
+					when others => tmp_sel := "11110"; --ignore
+				end case;
+			when "110" =>
+				case opcode(2 downto 0) is
+					when "000" => tmp_sel := "10011"; --lsli
+					when "001" => tmp_sel := "10100"; --lsri
+					when "010" => tmp_sel := "10101"; --scb
+					when "011" => tmp_sel := "10110"; --roti 22
+					when "100" => tmp_sel := "11110"; --cmpv 
+					when "101" => tmp_sel := "10111"; --cmplt
+					when "110" => tmp_sel := "11000"; --cmpltu
+					when "111" => tmp_sel := "11001"; --cmplte
+					when others => tmp_sel := "11110"; --ignore
+				end case;
+			when "111" =>
+				case opcode(2 downto 0) is
+					when "000" => tmp_sel := "11010"; --cmplteu
+					when "001" => tmp_sel := "11011"; --cmpe
+					when "010" => tmp_sel := "11100"; --cmpei
+					when "011" => tmp_sel := "11101"; --mov
+					when "100" => tmp_sel := "11110"; --ld, ignore
+					when "101" => tmp_sel := "11110"; --ldb, ignore
+					when "110" => tmp_sel := "11110"; --st, ignore
+					when "111" => tmp_sel := "11110"; --stb, ignore
+					when others => tmp_sel := "11110"; --ignore
+				end case;
+			when others => tmp_sel := "11110"; --ignore
+		end case;
+		
+		mux_sel <= tmp_sel;
+		result <= mux1_o;
+		
 	end process;
-		
-	process(opcode, opa, opb, carry)
-			variable tmp_carry: 	std_logic_vector(16 downto 0);
-			variable tmp_mul:   	std_logic_vector(31 downto 0);
-			variable tmp: 			word_t;
-			variable tmp_opa:		word_t;
-			variable tmp_opb:		word_t;
-			variable res_ignore:	word_t;
-			variable sgn_a:			std_logic;
-			variable sgn_b:			std_logic;
-	begin
-		carry_nxt <= carry;
-		
-		sgn_a := '0';
-		sgn_b := '0';
-		tmp_opa := opa;
-		tmp_opb := opb;
-		res_ignore := x"0000";
-		
-		if 	opcode(5 downto 0) = "100100" or 
-			opcode(5 downto 0) = "100110" or
-			opcode(5 downto 2) = "0111" then
-			
-			if opa(15) = '1' then
-				sgn_a := '1';
-				tmp_opa := std_logic_vector(unsigned(not opa) + 1);
-			end if;
-			if opb(15) = '1' then
-				sgn_b := '1';
-				tmp_opb := std_logic_vector(unsigned(not opb) + 1);
-			end if;
-		end if; 
-		
-			case opcode(5 downto 3) is
-				when "000" => -- ldi
-					result <= opa(15 downto 8) & opb(7 downto 0);
-					
-				when "011" => --addi/muli
-					if opcode(2) = '0' then --addi
-						--result <= std_logic_vector(signed(opa) + signed(opb));
-						tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)));
-						carry_nxt <= tmp_carry(16);
-						result <= tmp_carry(15 downto 0);
-						
-					else --muli
-						tmp_mul := std_logic_vector(unsigned(tmp_opa) * unsigned(tmp_opb));
-						if sgn_a /= sgn_b then
-							tmp_mul := std_logic_vector(unsigned(not tmp_mul) + 1);
-						end if;
-						result <= tmp_mul(15 downto 0);
-					end if;
-					
-				when "100" =>
-					case opcode(2 downto 0) is
-						when "000" => -- add
-							tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)) );
-							carry_nxt <= tmp_carry(16);
-							result <= tmp_carry(15 downto 0);
-						
-						when "001" => -- addc
-							tmp_carry := std_logic_vector(('0' & unsigned(opa)) + ('0' & unsigned(opb)) + (x"0000"&carry));
-							carry_nxt <= tmp_carry(16);
-							result <= tmp_carry(15 downto 0);
-					
-						when "010" => --sub
-							tmp_carry := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)));
-							carry_nxt <= tmp_carry(16);
-							result <= tmp_carry(15 downto 0);
-					
-						when "011" => -- subc
-							tmp_carry := std_logic_vector(('0' & unsigned(opa)) - ('0' & unsigned(opb)) - (x"0000"&carry));
-							carry_nxt <= tmp_carry(16);
-							result <= tmp_carry(15 downto 0);
-						
-						when "100" => -- mul
-							tmp_mul := std_logic_vector(unsigned(tmp_opa) * unsigned(tmp_opb));
-							if sgn_a /= sgn_b then
-								tmp_mul := std_logic_vector(unsigned(not tmp_mul) + 1);
-							end if;
-							result <= tmp_mul(15 downto 0);
-							
-						when "101" => -- mulu
-							tmp_mul := std_logic_vector(unsigned(tmp_opa) * unsigned(tmp_opb));
-							result <= tmp_mul(15 downto 0);
-					
-						when "110" => -- mulh
-							tmp_mul := std_logic_vector(unsigned(tmp_opa) * unsigned(tmp_opb));
-							if sgn_a /= sgn_b then
-								tmp_mul := std_logic_vector(unsigned(not tmp_mul) + 1);
-							end if;
-							result <= tmp_mul(31 downto 16);
-					
-						when "111" => -- mulhu
-							tmp_mul := std_logic_vector(unsigned(tmp_opa) * unsigned(tmp_opb));
-							result <= tmp_mul(31 downto 16);
-							
-						when others =>
-							result <= res_ignore;
-					end case;
-					
-				when "101" =>
-					case opcode(2 downto 0) is
-						when "000" => -- or 
-							result <= opa or opb;
-					
-						when "001" => -- and
-							result <= opa and opb;
-					
-						when "010" => -- xor
-							result <= opa xor opb;
-					
-						when "011" => -- not
-							result <= not opb;
-					
-						when "100" => -- neg
-							result <= std_logic_vector(unsigned(not opb) + 1); 
-					
-						when "101" => -- asr
-							result <= to_stdlogicvector(to_bitvector(opb) sra 1);
-					
-						when "110" => -- lsl
-							result <= std_logic_vector(unsigned(opb) sll 1);
-					
-						when "111" => -- lsr
-							result <= std_logic_vector(unsigned(opb) srl 1);
-						
-						when others =>
-							result <= res_ignore;
-					end case;
-					
-				when "110" =>
-					case opcode(2 downto 0) is
-						when "000" => -- lsli
-							result <= std_logic_vector(unsigned(opa) sll to_integer(unsigned(opb(3 downto 0)))); 
-					
-						when "001" => -- lsri
-							result <= std_logic_vector(unsigned(opa) srl to_integer(unsigned(opb(3 downto 0))));
-					
-						when "010" => -- scb
-							tmp := std_logic_vector(to_unsigned(2**to_integer(unsigned(opb(3 downto 0))),word_t'length));
-							if opb(4) = '1' then
-								result <= opa or tmp;
-							else
-								result <= opa and (not tmp);
-							end if;
-					
-						when "011" => -- roti
-							if opb(4) = '0' then -- rotl
-								result <= std_logic_vector(unsigned(opa) rol to_integer(unsigned(opb(3 downto 0))));
-							else -- rotr
-								result <= std_logic_vector(unsigned(opa) ror to_integer(unsigned(opb(3 downto 0))));
-							end if;
-						
---						when "100" => --cmpv
-							
-						when "101" => -- cmplt
-							if signed(opa) < signed(opb) then
-								result <= x"0001";
-							else
-								result <= x"0000";
-							end if;
-					
-						when "110" => -- cmpltu
-							if opa < opb then
-								result <= x"0001";
-							else
-								result <= x"0000";
-							end if;
-					
-						when "111" => -- cmplte
-							if signed(opa) <= signed(opb) then
-								result <= x"0001";
-							else
-								result <= x"0000";
-							end if;
-							
-						when others =>
-							result <= res_ignore;
-					end case;
-					
-				when "111" =>
-					case opcode(2 downto 0) is-- cmplteu
-						when "000" =>
-							if opa <= opb then
-								result <= x"0001";
-							else
-								result <= x"0000";
-							end if;
-					
-						when "001" => -- cmpe
-							if opa = opb then
-								result <= x"0001";
-							else
-								result <= x"0000";
-							end if;
-							
-						when "010" => -- cmpei
-							if opa = ((15 downto 5 => '0')&opb(4 downto 0))  then
-								result <= x"0001";
-							else
-								result <= x"0000";
-							end if;
-							
-						when "011" => 
-								result <= opb;-- mov
-						
-						when others =>
-								result <= res_ignore;
-					end case;
-					
-				when others => 
-					result <= res_ignore;
-			end case;
--- others 
---				when "001101" => result <= x"0000";-- jmpl
---				when "001110" => result <= x"0000";-- brez
---				when "001111" => result <= x"0000";-- brnez
---				when "010000" => result <= x"0000";-- brezi
---				when "010001" => result <= x"0000";-- brezi
---				when "010010" => result <= x"0000";-- brezi
---				when "010011" => result <= x"0000";-- brezi
---				when "010100" => result <= x"0000";-- brnezi
---				when "010101" => result <= x"0000";-- brnezi
---				when "010110" => result <= x"0000";-- brnezi
---				when "010111" => result <= x"0000";-- brnezi 
---				when "111100" => result <= x"0000";-- ld
---				when "111101" => result <= x"0000";-- ldb
---				when "111110" => result <= x"0000";-- st
---				when "111111" => result <= x"0000";-- stb
---				when "110100" => result <= x"0000";-- cmpv
-		end process;
-    end sat1;
+end sat1;
