@@ -292,7 +292,7 @@ int As::_compile_instr(loc& l) {
 						l.params[field_cnt]);
 				if (iter != labels.end()) {
 					if (isupper(type)) { // Adresse relativ
-						imm = iter->second - addr;
+						imm = (iter->second - addr) >> 1;
 					} else {
 						imm = iter->second;
 					}DBG("imm: %d", imm);
