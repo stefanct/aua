@@ -271,7 +271,7 @@ begin
 		
 		case opcode(5 downto 3) is
 			when "000" => tmp_sel := "00000"; --ldi
-			--when "001" => tmp_sel := "11110"; --ignore
+			--when "001" => tmp_sel := "11110"; branches--ignore
 			--when "010" => tmp_sel := "11110"; --ignore
 			when "011" =>
 				case opcode(2 downto 0) is
@@ -314,18 +314,18 @@ begin
 					when "000" => tmp_sel := "10011"; --lsli
 					when "001" => tmp_sel := "10100"; --lsri
 					when "010" => tmp_sel := "10101"; --scb
-					when "011" => tmp_sel := "10110"; --roti 22
-					when "100" => tmp_sel := "11110"; --cmpv 
-					when "101" => tmp_sel := "10111"; --cmplt
-					when "110" => tmp_sel := "11000"; --cmpltu
-					when "111" => tmp_sel := "11001"; --cmplte
+					when "011" => tmp_sel := "10110"; --roti
+					when "100" => tmp_sel := "10111"; --cmplt
+					when "101" => tmp_sel := "11000"; --cmpltu
+					when "110" => tmp_sel := "11001"; --cmplte
+					when "111" => tmp_sel := "11010"; --cmplteu
 					when others => tmp_sel := "11110"; --ignore
 				end case;
 			when "111" =>
 				case opcode(2 downto 0) is
-					when "000" => tmp_sel := "11010"; --cmplteu
-					when "001" => tmp_sel := "11011"; --cmpe
-					when "010" => tmp_sel := "11100"; --cmpei
+					when "000" => tmp_sel := "11011"; --cmpe
+					when "001" => tmp_sel := "11100"; --cmpei
+					when "010" => tmp_sel := "11110"; --ignore
 					when "011" => tmp_sel := "11101"; --mov
 					when "100" => tmp_sel := "11110"; --ld, ignore
 					when "101" => tmp_sel := "11110"; --ldb, ignore
