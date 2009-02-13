@@ -10,13 +10,4 @@ begin
 	id_instr_valid <= mmu_instr_valid;
 	id_instr <= mmu_instr;
 	mmu_instr_addr <= id_instr_addr;
---	process(reset)
---	begin
---		if reset = '1' then
---			id_instr_valid <= '0';
---			id_instr <= (others => '0');
---			mmu_instr_addr <= (others => '0');
---		elsif rising_edge(clk) then
---		end if;
---	end process;
 end cache_null;

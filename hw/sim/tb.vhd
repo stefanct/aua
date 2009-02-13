@@ -9,7 +9,7 @@ end aua_tb;
 architecture aua_test of aua_tb is
     component aua
 		port (
-			clk			: in std_logic;
+			clk_in		: in std_logic;
 			reset_pin	: in std_logic;
 			switch_pins	: in std_logic_vector(15 downto 0);
 			led_pins	: out std_logic_vector(15 downto 0);
@@ -19,11 +19,17 @@ architecture aua_test of aua_tb is
 			digit3_pins	: out std_logic_vector(6 downto 0);
 			digit4_pins	: out std_logic_vector(6 downto 0);
 			digit5_pins	: out std_logic_vector(6 downto 0);
-			sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
+			sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1  downto 0);
 			sram_dq		: inout word_t;
 			sram_we		: out std_logic;
+		--	sram_oe		: out std_logic;
+			sram_ub		: out std_logic;
+			sram_lb		: out std_logic;
+		--	sram_ce		: out std_logic
 			txd			: out std_logic;
 			rxd			: in std_logic
+			--~ ncts		: in std_logic;
+			--~ nrts		: out std_logic
 
 		);
     end component;
@@ -41,13 +47,15 @@ architecture aua_test of aua_tb is
 	signal sram_addr	: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
 	signal sram_dq		: word_t;
 	signal sram_we		: std_logic;
+	signal sram_ub		: std_logic;
+	signal sram_lb		: std_logic;
 	signal txd		: std_logic;
 	signal rxd		: std_logic;
 begin
     
-    aua1: aua
+    aua1: configuration work.aua_cache
     port map (
-		clk => clk,
+		clk_in => clk,
 		reset_pin => reset_pin,
 		switch_pins => switch_pins,
 		led_pins => led_pins,
@@ -60,6 +68,8 @@ begin
 		sram_addr => sram_addr,
 		sram_dq => sram_dq,
 		sram_we => sram_we,
+		sram_ub => sram_ub,
+		sram_lb => sram_lb,
 		txd => txd,
 		rxd => rxd
     );

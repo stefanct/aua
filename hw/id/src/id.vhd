@@ -184,7 +184,11 @@ extend: process (opcode_in, imm_in,regb_done, jmpl_op, pc_in)
 			opb_nxt <= (15 downto 7 => '0') & imm_in(6 downto 0);
 		elsif opcode_in(5 downto 4)="01" then
 			--sign extend imm(6 downto 0)
-			opb_nxt <= (15 downto 7 => imm_in(6)) & imm_in(6 downto 0);
+			if opcode_in(3) = '0' then -- imm branch; word addressing -> shift
+				opb_nxt <= (15 downto 8 => imm_in(6)) & imm_in(6 downto 0) & '0';
+			else
+				opb_nxt <= (15 downto 7 => imm_in(6)) & imm_in(6 downto 0);
+			end if;
 		elsif jmpl_op='1' then
 			opb_nxt <= word_t(pc_in);
 		else

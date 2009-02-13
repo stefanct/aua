@@ -1,2 +1,3 @@
 loop:
+	nop
 	rjmpi loop

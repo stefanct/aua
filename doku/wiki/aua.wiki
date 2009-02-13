@@ -114,17 +114,17 @@ The ''Imm.'' column indicates how immediates are interpreted (e.g. the values us
 |-
 | style="text-align: left"| brnezi||signed||0||1||0||1||i||i||i||i||i||i||i||s||s||s||s||s||style="text-align: right"|0x14-0x17||
 |-
-| style="text-align: left"| addi||signed||0||1||1||0||i||i||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x18-0x1B||carry
+| style="text-align: left"| addi||signed||0||1||1||0||i||i||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x18-0x1B||sets carry
 |-
 | style="text-align: left"| muli||signed||0||1||1||1||i||i||i||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x1C-0x1F||
 |-
-| style="text-align: left"| add||||1||0||0||0||0||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x20|||
+| style="text-align: left"| add||||1||0||0||0||0||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x20||sets carry
 |-
-| style="text-align: left"| addc||||1||0||0||0||0||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x21||carry
+| style="text-align: left"| addc||||1||0||0||0||0||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x21||sets carry
 |-
-| style="text-align: left"| sub||||1||0||0||0||1||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x22||carry
+| style="text-align: left"| sub||||1||0||0||0||1||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x22||sets carry
 |-
-| style="text-align: left"| subc||||1||0||0||0||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x23||carry
+| style="text-align: left"| subc||||1||0||0||0||1||1||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x23||sets carry
 |-
 | style="text-align: left"| mul||||1||0||0||1||0||0||s||s||s||s||s||d||d||d||d||d||style="text-align: right"|0x24||
 |-
@@ -154,9 +154,9 @@ The ''Imm.'' column indicates how immediates are interpreted (e.g. the values us
 |-
 | style="text-align: left"| lsri||unsigned||1||1||0||0||0||1||||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x31||
 |-
-| style="text-align: left"| scb||unsigned||1||1||0||0||1||0||d||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x32||d=set/!clear
+| style="text-align: left"| scb||unsigned||1||1||0||0||1||0||k||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x32||k=set/!clear
 |-
-| style="text-align: left"| roti||unsigned||1||1||0||0||1||1||d||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x33||d=left/!left
+| style="text-align: left"| roti||unsigned||1||1||0||0||1||1||k||i||i||i||i||d||d||d||d||d||style="text-align: right"|0x33||k=left/!left
 |-
 | style="text-align: left"| cmplt||||1||1||0||1||0||0||s||s||s||s||s||s||s||s||s||s||style="text-align: right"|0x34||
 |-

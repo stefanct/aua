@@ -42,7 +42,7 @@ if {[file exists rtl_work]} {
 vlib rtl_work
 vmap work rtl_work
 
-vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_types.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_types_de2.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_dummy/src/sc_dummy.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_uart/src/sc_uart.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_uart/src/fifo.vhd
@@ -51,21 +51,25 @@ vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_de2_switches/src/sc_de2_switc
 vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/rom.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/ram.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_ent.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_null.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_direct.vhd
+#vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_null.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/mmu.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/if/src/if.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/reg.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/id/src/id.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/ex/src/ex.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/alu.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_pll.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_top.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_de2_config.vhd
 
 vcom -93 -work work $path_to_calu_svn/AUA/hw/project/../sim/tb.vhd
 
 vsim -t 1ps -L lpm -L altera -L altera_mf -L sgate -L cycloneii -L rtl_work -L work -voptargs="+acc" aua_tb
 
-add wave		/aua_tb/clk /aua_tb/aua1/reset 
+add wave		/aua_tb/aua1/clk
+add wave		/aua_tb/aua1/reset_pin
+add wave		/aua_tb/aua1/reset_sync
+add wave		/aua_tb/aua1/reset 
 #add wave -divider UI
 #add wave		/aua_tb/switch_pins /aua_tb/led_pins /aua_tb/digit0_pins /aua_tb/digit1_pins /aua_tb/digit2_pins /aua_tb/digit3_pins /aua_tb/digit4_pins /aua_tb/digit5_pins
 #add wave -divider SRAM
@@ -87,6 +91,7 @@ add wave		/aua_tb/aua1/cmp_mmu/instr_valid
 add wave -divider ID
 add wave -hex	/aua_tb/aua1/cmp_id/opcode_in
 add wave -hex	/aua_tb/aua1/cmp_id/pc_in
+add wave -dec	/aua_tb/aua1/cmp_id/opb_nxt
 add wave		/aua_tb/aua1/cmp_id/branch/brinstr
 add wave		/aua_tb/aua1/cmp_id/branch/inv
 add wave		/aua_tb/aua1/cmp_id/br_data_hz_nxt
@@ -121,8 +126,8 @@ add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/
 add wave -divider interstages
 add wave 		/aua_tb/aua1/ex_locks 
 add wave		/aua_tb/aua1/cmp_ex/ex_locks_nxt
-#add wave -dec	/aua_tb/aua1/lock_if
-#add wave -dec	/aua_tb/aua1/lock_id
+add wave -dec	/aua_tb/aua1/lock_if
+add wave -dec	/aua_tb/aua1/lock_id
 
 add wave -divider IO
 add wave -hex	/aua_tb/aua1/cmp_mmu/ex_address
@@ -138,9 +143,9 @@ add wave -hex	/aua_tb/aua1/cmp_test/wr_data
 add wave -hex	/aua_tb/aua1/cmp_test/rd
 add wave -hex	/aua_tb/aua1/cmp_mmu/sc_rd_data
 add wave		/aua_tb/aua1/cmp_ex/mmu_done
+add wave 		/aua_tb/aua1/cmp_mmu/mmu_state
 add wave -hex	/aua_tb/aua1/cmp_mmu/ex_rd_data
 add wave		/aua_tb/aua1/cmp_mmu/sc_rdy_cnt
-add wave 		/aua_tb/aua1/cmp_mmu/sc_state
 add wave -hex	/aua_tb/aua1/mmuio_out.address
 add wave -hex	/aua_tb/aua1/mmuio_out.wr_data 
 add wave -hex	/aua_tb/aua1/mmuio_out.rd 

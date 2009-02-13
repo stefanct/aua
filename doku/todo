@@ -1,6 +1,7 @@
 jmpl/ret konkretisieren/durchdenken und dann implementieren (as only. abi (argument registers, caller/callee saves etc))
 ex fwd nochmal ueberdenken
 COMPARES IMPLEMENTIEREN UND OPCODES VERSCHIEBEN
+synchron reset?
 alu optimieren
 ganz tolle neue instructions erfinden
 bootloader

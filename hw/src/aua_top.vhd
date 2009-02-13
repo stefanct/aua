@@ -374,9 +374,12 @@ architecture sat1 of aua is
 	signal sc_sel, sc_sel_reg	: integer range 0 to 2**SC_ADDR_BITS; -- one more than needed (for NC)
 	signal sc_addr 				: sc_addr_t;
 
+	signal reset_sync : std_logic; -- reset pin is async! so we synchronize it: see sync_reset
+	signal reset_pll : std_logic;
+
 begin
 cmp_pll: aua_pll
-	port map(reset, clk_in, clk);
+	port map(reset_pll, clk_in, clk);
 cmp_if: ent_if
 	generic map(RST_VECTOR)
 	port map(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_imm_in, ifid_async_rega_in, ifid_async_regb_in, idif_pc_out, idif_branch_out, ifcache_addr, ifcache_valid, ifcache_data, lock_if);
@@ -393,7 +396,20 @@ cmp_mmu: mmu
 		mmuio_in, mmuio_out,
 		sram_addr, sram_dq, sram_we, sram_ub, sram_lb);
 
-	reset <= not reset_pin; -- in case we need to invert... should be "calculated" with help of a constant
+
+-- taken from http://www.sunburst-design.com/papers/CummingsSNUG2003Boston_Resets.pdf
+sync_reset: process (clk, reset_pin)
+	begin
+		if (reset_pin = '0') then
+			reset_sync <= '1';
+			reset <= '1';
+		elsif rising_edge(clk) then
+			reset_sync <= '0';
+			reset <= reset_sync;
+		end if;
+	end process;
+
+	reset_pll <= not reset_pin; -- needs to be async (think about it. :)
 
 	ifid_opcode_out <= ifid_opcode_in;
 	ifid_dest_out <= ifid_dest_in;
@@ -508,6 +524,7 @@ configuration aua_cache of aua is
 	for sat1
 		for cmp_icache : instr_cache
 			use entity work.instr_cache(cache_null);
+			--~ use entity work.instr_cache(cache_direct);
 	    end for;
 	    -- does not work... why?
 	    --~ for cmp_mmu: mmu
