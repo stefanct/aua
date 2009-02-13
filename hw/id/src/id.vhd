@@ -95,7 +95,6 @@ begin
 branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_in, br_data_hz)
 		variable inv : std_logic; -- set if op is a "not branch"
 		variable brinstr : std_logic; -- set if op changes PC
-		--~ variable pc_tmp : unsigned(pc_t'length downto 0); -- n.b. thats one bit larger
 	begin
 		inv := '0';
 		brinstr := '0';
@@ -103,10 +102,9 @@ branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_i
 		br_data_hz_nxt <= '0';
 		opa_to_nop <= '0';
 		jmpl_op <= '0';
-		pc_out <= unsigned(to_integer(pc_in) + signed(opb_nxt));
+		pc_out <= resize(unsigned(to_integer(pc_in) + signed(resize(unsigned(opb_nxt(ADDR_SIZE-1 downto 1)&'0'), ADDR_SIZE+1))), ADDR_SIZE);
+		--~ pc_out <= unsigned(resize(unsigned(opb_nxt(ADDR_SIZE-1 downto 1)&'0'), ADDR_SIZE+1)); -- numeric_std warnings in modelsim
 		opcode_nxt <= opcode_in;
-		--~ pc_tmp := unsigned(signed('0'&pc_in) + signed(opb_nxt));
-		--~ pc_out <= pc_tmp(pc_t'length-1 downto 0);
 
 		if opcode_in(5 downto 3)="010" then -- branch imm
 			inv := opcode_in(2);
@@ -175,7 +173,7 @@ insert_nop: process (vala, opa_to_nop)
 	end process;
 
 	-- sign extend, expand and mux with regb
-extend: process (opcode_in, imm_in,regb_done, jmpl_op, pc_in)
+extend_n_mux: process (opcode_in, imm_in, regb_done, jmpl_op, pc_in)
 	begin
 		if opcode_in(5 downto 3)="000" then
 			opb_nxt <= (15 downto 8 => '0') & imm_in(7 downto 0);
