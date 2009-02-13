@@ -294,7 +294,8 @@ int As::_compile_instr(loc& l) {
 					if (isupper(type)) { // Adresse relativ
 						imm = (iter->second - addr) >> 1;
 					} else {
-						imm = iter->second;
+						int start_addr = strtol(settings["rom_start"].c_str(), NULL, 0);
+						imm = iter->second + start_addr;
 					}DBG("imm: %d", imm);
 					valid = true;
 				}
