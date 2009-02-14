@@ -173,7 +173,8 @@ extend_n_mux: process (opcode_in, imm_in, valb, jmpl_op, pc_in)
 				opb_nxt <= (15 downto 7 => imm_in(6)) & imm_in(6 downto 0);
 			end if;
 		elsif jmpl_op='1' then
-			opb_nxt <= word_t(pc_in);
+			--~ opb_nxt <= word_t(pc_in);
+			opb_nxt <= valb;
 		else
 			opb_isfrom_regb_nxt <= true;
 			opb_nxt <= valb;

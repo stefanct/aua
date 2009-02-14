@@ -67,8 +67,8 @@ vcom -93 -work work $path_to_calu_svn/AUA/hw/project/../sim/tb.vhd
 vsim -t 1ps -L lpm -L altera -L altera_mf -L sgate -L cycloneii -L rtl_work -L work -voptargs="+acc" aua_tb
 
 add wave		/aua_tb/aua1/clk
-add wave		/aua_tb/aua1/reset_pin
-add wave		/aua_tb/aua1/reset_sync
+#~ add wave		/aua_tb/aua1/reset_pin
+#~ add wave		/aua_tb/aua1/reset_sync
 add wave		/aua_tb/aua1/reset 
 #add wave -divider UI
 #add wave		/aua_tb/switch_pins /aua_tb/led_pins /aua_tb/digit0_pins /aua_tb/digit1_pins /aua_tb/digit2_pins /aua_tb/digit3_pins /aua_tb/digit4_pins /aua_tb/digit5_pins
@@ -91,8 +91,8 @@ add wave -hex	/aua_tb/aua1/cmp_if/pc_nxt
 add wave -divider IF/MMU
 add wave -hex	/aua_tb/aua1/cmp_mmu/instr_addr
 add wave		/aua_tb/aua1/cmp_mmu/instr_valid
-add wave -hex	/aua_tb/aua1/cmp_mmu/instr_enable
-add wave		/aua_tb/aua1/cmp_mmu/instr_valid
+add wave -hex	/aua_tb/aua1/cmp_mmu/instr_data
+add wave		/aua_tb/aua1/cmp_mmu/instr_enable
 
 add wave -divider ID
 add wave -hex	/aua_tb/aua1/cmp_id/opcode_in
