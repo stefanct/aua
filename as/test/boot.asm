@@ -1,7 +1,3 @@
-#include libaua/stdlib.h
-#include libaua/io/uart.h
-#include libaua/io/digit.h
-
 ldiw $fp, STACK_TOP
 ldiw $sp, STACK_TOP
 
@@ -19,3 +15,8 @@ ld $11, $10 -- jetzt lesen wir soviel, wie das Image lang ist
 st $11, $16
 
 call $2
+
+
+#include libaua/stdlib.h
+#include libaua/io/uart.h
+#include libaua/io/digit.h

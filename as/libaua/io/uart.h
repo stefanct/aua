@@ -5,6 +5,11 @@
 -- Params: address, length (in word)
 -- Returns: void (undefined)
 uart_read:
+
+	ldiw $20, SC_DIGITS
+	ldiw $21, 0xf
+	st $21, $20
+
 	push $1
 	push $2
 	push $3
@@ -22,15 +27,19 @@ uart_read:
 
 	ld $2, $4 -- Daten lesen
 	st $2, $10 -- Daten speichern
+
+	ldiw $5, SC_DIGITS
+	st $2, $5
+
 	addi $10, 2 -- Adresse zum Speicher +2
 	addi $11, -1 -- wieder ein word weniger zu lesen
 
 	brnezi $11, loop_read -- solang wir noch lesen müssen, tun wir das brav
 
-	pop $1
-	pop $2
-	pop $3
-	pop $4
-	pop $10
 	pop $11
+	pop $10
+	pop $4
+	pop $3
+	pop $2
+	pop $1
 	ret
