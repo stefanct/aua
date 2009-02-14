@@ -51,8 +51,8 @@ vcom -93 -work work $path_to_calu_svn/AUA/hw/io/sc_de2_switches/src/sc_de2_switc
 vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/rom.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/ram.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_ent.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_direct.vhd
-#vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_null.vhd
+#vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_direct.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/caches/src/cache_null.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/mmu/src/mmu.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/if/src/if.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/reg.vhd
@@ -83,40 +83,47 @@ add wave		/aua_tb/aua1/cmp_if/branch
 add wave -hex	/aua_tb/aua1/cmp_if/pc_nxt
 
 
+#~ add wave -divider CACHE(direct-mapped)
+#~ add wave		/aua_tb/aua1/cmp_icache/store
+#~ add wave		/aua_tb/aua1/cmp_icache/cur_line
+#~ add wave		/aua_tb/aua1/cmp_icache/in_cache
+
 add wave -divider IF/MMU
 add wave -hex	/aua_tb/aua1/cmp_mmu/instr_addr
-add wave -hex	/aua_tb/aua1/cmp_mmu/instr_data
+add wave		/aua_tb/aua1/cmp_mmu/instr_valid
+add wave -hex	/aua_tb/aua1/cmp_mmu/instr_enable
 add wave		/aua_tb/aua1/cmp_mmu/instr_valid
 
 add wave -divider ID
 add wave -hex	/aua_tb/aua1/cmp_id/opcode_in
 add wave -hex	/aua_tb/aua1/cmp_id/pc_in
-add wave -dec	/aua_tb/aua1/cmp_id/opb_nxt
 add wave		/aua_tb/aua1/cmp_id/branch/brinstr
 add wave		/aua_tb/aua1/cmp_id/branch/inv
 add wave		/aua_tb/aua1/cmp_id/br_data_hz_nxt
 add wave		/aua_tb/aua1/cmp_id/br_data_hz
-add wave -dec	/aua_tb/aua1/cmp_id/rega_in
+add wave -hex	/aua_tb/aua1/cmp_id/opa_nxt
+add wave -uns	/aua_tb/aua1/cmp_id/rega_in
 add wave -hex	/aua_tb/aua1/cmp_id/vala
-add wave -dec	/aua_tb/aua1/cmp_id/regb_in
+add wave -uns	/aua_tb/aua1/cmp_id/regb_in
 add wave -hex	/aua_tb/aua1/cmp_id/valb
-add wave -dec	/aua_tb/aua1/cmp_id/imm_in
-
+add wave -hex	/aua_tb/aua1/cmp_id/imm_in
+add wave -hex	/aua_tb/aua1/cmp_id/opb_nxt
 add wave -divider EX
 add wave -hex	/aua_tb/aua1/cmp_ex/opcode
 add wave -hex	/aua_tb/aua1/cmp_ex/opa
+add wave -hex	/aua_tb/aua1/cmp_id/opb_out
 add wave -hex	/aua_tb/aua1/cmp_ex/opb
 #add wave		/aua_tb/aua1/cmp_ex/cmp_alu/carry
-add wave -dec	/aua_tb/aua1/cmp_ex/dest_out
+add wave -uns	/aua_tb/aua1/cmp_ex/dest_out
 add wave -hex	/aua_tb/aua1/cmp_ex/result_out
 
 add wave -divider REG-file
-add wave -dec	/aua_tb/aua1/cmp_id/cmp_reg/rega
+add wave -uns	/aua_tb/aua1/cmp_id/cmp_reg/rega
 #add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/rdaddress
 add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/vala
-add wave -dec	/aua_tb/aua1/cmp_id/cmp_reg/regb
+add wave -uns	/aua_tb/aua1/cmp_id/cmp_reg/regb
 add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/valb
-add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/regr
+add wave -uns	/aua_tb/aua1/cmp_id/cmp_reg/regr
 #add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/wraddress
 add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/valr
 #add wave -hex	/aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_a(1)

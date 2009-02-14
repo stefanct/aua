@@ -45,9 +45,7 @@ architecture sat1 of ex is
 		);
 	end component;
 
-	signal opcode_nxt	: opcode_t;
 	signal dest_nxt		: reg_t;
-	signal result_nxt	: word_t;
 	signal alu_result	: word_t;
 	signal ex_locks_nxt	: std_logic;
 begin

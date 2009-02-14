@@ -104,6 +104,7 @@ architecture sat1 of aua is
 			-- needed for EX forwarding
 			rega_out	: out reg_t;
 			regb_out	: out reg_t;
+			opb_isfrom_regb	: out boolean;
 
 			-- branch decision
 			pc_out		: out pc_t;
@@ -361,6 +362,7 @@ architecture sat1 of aua is
 	--forwarding
 	signal id_rega_in	: reg_t;
 	signal id_regb_in	: reg_t;
+	signal id_opb_isfrom_regb : boolean;
 	signal exid_dest	: reg_t;
 	signal exid_result	: word_t;
 	--interlocks
@@ -384,7 +386,7 @@ cmp_if: ent_if
 	generic map(RST_VECTOR)
 	port map(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_imm_in, ifid_async_rega_in, ifid_async_regb_in, idif_pc_out, idif_branch_out, ifcache_addr, ifcache_valid, ifcache_data, lock_if);
 cmp_id: id
-	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, id_rega_in, id_regb_in, idif_pc_in, idif_branch_in, lock_id, id_locks_async);
+	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, id_rega_in, id_regb_in, id_opb_isfrom_regb, idif_pc_in, idif_branch_in, lock_id, id_locks_async);
 cmp_ex: ex
 	port map(clk, reset, idex_opcode_out, idex_dest_out, idex_opa_out, idex_opb_out, exid_dest_in, exid_result_in, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid, ex_locks, ex_locks_async);
 cmp_icache: instr_cache
@@ -429,7 +431,7 @@ sync_reset: process (clk, reset_pin)
 	lock_if <= ex_locks_async or id_locks_async;
 	lock_id <= ex_locks_async;
 
-ex_fw: process(id_rega_in, id_regb_in, exid_dest, exid_result, idex_opa_in, idex_opb_in, ex_locks)
+ex_fw: process(id_rega_in, id_regb_in, exid_dest, exid_result, idex_opa_in, idex_opb_in, id_opb_isfrom_regb, ex_locks)
 	begin
 		if id_rega_in = exid_dest and ex_locks = '0' then
 			idex_opa_out <= exid_result;
@@ -437,7 +439,7 @@ ex_fw: process(id_rega_in, id_regb_in, exid_dest, exid_result, idex_opa_in, idex
 			idex_opa_out <= idex_opa_in;
 		end if;
 		
-		if id_regb_in = exid_dest and ex_locks = '0' then
+		if id_regb_in = exid_dest and id_opb_isfrom_regb and ex_locks = '0' then
 			idex_opb_out <= exid_result;
 		else
 			idex_opb_out <= idex_opb_in;

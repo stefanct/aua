@@ -34,6 +34,7 @@ entity id is
 		-- needed for EX forwarding
 		rega_out	: out reg_t;
 		regb_out	: out reg_t;
+		opb_isfrom_regb	: out boolean;
 
 		-- branch decision
 		pc_out		: out pc_t;
@@ -67,16 +68,16 @@ architecture sat1 of id is
 	signal dest_nxt		: reg_t;
 	signal opa_nxt		: word_t;
 	signal opb_nxt		: word_t;
-	signal rega_nxt		: reg_t;
-	signal regb_nxt		: reg_t;
-	signal opcode		: opcode_t;
 	signal dest			: reg_t;
 	signal opa			: word_t;
 	signal opb			: word_t;
 	signal vala			: word_t;
 	signal valb			: word_t;
+
+	signal rega_nxt				: reg_t;
+	signal regb_nxt				: reg_t;
+	signal opb_isfrom_regb_nxt	: boolean;
 	
-	signal regb_done	: word_t;	-- hides r0 changes
 	signal jmpl_op		: std_logic; -- set if instr is jmpl. used to propagate $ra to EX
 	signal opa_to_nop	: std_logic; -- set if we need opa to be all 0s for idle EX
 
@@ -145,23 +146,6 @@ branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_i
 		end if;
 	end process;
 
-	--~ -- hide r0 changes
---~ r0readonly: process (rega_in, regb_in, vala, valb, opa_to_nop)
-	--~ begin
-		--~ if rega_in="00000" or opa_to_nop = '1' then
-			--~ opa_nxt <= (others => '0');
-		--~ else
-			--~ opa_nxt <= vala;
-		--~ end if;
---~ 
-		--~ if regb_in=(4 downto 0=>'0') then
-			--~ regb_done <= (others => '0');
-		--~ else
-			--~ regb_done <= valb;
-		--~ end if;
-	--~ end process;
-	
-	regb_done <= valb;
 	-- inserts a nop (for branches etc.)
 insert_nop: process (vala, opa_to_nop)
 	begin
@@ -173,8 +157,9 @@ insert_nop: process (vala, opa_to_nop)
 	end process;
 
 	-- sign extend, expand and mux with regb
-extend_n_mux: process (opcode_in, imm_in, regb_done, jmpl_op, pc_in)
+extend_n_mux: process (opcode_in, imm_in, valb, jmpl_op, pc_in)
 	begin
+		opb_isfrom_regb_nxt <= false;
 		if opcode_in(5 downto 3)="000" then
 			opb_nxt <= (15 downto 8 => '0') & imm_in(7 downto 0);
 		elsif opcode_in(5 downto 2) ="1100" or opcode_in(5 downto 0) ="111010" then
@@ -190,7 +175,8 @@ extend_n_mux: process (opcode_in, imm_in, regb_done, jmpl_op, pc_in)
 		elsif jmpl_op='1' then
 			opb_nxt <= word_t(pc_in);
 		else
-			opb_nxt <= regb_done;
+			opb_isfrom_regb_nxt <= true;
+			opb_nxt <= valb;
 		end if;
 	end process;	
 	
@@ -206,6 +192,7 @@ sync: process (clk, reset)
 			rega_out <= (others => '0');
 			regb_out <= (others => '0');
 			br_data_hz <= '0';
+			opb_isfrom_regb <= false;
 		elsif rising_edge(clk) then
 			if lock/='1' then
 				opcode_out <= opcode_nxt;
@@ -220,6 +207,7 @@ sync: process (clk, reset)
 				--~ opb <= opb;
 				rega_out <= rega_nxt;
 				regb_out <= regb_nxt;
+				opb_isfrom_regb <= opb_isfrom_regb_nxt;
 				br_data_hz <= br_data_hz_nxt;
 			end if;
 		end if;
