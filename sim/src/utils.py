@@ -21,5 +21,5 @@ def to_unsigned(value, width):
         value &= ((1 << width) - 1)
     else:
         while value < 0:
-            value = (1 << width) - value
+            value = (1 << width) + value
     return value

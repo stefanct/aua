@@ -12,6 +12,7 @@ class Cpu:
         self.__sram_wait_cycles = 1
 
         self.__breakpoints = []
+        self.__watch = []
         
         self.reset()
 
@@ -29,9 +30,10 @@ class Cpu:
         self.__cycles = 0
         self.__backtrace = []
         self.__load()
+        self.__changed_regs = []
     
     def __load(self):
-        if len(self.__file) >0:
+        if len(self.__file) > 0:
             file = open(self.__file, mode='rb')
             a = 1
             addr = 0x8000
@@ -70,12 +72,12 @@ class Cpu:
         else:
             pass
     
-    def add_brakepoint(self, addresses):
+    def add_breakpoint(self, addresses):
         if len(addresses) == 1:
             try:
                 a = int(addresses[0], 0)
                 self.__breakpoints.append(a)
-                print "Added brakepoint at", hex(a)
+                print "Added brakepoint", len(self.__breakpoints), "at", hex(a)
             except:
                 print "No valid breakpoint address."
         
@@ -92,25 +94,97 @@ class Cpu:
                 else:
                     bad += [a]
             if len(good) > 0:
-                print "Added brakepoints at", map(hex, good)
+                print "Added breakpoints at", map(hex, good)
                 self.__breakpoints += good
             else:
-                print "Added no brakepoints as no valid addresses were given."
+                print "Added no breakpoints as no valid addresses were given."
             if len(bad) > 0:
                 print "Ignored invalid addresses", bad
     
-    def list_brakepoints(self):
-        return sorted(self.__breakpoints)
+    def delete_breakpoint(self, breakpoints):
+        good = []
+        bad = []
+        out = []
+        for b in breakpoints:
+            try:
+                b = int(b)
+                if b > 0 and b <= len(self.__breakpoints):
+                    good += [b]
+                else:
+                    out += [b]
+            except:
+                bad += [b]
+        for g in sorted(good, reverse=True):
+            self.__breakpoints.pop(g - 1)
+        if len(good) > 0:
+            print "Removed breakpoints:", good
+        else:
+            print "Deleted no breakpoints as no valid were specified."
+        if len(bad) > 0:
+            print "Ignored invalid breakpoints", bad
+        if len(out) > 0:
+            print "Ignored not-existing breakpoints", out
+        
+    def list_breakpoints(self):
+        return self.__breakpoints
     
+    def add_watchpoint(self, registers):
+        good = []
+        bad = []
+        for r in registers:
+            try:
+                if r[0] != "$":
+                    raise "NoRegister"
+                r = int(r[1:])
+                if r >= 0 and r <= 31:
+                    good += [r]
+                else:
+                    bad += [r]
+            except:
+                bad += [r]
+                
+        for r in good:
+            self.__watch += [r]
+        if len(good) > 0:
+            print "Added watchpoints for registers", reduce(lambda x, y: x + " " + str(y), map(lambda x: "$" + str(x), good))
+        else:
+            print "Added no watchpoints as no valid registers were specified."
+        if len(bad) > 0:
+            print "Ignored invalid registers", bad
+    
+    def list_watchpoints(self):
+        return self.__watch
+    
+    def delete_watchpoints(self, watchpoints):
+        good = []
+        bad = []
+        for w in watchpoints:
+            try:
+                w = int(w)
+                if w > 0 and w <= len(self.__watch):
+                    good += [w]
+                else:
+                    bad += [w]
+            except:
+                bad += [w]
+        for g in sorted(good, reverse=True):
+            self.__watch.pop(g - 1)
+        if len(good) > 0:
+            print "Removed watchpoints:", good
+        else:
+            print "Deleted no watchpoints as no valid were specified."
+        if len(bad) > 0:
+            print "Ignored invalid watchpoints", bad
+
     def print_regs(self):
         for line in range(0, 4):
-            print reduce(lambda x,y: x + y, map(lambda x: hex(x) + "  ", self.__registers[line * 8:line * 8 + 8]))
+            print reduce(lambda x, y: x + y, map(lambda x: hex(x) + "\t", self.__registers[line * 8:line * 8 + 8]))
     
     def get_reg(self, reg):
         return self.__registers[reg]
     
     def get_mem(self, addr):
-        return (self.__memory[addr] << 8) + self.__memory[addr+1]
+        return (self.__memory[addr] << 8) + self.__memory[addr + 1]
     
     def print_backtrace(self):
         if len(self.__backtrace) == 0:
@@ -118,8 +192,27 @@ class Cpu:
         else:
             print reduce(lambda x, y: x + " -> " + y, map(hex, self.__backtrace)) + " -> " + hex(self.__pc)
     
-    def run(self):
-        while True:
+    def print_status(self):
+        self.print_backtrace()
+        print "Cycles since reset:", self.__cycles
+        
+    def __checkwatch(self):
+        for c in self.__changed_regs:
+            if self.__watch.__contains__(c):
+                print "Watched register $", c, "changed at", hex(self.__pc - 2)
+                return True
+        return False
+    
+    def run(self, count=0):
+        limit = False
+        if count > 0:
+            limit = True
+        while limit == False or count > 0:
+            
+            if count > 0:
+                count -= 1
+            
+            self.__changed_regs = []
             
             self.__cycles += 1
             
@@ -141,6 +234,7 @@ class Cpu:
                     opb += ((instr & 0x7) << 5)
                     self.__registers[opa] &= 0xff00
                     self.__registers[opa] |= opb
+                    self.__changed_regs += [opa]
                     
                 elif instr <= 0x0c:
                     unknown
@@ -149,6 +243,7 @@ class Cpu:
                     self.__registers[31] = self.__pc + 2
                     self.__backtrace.insert(0, self.__pc)
                     self.__pc = self.__registers[opb]
+                    self.__changed_regs += [31]
                     
                 elif instr <= 0x0e: # brez
                     if opa == 0:
@@ -172,20 +267,23 @@ class Cpu:
                 
                 elif instr <= 0x1b: # addi
                     opb += ((instr & 0x3) << 5)
-                    self.__registers[opa] = self.__registers[opa] + opb
+                    self.__registers[opa] = self.__registers[opa] + to_signed(opb, 7)
                     if self.__carry > 0:
                         self.__registers[opa] += 1
                     self.__registers[opa] = to_unsigned(self.__registers[opa], 16)
+                    self.__changed_regs += [opa]
                 
                 elif instr <= 0x1f: # muli
                     opb += ((instr & 0x3) << 5)
                     self.__registers[opa] = to_unsigned(self.__registers[opa] * opb, 16)
+                    self.__changed_regs += [opa]
                 
                 elif instr <= 0x20: # add
                     self.__registers[opa] = self.__registers[opa] + self.__registers[opb]
                     if self.__carry > 0:
                         self.__registers[opa] += 1
                     self.__registers[opa] = to_unsigned(self.__registers[opa], 16)
+                    self.__changed_regs += [opa]
                     
                 elif instr <= 0x21: # addc
                     self.__registers[opa] = self.__registers[opa] + self.__registers[opb]
@@ -194,27 +292,31 @@ class Cpu:
                     if self.__registers[opa] >= (1 << 16): 
                         self.__carry = 2
                         self.__registers[opa] = to_unsigned(self.__registers[opa], 16)
+                    self.__changed_regs += [opa]
                 
                 elif instr <= 0x22: # sub
                     self.__registers[opa] = self.__registers[opa] - self.__registers[opb]
                     if self.__carry > 0:
                         self.__registers[opa] += 1
-                    
+                    self.__changed_regs += [opa]
 
                 elif instr <= 0x23: # subc
                     self.__registers[opa] = self.__registers[opa] - self.__registers[opb]
                     if self.__registers[opa] < 0 or self.__registers[opa] >= (1 << 16): # TODO: subc = wtf
                         self.__carry = 2
                         self.__registers[opa] = to_unsigned(self.__registers[opa], 16)
+                    self.__changed_regs += [opa]
                 
                 elif instr <= 0x27:
                     self.unknown()
                                     
                 elif instr <= 0x28: # or
                     self.__registers[opa] |= self.__registers[opb]
+                    self.__changed_regs += [opa]
                     
                 elif instr <= 0x29: # and
                     self.__registers[opa] &= self.__registers[opb] 
+                    self.__changed_regs += [opa]
                 
                 elif instr <= 0x2f:
                     self.unknown()
@@ -258,9 +360,12 @@ class Cpu:
                     self.__waiting = ()
                     self.__pc += 2
                 
-                
             if self.__waiting.__len__() == 0:
                 self.__pc += 2
+            
+            if self.__checkwatch():
+                return 0
+            self.__changed_regs = []
                 
             if self.__breakpoints.__contains__(self.__pc):
                 print "Reached breakpoint at", hex(self.__pc), "Cycle", self.__cycles
