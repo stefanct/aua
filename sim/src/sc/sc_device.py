@@ -1,16 +1,16 @@
 class ScDevice:
     def __init__(self):
         self._name = ""
-        self._address = 0
+        self._base = 0
         self._mask = 0
         self._wait_cycles = 0
         self._data = False
     
     def getAddress(self):
-        return _address
+        return self._base
     
     def getMask(self):
-        return _mask
+        return self._mask
     
     def tick(self):
         if self._wait_cycles > 0:

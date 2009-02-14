@@ -17,4 +17,9 @@ def to_signed(value, width):
             return 0
 
 def to_unsigned(value, width):
-    value &= ((1 << width) - 1)
+    if value >= 0:
+        value &= ((1 << width) - 1)
+    else:
+        while value < 0:
+            value = (1 << width) - value
+    return value

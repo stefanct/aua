@@ -11,11 +11,20 @@ ldiw $2, uart_read -- Adresse von Funktion uart_read
 
 call $2
 
+ldiw $5, SC_DIGITS
+addi $5, 1
+ldiw $6, 1
+st $6, $5
+
 ld $11, $10 -- jetzt lesen wir soviel, wie das Image lang ist
 st $11, $16
 
 call $2
 
+
+addi $5, 1
+ldiw $6, 2
+st $6, $5
 
 #include libaua/stdlib.h
 #include libaua/io/uart.h

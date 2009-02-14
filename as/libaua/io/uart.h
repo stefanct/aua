@@ -2,6 +2,10 @@
 #define SC_UART_STATUS 0xff20
 #define SC_UART_DATA 0xff21
 
+uart_write:
+	nop
+	ret
+
 -- Params: address, length (in word)
 -- Returns: void (undefined)
 uart_read:

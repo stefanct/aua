@@ -4,7 +4,7 @@ class ScMaster:
     
     def __init__(self):
         self.__sc_devices = []
-        self.__active_devices = False
+        self.__active_device = False
     
     def tick(self):
         map(lambda d: d.tick(), self.__sc_devices)
@@ -19,29 +19,32 @@ class ScMaster:
         return False
     
     def ld(self, address):
-        device = find_device(address)
+        device = self.find_device(address)
         if device:
             device.ld(address)
-            self.__active_devices = device
+            self.__active_device = device
         else:
-            print "device not found"
+            print "device not found at ", hex(address)
     
     def st(self, address, data):
         device = find_device(address)
         if device:
             device.st(address, data)
-            self.__active_devices = device
+            self.__active_device = device
         else:
-            print "device not found"
+            print "device not found at ", hex(address)
     
     def is_ready(self):
-        if self.__active_devices == False:
+        if self.__active_device == False:
             return True
         else:
-            return self.__active_devices.is_ready()
+            if self.__active_device.is_ready():
+                return True
+            else:
+                return False
     
     def get_data(self):
-        if self.__active_devices == False:
+        if self.__active_device == False:
             return False
         else:
-            return self.active_device.get_data
+            return self.__active_device.get_data()

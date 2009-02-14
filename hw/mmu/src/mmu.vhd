@@ -177,12 +177,13 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, sram_b_e
 			when mmu_idle =>
      		if(address(15) = '0') then -- SRAM
      			sram_a_nxt(13 downto 0) <= address(14 downto 1); -- SRAM adressiert word, instr byte => shift
-     			if(ex_opcode(1) = '1') then
-     			    if(address(0) = '0') then
-     			        sram_b_en_nxt <= "01";
-     			    else
-     			        sram_b_en_nxt <= "10";
-     			    end if;
+     			if(ex_opcode(1) = '1') and (ex_enable = '1') then
+     			    sram_b_en_nxt <= address(0) & not address(0);
+     			    --if(address(0) = '0') then
+     			    --    sram_b_en_nxt <= "01";
+     			    --else
+     			    --    sram_b_en_nxt <= "10";
+     			    --end if;
      			end if;
      			if(write = '1') then
      			    sram_w_nxt <= '0';
