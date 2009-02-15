@@ -187,8 +187,13 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, sram_b_e
      			end if;
      			if(write = '1') then
      			    sram_w_nxt <= '0';
-     			    sram_d_nxt <= ex_wr_data;
-     			    sram_dq <= ex_wr_data;
+     			    if(ex_opcode(0) = '1' and (ex_enable = '1') and (address(0) = '0')) then
+     			        sram_d_nxt <= ex_wr_data(7 downto 0) & x"00";
+     			        sram_dq <= ex_wr_data(7 downto 0) & x"00";
+     			    else
+      			    	sram_d_nxt <= ex_wr_data;
+      			    	sram_dq <= ex_wr_data;
+      			    end if;
      			    if(CLK_FREQ > SRAM_WR_FREQ) then
      			        sram_wait_nxt <= TO_UNSIGNED(0, 2);--TO_UNSIGNED(natural(floor(SRAM_WR_RATIO)), SRAM_WAIT_WIDTH) - 1;
      			        mmu_state_nxt <= st_sram;
@@ -282,8 +287,12 @@ mmu_return_result: process(ex_enable, q, done)
 		ex_done <= '0';
 		
 		if(ex_enable = '1') then
-	        ex_rd_data <= q;
-	        ex_done <= done;
+		    if(ex_opcode(0) = '1' and sram_a(0) = '0') then
+				ex_rd_data <= x"00" & q(15 downto 8);	        
+		    else
+	        	ex_rd_data <= q;
+	        end if;
+	       	ex_done <= done;
 	    else
 	        instr_data <= q;
 	        instr_valid <= done;
