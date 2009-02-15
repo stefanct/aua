@@ -37,7 +37,7 @@ def print_no_cpu():
 print "AUA interactive debugging shell 0.1"
 
 c = Cpu()
-c.load("../../as/boot")
+c.load("../../as/kurz")
 input = readline.get_line_buffer()
 while len(input) == 0 or input[0] != "q":
     

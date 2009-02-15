@@ -24,23 +24,37 @@ uart_read:
 
 	ldiw $1, SC_UART_STATUS
 	ldiw $4, SC_UART_DATA
+
   loop_read:
 	ldi $3, 2 -- Konstante 2
 	ld $2, $1 -- UART Status in $2
 	and $3, $2 -- Bit 0 in Status sagt, ob was zu lesen da
 	brezi $3, loop_read -- nichts zu lesen => warten
 
-	ld $2, $4 -- Daten lesen
-	st $2, $10 -- Daten speichern
+	ld $2, $4 -- Daten von UART lesen
+	stb $2, $10 -- Daten in SRAM speichern
+
+	addi $10, 1 -- Adresse zum Speicher +1
+
+  loop_read2: -- voll fad nochmal das selbe wie oben, damit
+	ldi $3, 2 -- Konstante 2
+	ld $2, $1 -- UART Status in $2
+	and $3, $2 -- Bit 0 in Status sagt, ob was zu lesen da
+	brezi $3, loop_read2 -- nichts zu lesen => warten
+
+	ld $2, $4 -- Daten von UART lesen
+	stb $2, $10 -- Daten in SRAM speichern
+
 
 	ldiw $5, SC_DIGITS
 	addi $5, 4
 	st $2, $5
 
-	addi $10, 2 -- Adresse zum Speicher +2
+	addi $10, 1 -- Adresse zum Speicher +1
 	addi $11, -1 -- wieder ein word weniger zu lesen
 
 	addi $5, 1
+	nop
 	st $11, $5
 
 	brnezi $11, loop_read -- solang wir noch lesen müssen, tun wir das brav

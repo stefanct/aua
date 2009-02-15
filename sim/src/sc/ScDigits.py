@@ -18,6 +18,7 @@ class ScDigits(ScDevice):
             self._address = address
     
     def st(self, address, data):
+        print "uart st"
         self._address = address
         self._data = data
         if address <= self._base + 8:

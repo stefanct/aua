@@ -31,7 +31,7 @@ class Cpu:
         digits = ScDigits(0xff10, 0xfff0)
         scm.add(digits)
         
-        self.__waiting = ()
+        self.__waiting = {"type": 0}
         self.__waiting_cycles = 0
         self.__cycles = 0
         self.__backtrace = []
@@ -64,7 +64,7 @@ class Cpu:
             try:
                 a = int(addresses[0], 0)
                 self.__breakpoints.append(a)
-                print "Added brakepoint", len(self.__breakpoints), "at", hex(a)
+                print "Added breakpoint", len(self.__breakpoints), "at", hex(a)
             except:
                 print "No valid breakpoint address."
         
@@ -197,25 +197,38 @@ class Cpu:
                 return True
         return False
     
-    def __ld(self, address, reg):
+    def __ld(self, address, reg, mask=False):
         if address < 0x8000: # SRAM
-            self.__waiting = (0, address, reg)
-            self.__waiting_cycles = self.__sram_wait_cycles
+            self.__waiting["action"] = "ld"
+            self.__waiting["type"] = "sram"
+            self.__waiting["cycles"] = self.__sram_wait_cycles
+            self.__waiting["address"] = address
+            self.__waiting["register"] = reg
+            self.__waiting["mask"] = mask
         elif address < 0x9000: # ROM
             self.__registers[reg] = self.__memory[address]
         else:
             self.__scm.ld(address)
-            self.__waiting = (0, reg)
+            self.__waiting["action"] = "ld"
+            self.__waiting["type"] = "sc"
+            self.__waiting["register"] = reg
+            self.__waiting["mask"] = mask
             
-    def __st(self, address, reg):
+    def __st(self, address, reg, mask=False):
         if address < 0x8000: # SRAM
-            self.__waiting = (1, address, reg)
-            self.__waiting_cycles = self.__sram_wait_cycles
+            self.__waiting["action"] = "st"
+            self.__waiting["type"] = "sram"
+            self.__waiting["cycles"] = self.__sram_wait_cycles
+            self.__waiting["address"] = address
+            self.__waiting["register"] = reg
+            self.__waiting["mask"] = mask
         elif address < 0x9000: # ROM
             pass
         else:
+            print "store", address, reg, mask
             self.__scm.st(address, self.__registers[reg])
-            self.__waiting = (1, reg)
+            self.__waiting["action"] = "st"
+            self.__waiting["type"] = "sc"
     
     def run(self, count=0):
         limit = False
@@ -236,7 +249,7 @@ class Cpu:
             
             self.__scm.tick()
             
-            if self.__waiting.__len__() == 0:
+            if self.__waiting["type"] == 0:
                 instruction = [0] * 2
                 for i in range(2):
                     instruction[i] = self.__memory[self.__pc + i]
@@ -356,29 +369,46 @@ class Cpu:
                 elif instr <= 0x3e: # st
                     self.__st(self.__registers[opb], opa)
                 
+                elif instr <= 0x3f: # stb
+                    self.__st(self.__registers[opb], opa, True)
+                
                 else:
                     self.unknown()
                     
-                
-            if self.__waiting.__len__() == 3: # SRAM
-                if self.__waiting_cycles > 0:
-                    self.__waiting_cycles -= 1
-                else:
-                    if self.__waiting[0] == 0: # ld
-                        self.__registers[self.__waiting[2]] = self.__memory[self.__waiting[1]];
-                    else: # st
-                        self.__memory[self.__waiting[1]] = self.__registers[self.__waiting[2]]
-                    self.__waiting = ()
             
-            elif self.__waiting.__len__() == 2: # SC
+            if self.__waiting["type"] == "sram":
+                if self.__waiting["cycles"] > 0:
+                    self.__waiting["cycles"] -= 1
+                else:
+                    if self.__waiting["action"] == "ld":
+                        if self.__waiting["mask"]: # nur ein Byte
+                            self.__registers[self.__waiting["register"]] &= 0xff00
+                            self.__registers[self.__waiting["register"]] |= self.__memory[self.__waiting["address"]] & 0xff
+                        else:
+                            self.__registers[self.__waiting["register"]] = self.__memory[self.__waiting["address"] & 0xfffe] << 8
+                            self.__registers[self.__waiting["register"]] |= self.__memory[self.__waiting["address"] | 1]
+                   
+                    else: # st
+                        if self.__waiting["mask"]: # nur ein Byte
+                            print "st mask"
+                            self.__memory[self.__waiting["address"]] = self.__registers[self.__waiting["register"]] & 0xff
+                        else:
+                            print "st no mask"
+                            self.__memory[self.__waiting["address"] & 0xfffe] = self.__registers[self.__waiting["register"]] >> 8
+                            self.__memory[self.__waiting["address"] | 1] = self.__registers[self.__waiting["register"]] & 0xff
+                    
+                    self.__waiting["type"] = 0
+            
+            elif self.__waiting["type"] == "sc": # TODO: mask
                 if self.__scm.is_ready():
-                    if self.__waiting[0] == 0: # ld
-                        self.__registers[self.__waiting[1]] = self.__scm.get_data()
+                    if self.__waiting["action"] == "ld":
+                        self.__registers[self.__waiting["register"]] = self.__scm.get_data()
                     else: # st
                         self.__scm.set_data()
-                    self.__waiting = ()
+                    self.__waiting["type"] = 0
                 
-            if self.__waiting.__len__() == 0:
+                
+            if self.__waiting["type"] == 0:
                 self.__pc += 2
             
             if self.__checkwatch():
