@@ -465,7 +465,7 @@ sync: process (clk, reset)
 sc_sync: process(clk, reset)
 	begin
 		if (reset='1') then
-			sc_sel_reg <= 0;
+			sc_sel_reg <= SC_SLAVE_CNT;
 		elsif rising_edge(clk) then
 			sc_sel_reg <= sc_sel;
 		end if;
@@ -487,6 +487,9 @@ sc_rdwr_mux: for i in 0 to SC_SLAVE_CNT-1 generate
 		mmuio_outa(i).wr <= mmuio_out.wr when i=sc_sel else '0';
 	end generate;
 
+-- 0* --> ram
+-- 10* --> rom
+-- 11* --> simcon...
 -- 1111* --> Blöcke 0xF000/4
 -- 11111111 * --> Blöcke 0xFF00/8 (I/O Devices)
 -- 11111111 0000* --> Switches 0xFF00/12

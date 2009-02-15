@@ -67,9 +67,11 @@ ldst_n_mux: process(opcode, opa, opb, dest_in, dest_nxt, mmu_result, mmu_done, a
 			mmu_enable <= '1';
 			ex_locks_nxt <= not mmu_done;
 			result_out <= mmu_result;
-			-- stores and incomplete mmu ops should not alter registers
 			if opcode(1) = '1' or mmu_done /= '1' then
-				dest_nxt <= (others => '0');
+				dest_nxt <= (others => '0'); -- stores and incomplete mmu ops should not alter registers
+			end if;
+			if opcode(0) = '1' then -- byte ld/st
+				result_out(WORD_SIZE-1 downto 8) <= opa(WORD_SIZE-1 downto 8); -- preserve all but the lowest byte
 			end if;
 		else
 			mmu_enable <= '0';
