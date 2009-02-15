@@ -208,7 +208,7 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, sram_b_e
      		else
      		    if(address(14) = '0') then -- non-Simpcon
      		    	if(address(13) = '0') then -- ROM (write wird ignoriert)
-     		    		rom_addr <= address;
+     		    		rom_addr <= address(15 downto 1) & '0';
      		    		q <= rom_q;
      		    		done <= '1';
      		    	end if;
