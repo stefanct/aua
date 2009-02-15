@@ -53,9 +53,12 @@ uart_read:
 	addi $10, 1 -- Adresse zum Speicher +1
 	addi $11, -1 -- wieder ein word weniger zu lesen
 
-	addi $5, 1
+	addi $5, -1
 	nop
-	st $11, $5
+
+	ldiw $24, 0
+	st $24, $5
+	!st $11, $5
 
 	brnezi $11, loop_read -- solang wir noch lesen müssen, tun wir das brav
 
