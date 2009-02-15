@@ -1,4 +1,4 @@
-from sc.sc_device import *
+from sc.ScDevice import *
 
 class ScMaster:
     
@@ -27,7 +27,7 @@ class ScMaster:
             print "device not found at ", hex(address)
     
     def st(self, address, data):
-        device = find_device(address)
+        device = self.find_device(address)
         if device:
             device.st(address, data)
             self.__active_device = device
@@ -48,3 +48,9 @@ class ScMaster:
             return False
         else:
             return self.__active_device.get_data()
+    
+    def set_data(self):
+        if self.__active_device == False:
+            return False
+        else:
+            return self.__active_device.set_data()

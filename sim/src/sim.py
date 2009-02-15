@@ -9,8 +9,9 @@ def print_help():
     print "HELP"
     print "  h[elp] \n\tPrint this help.\n"
     
-    print "\nNAVIGATING"
-    print "  r[un] \n\tRun the program. If already running, restart. Use c[ontinue] if you do not want to restart.\n"
+    print "\nNAVIGATION"
+    print "  reset \n\tReset the CPU.\n"
+    print "  r[un] \n\tRun the program. If already running, reset the CPU and restart. Use c[ontinue] if you just want to continue.\n"
     print "  c[ontinue] \n\tContinue program after breakpoint.\n"
     print "  n[ext] <nr>\n\tProcess <nr> instructions. If <nr> not given process one single instruction.\n"
     
@@ -19,6 +20,7 @@ def print_help():
     print "  bt \n\tPrint backtrace.\n"
     print "  regs \n\tPrints values of all registers.\n"
     print "  p[rint] <register|address> \n\tPrint a register or data at the address specified.\n"
+    print "  t[race] on|off \n\tTrace prints the program counter before every instruction executed.\n"
     
     print "\nCAPTURING"
     print "  b [address] \n\tSet one or more brakepoints."
@@ -82,9 +84,11 @@ while len(input) == 0 or input[0] != "q":
                 c.run(1)
             elif len(input) == 2:
                 try:
-                    c.run(int(input[1]))
+                    cycles = int(input[1])
                 except:
                     print "No valid number of cycles given."
+                else:
+                    c.run(cycles)
             else:
                 print "No valid number of cycles given."
         
@@ -125,6 +129,20 @@ while len(input) == 0 or input[0] != "q":
         
         elif input[0] == "regs":
             c.print_regs()
+        
+        elif input[0] == "reset":
+            c.reset()
+        
+        elif input[0] == "t" or input[0] == "trace":
+            if len(input) > 1:
+                if input[1] == "on" or input[1] == "On" or input[1] == "1":
+                    c.set_trace(1)
+                    print "Trace is now on."
+                elif input[1] == "off" or input[1] == "Off" or input[1] == "0":
+                    c.set_trace(0)
+                    print "Trace is now off."
+            else:
+                print "You must set trace to \"on\" or \"off\"."
         
         elif input[0] == "w" or input[0] == "watch":
             if len(input) > 1:

@@ -33,3 +33,7 @@ class ScDevice:
     def get_data(self):
         print "Unknown device"
         return False
+    
+    def set_data(self, data):
+        print "Unknown device"
+        return False

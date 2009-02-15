@@ -1,7 +1,8 @@
 import sys
 from utils import *
-from sc_master import *
-from sc.sc_uart import *
+from ScMaster import *
+from sc.ScUart import *
+from sc.ScDigits import *
 
 class Cpu:
 
@@ -13,6 +14,7 @@ class Cpu:
 
         self.__breakpoints = []
         self.__watch = []
+        self.__trace = 0
         
         self.reset()
 
@@ -21,10 +23,14 @@ class Cpu:
         self.__registers = [0] * 32
         self.__carry = 0
         self.__memory = [0 for x in range(1 << 16)]
+        
         scm = ScMaster()
+        self.__scm = scm
         uart = ScUart(0xff20, 0xfff0)
         scm.add(uart)
-        self.__scm = scm
+        digits = ScDigits(0xff10, 0xfff0)
+        scm.add(digits)
+        
         self.__waiting = ()
         self.__waiting_cycles = 0
         self.__cycles = 0
@@ -52,25 +58,6 @@ class Cpu:
     
     def unknown(self):
         print "Instruction invalid or not yet implemented"
-    
-    def __ld(self, address, reg):
-        if address < 0x8000: # SRAM
-            self.__waiting = (0, address, reg)
-            self.__waiting_cycles = self.__sram_wait_cycles
-        elif address < 0x9000: # ROM
-            self.__registers[reg] = self.__memory[address]
-        else:
-            self.__scm.ld(address)
-            self.__waiting = (0, reg)
-            
-    def __st(self, address, reg):
-        if address < 0x8000: # SRAM
-            self.__waiting = (1, address, reg)
-            self.__waiting_cycles = self.__sram_wait_cycles
-        elif address < 0x9000: # ROM
-            pass
-        else:
-            pass
     
     def add_breakpoint(self, addresses):
         if len(addresses) == 1:
@@ -193,21 +180,52 @@ class Cpu:
             print reduce(lambda x, y: x + " -> " + y, map(hex, self.__backtrace)) + " -> " + hex(self.__pc)
     
     def print_status(self):
-        self.print_backtrace()
         print "Cycles since reset:", self.__cycles
-        
+        if len(self.__backtrace) == 0:
+            print "Backtrace:", hex(self.__pc)
+        else:
+            print "Backtrace:", reduce(lambda x, y: x + " -> " + y, map(hex, self.__backtrace)) + " -> " + hex(self.__pc)
+        print "$fp:", hex(self.__registers[30]), "\t$sp:", hex(self.__registers[29]) 
+    
+    def set_trace(self, state):
+        self.__trace = state
+    
     def __checkwatch(self):
         for c in self.__changed_regs:
             if self.__watch.__contains__(c):
-                print "Watched register $", c, "changed at", hex(self.__pc - 2)
+                print "Watched register $" + str(c) + " changed at " + hex(self.__pc - 2) + ": " + hex(self.__registers[c])
                 return True
         return False
+    
+    def __ld(self, address, reg):
+        if address < 0x8000: # SRAM
+            self.__waiting = (0, address, reg)
+            self.__waiting_cycles = self.__sram_wait_cycles
+        elif address < 0x9000: # ROM
+            self.__registers[reg] = self.__memory[address]
+        else:
+            self.__scm.ld(address)
+            self.__waiting = (0, reg)
+            
+    def __st(self, address, reg):
+        if address < 0x8000: # SRAM
+            self.__waiting = (1, address, reg)
+            self.__waiting_cycles = self.__sram_wait_cycles
+        elif address < 0x9000: # ROM
+            pass
+        else:
+            self.__scm.st(address, self.__registers[reg])
+            self.__waiting = (1, reg)
     
     def run(self, count=0):
         limit = False
         if count > 0:
             limit = True
+        
         while limit == False or count > 0:
+            
+            if self.__trace == 1:
+                print "PC:", hex(self.__pc)
             
             if count > 0:
                 count -= 1
@@ -237,33 +255,33 @@ class Cpu:
                     self.__changed_regs += [opa]
                     
                 elif instr <= 0x0c:
-                    unknown
+                    self.unknown()
                 
                 elif instr <= 0x0d: # jmpl
                     self.__registers[31] = self.__pc + 2
                     self.__backtrace.insert(0, self.__pc)
-                    self.__pc = self.__registers[opb]
+                    self.__pc = self.__registers[opb] - 2
                     self.__changed_regs += [31]
                     
                 elif instr <= 0x0e: # brez
-                    if opa == 0:
+                    if self.__registers[opa] == 0:
                         if opb == 31:
                             self.__backtrace.pop(0)
-                        self.__pc = to_signed(opb, 16)
+                        self.__pc = to_unsigned(self.__registers[opb] - 2, 16)
                 
                 elif instr <= 0x0f: # brnez
-                    if opa != 0:
-                        self.__pc = to_signed(opb, 16)
+                    if self.__registers[opa] != 0:
+                        self.__pc = to_unsigned(self.__registers[opb] - 2, 16)
                         
                 elif instr <= 0x13: # brezi
                     opb += ((instr & 0x3) << 5)
-                    if opa == 0:
-                        self.__pc += to_signed(opb * 2 + 2, 8)
+                    if self.__registers[opa] == 0:
+                        self.__pc += to_signed(opb * 2 - 2, 8)
                 
                 elif instr <= 0x17: # brnezi
                     opb += ((instr & 0x3) << 5)
-                    if opa != 0:
-                        self.__pc += to_signed(opb * 2 + 2, 8)
+                    if self.__registers[opa] != 0:
+                        self.__pc += to_signed(opb * 2 - 2, 8)
                 
                 elif instr <= 0x1b: # addi
                     opb += ((instr & 0x3) << 5)
@@ -323,12 +341,14 @@ class Cpu:
                 
                 elif instr <= 0x30: # lsli
                     self.__registers[opa] <<= opb
+                    self.__changed_regs += [opa]
                 
                 elif instr <= 0x3b:
                     self.unknown()
                 
                 elif instr <= 0x3c: # ld
                     self.__ld(self.__registers[opb], opa)
+                    self.__changed_regs += [opa]
                 
                 elif instr <= 0x3d:
                     self.unknown()
@@ -345,20 +365,18 @@ class Cpu:
                     self.__waiting_cycles -= 1
                 else:
                     if self.__waiting[0] == 0: # ld
-                        self.__registers[self.__waiting[2]] = memory[1];
+                        self.__registers[self.__waiting[2]] = self.__memory[self.__waiting[1]];
                     else: # st
-                        self.__memory[1] = self.__registers[self.__waiting[2]]
+                        self.__memory[self.__waiting[1]] = self.__registers[self.__waiting[2]]
                     self.__waiting = ()
-                    self.__pc += 2
             
             elif self.__waiting.__len__() == 2: # SC
                 if self.__scm.is_ready():
                     if self.__waiting[0] == 0: # ld
                         self.__registers[self.__waiting[1]] = self.__scm.get_data()
                     else: # st
-                        pass
+                        self.__scm.set_data()
                     self.__waiting = ()
-                    self.__pc += 2
                 
             if self.__waiting.__len__() == 0:
                 self.__pc += 2

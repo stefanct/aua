@@ -1,4 +1,4 @@
-from sc.sc_device import *
+from sc.ScDevice import *
 
 import readline
 
@@ -11,9 +11,9 @@ class ScUart(ScDevice):
         self._mask = mask
     
     def ld(self, address):
-        if address == self._base:
+        if address & self._mask == self._base:
             self._wait_cycles = 1
-            self._data = 1
+            self.__address = address
     
     def st(self, address, data):
         print "[UART]: ", _data
@@ -21,8 +21,15 @@ class ScUart(ScDevice):
     def get_data(self):
         if self.is_ready():
             input = ""
+            
+            what = "invalid element" + hex(self.__address)
+            if self.__address == self._base:
+                what = "status"
+            elif self.__address == self._base + 1:
+                what = "data"
+            
             while len(input) < 1:
-                input = raw_input('[UART] Reading byte: ')
+                input = raw_input("[UART] Reading " + what + ": ")
             try:
                 input = int(input, 0)
             except:
