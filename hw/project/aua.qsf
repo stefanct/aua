@@ -196,6 +196,11 @@ set_global_assignment -name QIP_FILE ../reg/src/ram.qip
 set_global_assignment -name VHDL_FILE ../reg/src/reg.vhd
 set_global_assignment -name VHDL_FILE ../id/src/id.vhd
 set_global_assignment -name VHDL_FILE ../ex/src/ex.vhd
-set_global_assignment -name VHDL_FILE ../alu/src/alu.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/alu_ent.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/alu_old.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/Mux4to1.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/Mux16to1.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/Mux32to1.vhd
+set_global_assignment -name VHDL_FILE ../alu/src/alu_opt.vhd
 set_global_assignment -name QIP_FILE ../src/aua_pll.qip
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd

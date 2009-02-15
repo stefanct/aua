@@ -3,18 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use work.aua_types.all;
 
-entity alu is
-	port (
-		clk		: in	std_logic;
-		reset	: in	std_logic;
-		opcode	: in	opcode_t;
-		opa		: in	word_t;
-		opb		: in	word_t;
-		result	: out	word_t
-	);
-end alu;
-
-architecture sat1 of alu is
+architecture old of alu is
 	signal carry: 		std_logic;
 	signal carry_nxt:	std_logic;
 	--constant max_value : integer := 2**word_t'length - 1;
@@ -256,4 +245,4 @@ sync_carry: process (clk, reset)
 				when others => result <= x"0000";
 			end case;
 		end process;
-    end sat1;
+    end old;

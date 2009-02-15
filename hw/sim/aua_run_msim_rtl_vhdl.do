@@ -58,7 +58,12 @@ vcom -93 -work work $path_to_calu_svn/AUA/hw/if/src/if.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/reg/src/reg.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/id/src/id.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/ex/src/ex.vhd
-vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/alu.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/alu_ent.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/alu_old.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/Mux4to1.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/Mux16to1.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/Mux32to1.vhd
+vcom -93 -work work $path_to_calu_svn/AUA/hw/alu/src/alu_opt.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_pll.vhd
 vcom -93 -work work $path_to_calu_svn/AUA/hw/src/aua_top.vhd
 

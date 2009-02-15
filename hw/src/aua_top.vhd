@@ -465,7 +465,8 @@ sync: process (clk, reset)
 sc_sync: process(clk, reset)
 	begin
 		if (reset='1') then
-			sc_sel_reg <= SC_SLAVE_CNT;
+			sc_sel_reg <= 0;
+--			sc_sel_reg <= SC_SLAVE_CNT; -- would be correct, but does not work on all devices; procudes warning
 		elsif rising_edge(clk) then
 			sc_sel_reg <= sc_sel;
 		end if;
@@ -535,6 +536,15 @@ configuration aua_cache of aua is
 		for cmp_icache : instr_cache
 			use entity work.instr_cache(cache_null);
 			--~ use entity work.instr_cache(cache_direct);
+	    end for;
+		for cmp_ex: ex
+			use entity work.ex(sat1);
+			for sat1
+				for cmp_alu: alu
+					use entity work.alu(old);
+					--~ use entity work.alu(opt);
+				end for;
+			end for;
 	    end for;
 	    -- does not work... why?
 	    --~ for cmp_mmu: mmu
