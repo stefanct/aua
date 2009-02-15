@@ -13,7 +13,7 @@ call $2
 
 ldiw $5, SC_DIGITS
 addi $5, 1
-ldiw $6, 1
+ldiw $6, 0
 st $6, $5
 
 ld $11, $10 -- jetzt lesen wir soviel, wie das Image lang ist
@@ -25,6 +25,9 @@ call $2
 addi $5, 1
 ldiw $6, 2
 st $6, $5
+
+loop:
+	rjmpi loop
 
 #include libaua/stdlib.h
 #include libaua/io/uart.h
