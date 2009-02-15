@@ -16,6 +16,7 @@ entity ent_if is
 		opcode_out	: out opcode_t;
 		dest_out	: out reg_t;
 		pc_out		: out pc_t;
+		pcnxt_out	: out pc_t;
 		rega_out	: out reg_t;
 		regb_out	: out reg_t;
 		imm_out		: out std_logic_vector(7 downto 0);
@@ -63,6 +64,7 @@ begin
 	regb_out <= regb;
 	imm_out <= imm;
 	pc_out <= pc_id;
+	pcnxt_out <= pc;
 
 instr_dec: process(reset, instr_data, branch, instr_valid)
 	begin

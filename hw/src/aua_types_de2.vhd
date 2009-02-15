@@ -6,6 +6,7 @@ use ieee.math_real.log2;
 use ieee.math_real.ceil;
 
 package aua_types is
+
 	constant ADDR_SIZE		: natural := 16;
 	constant WORD_SIZE		: natural := ADDR_SIZE;
 
@@ -33,6 +34,7 @@ package aua_types is
 
 	-- number of bits needed to address all slaves (2**SC_ADDR_BITS >= SLAVE_CNT)
 	constant SC_ADDR_BITS : integer := integer(ceil(log2(real(SC_SLAVE_CNT))));
+	--~ constant SC_ADDR_BITS : integer := integer(reqbits_for_choices(SC_SLAVE_CNT));
 
 	type sc_out_t is record
 		address		: std_logic_vector(SC_ADDR_SIZE-1 downto 0);
@@ -53,19 +55,60 @@ package aua_types is
 	subtype sc_addr_t is std_logic_vector(SC_ADDR_SIZE-1 downto 0);
 	subtype sc_data_t is std_logic_vector(SC_DATA_SIZE-1 downto 0);
 
-
-	function max (L, R: real) return real;
+	function max (L, R: real)
+		return real;
+    function bool2sl (arg : boolean)
+       return std_logic;
+    function sl2bool (arg : std_logic)
+       return boolean;
+    function reqbits_for_choices (choices : natural)
+       return positive;
+    function reqbitsZ_for_choices (choices : natural)
+       return natural;
 
 end aua_types;
 
 -- package body for aua on DE2
 package body aua_types is
-   	function max (L, R: real) return real IS
-	begin
+   	function max (L, R: real)
+   		return real is begin
 	    if L > R then
 	        return L;
 	    else
 	        return R;
 	    end if;
 	end function max;
+	
+	function bool2sl (arg : boolean) 
+       return std_logic is begin 
+       if arg then 
+          return '1'; 
+       else 
+          return '0'; 
+       end if; 
+    end function bool2sl;
+
+	function sl2bool (arg : std_logic) 
+       return boolean is begin 
+       if arg='1' then 
+          return true; 
+       else 
+          return false; 
+       end if; 
+    end function sl2bool;
+    
+    function reqbits_for_choices (choices : natural)
+		return positive is begin 
+		if choices=1 then 
+			return 1; 
+		else 
+			return positive(ceil(log2(real(choices)))); 
+		end if; 
+    end function reqbits_for_choices;
+    
+    function reqbitsZ_for_choices (choices : natural)
+		return natural is begin 
+		return natural(ceil(log2(real(choices)))); 
+    end function reqbitsZ_for_choices;
+    
 end aua_types;

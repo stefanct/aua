@@ -84,8 +84,11 @@ add wave -hex	/aua_tb/aua1/cmp_if/pc_nxt
 
 
 #~ add wave -divider CACHE(direct-mapped)
-#~ add wave		/aua_tb/aua1/cmp_icache/store
-#~ add wave		/aua_tb/aua1/cmp_icache/cur_line
+#~ add wave -hex	/aua_tb/aua1/cmp_icache/test
+#~ add wave -hex	/aua_tb/aua1/cmp_icache/testr
+#~ add wave -hex	/aua_tb/aua1/cmp_icache/store
+#~ add wave -uns	/aua_tb/aua1/cmp_icache/cur_word
+#~ add wave -uns	/aua_tb/aua1/cmp_icache/cur_line
 #~ add wave		/aua_tb/aua1/cmp_icache/in_cache
 
 add wave -divider IF/MMU
@@ -97,6 +100,7 @@ add wave		/aua_tb/aua1/cmp_mmu/instr_enable
 add wave -divider ID
 add wave -hex	/aua_tb/aua1/cmp_id/opcode_in
 add wave -hex	/aua_tb/aua1/cmp_id/pc_in
+add wave -hex	/aua_tb/aua1/cmp_id/pc_out
 add wave		/aua_tb/aua1/cmp_id/branch/brinstr
 add wave		/aua_tb/aua1/cmp_id/branch/inv
 add wave		/aua_tb/aua1/cmp_id/br_data_hz_nxt

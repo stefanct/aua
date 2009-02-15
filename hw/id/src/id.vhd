@@ -13,6 +13,7 @@ entity id is
 		opcode_in	: in opcode_t;
 		dest_in		: in reg_t;
 		pc_in		: in pc_t;
+		pcnxt_in	: in pc_t;
 		rega_in		: in reg_t;
 		regb_in		: in reg_t;
 		imm_in		: in std_logic_vector(7 downto 0);
@@ -93,7 +94,7 @@ begin
 		regb_nxt <= regb_in;
 		id_locks <= br_data_hz_nxt;
 
-branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_in, br_data_hz)
+branch: process (opcode_in, pc_in, vala, valb, dest_in, dest, opb_nxt, rega_in, regb_in, br_data_hz)
 		variable inv : std_logic; -- set if op is a "not branch"
 		variable brinstr : std_logic; -- set if op changes PC
 	begin
@@ -117,6 +118,7 @@ branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_i
 		elsif opcode_in(5 downto 1) ="00111" then
 			inv := opcode_in(0);
 			brinstr := '1';
+			pc_out <= pc_t(opb_nxt); -- absolute branch
 			-- schedule nop
 			opcode_nxt <= (others => '0');
 			opa_to_nop <= '1';
@@ -128,8 +130,7 @@ branch: process (opcode_in, pc_in, vala, dest_in, dest, opb_nxt, rega_in, regb_i
 			opcode_nxt <= "111011";
 			dest_nxt <= "11111";
 			jmpl_op <= '1';
-			-- jump is absolute!
-			pc_out <= pc_t(opb_nxt);
+			pc_out <= pc_t(valb); -- jump is absolute, and we need to take the reg value directly!
 		elsif opcode_in(5 downto 2) = "1101" or opcode_in(5 downto 1) = "11100" then
 			dest_nxt <= "11011";
 		else
@@ -157,7 +158,7 @@ insert_nop: process (vala, opa_to_nop)
 	end process;
 
 	-- sign extend, expand and mux with regb
-extend_n_mux: process (opcode_in, imm_in, valb, jmpl_op, pc_in)
+extend_n_mux: process (opcode_in, imm_in, valb, jmpl_op, pcnxt_in)
 	begin
 		opb_isfrom_regb_nxt <= false;
 		if opcode_in(5 downto 3)="000" then
@@ -173,8 +174,8 @@ extend_n_mux: process (opcode_in, imm_in, valb, jmpl_op, pc_in)
 				opb_nxt <= (15 downto 7 => imm_in(6)) & imm_in(6 downto 0);
 			end if;
 		elsif jmpl_op='1' then
-			--~ opb_nxt <= word_t(pc_in);
-			opb_nxt <= valb;
+			opb_nxt <= word_t(pcnxt_in); -- EX needs the return address
+			--~ opb_nxt <= valb;
 		else
 			opb_isfrom_regb_nxt <= true;
 			opb_nxt <= valb;
