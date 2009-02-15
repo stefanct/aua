@@ -204,3 +204,14 @@ set_global_assignment -name VHDL_FILE ../alu/src/Mux32to1.vhd
 set_global_assignment -name VHDL_FILE ../alu/src/alu_opt.vhd
 set_global_assignment -name QIP_FILE ../src/aua_pll.qip
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
+set_global_assignment -name SMART_RECOMPILE ON
+set_global_assignment -name AUTO_SHIFT_REGISTER_RECOGNITION ALWAYS
+set_global_assignment -name CYCLONEII_OPTIMIZATION_TECHNIQUE SPEED
+set_global_assignment -name REMOVE_REDUNDANT_LOGIC_CELLS ON
+set_global_assignment -name ADV_NETLIST_OPT_SYNTH_GATE_RETIME ON
+set_global_assignment -name MISC_FILE aua.dpf
+set_global_assignment -name IGNORE_LCELL_BUFFERS ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
+set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_RETIMING ON
+set_global_assignment -name PRE_MAPPING_RESYNTHESIS ON

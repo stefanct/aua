@@ -278,7 +278,7 @@ mmu_load_store: process(address, write, ex_enable, ex_wr_data, sram_dq, sram_b_e
     	end case;
  	end process;
 	
-mmu_return_result: process(ex_enable, q, done)
+mmu_return_result: process(ex_enable, q, done, sram_a, ex_opcode)
 	begin
 	    instr_data <= (others => '0');
 	    ex_rd_data <= (others => '0');
