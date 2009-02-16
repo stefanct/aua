@@ -34,6 +34,13 @@ uart_read:
 	and $22, $21
 	brezi $22, switch_loop
 
+  switch_loop2:
+	ld $21, $20
+	mov $22, $0
+	addi $22, 2
+	and $22, $21
+	brezi $22, switch_loop2
+
 
   loop_read:
 	ldi $23, 2 -- Konstante 2
