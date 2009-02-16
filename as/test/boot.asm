@@ -23,7 +23,7 @@ ld $11, $10 -- jetzt lesen wir soviel, wie das Image lang ist
 ldiw $11, 5 -- zum Testen ohne SRAM
 st $11, $16
 
-call $2
+!call $2
 
 
 addi $5, 1
