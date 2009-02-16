@@ -27,7 +27,7 @@ architecture aua_test of aua_tb is
 			sram_lb		: out std_logic;
 		--	sram_ce		: out std_logic
 			txd			: out std_logic;
-			rxd			: in std_logic
+			rxd			: in std_ulogic
 			--~ ncts		: in std_logic;
 			--~ nrts		: out std_logic
 
@@ -51,9 +51,41 @@ architecture aua_test of aua_tb is
 	signal sram_lb		: std_logic;
 	signal txd		: std_logic;
 	signal rxd		: std_logic;
+
+
+
+
+    constant freq: natural := 70000000;
+    constant clk_tick: natural := 1000000000/freq;
+    constant uart_baud: natural := 115200;
+    constant uart_clks: natural := freq/uart_baud;
 begin
-    
-    aua1: configuration work.aua_cache
+
+uart: process
+        procedure icwait(cycles : natural) is
+    begin
+      for i in 1 to cycles loop
+        wait until clk = '0' and clk'event;
+      end loop;
+    end;
+
+	begin
+	rxd <= '0';
+	icwait(uart_clks*2);
+	rxd <= '1';
+	icwait(uart_clks);
+	rxd <= '0';
+	icwait(uart_clks*2);
+	rxd <= '1';
+	icwait(uart_clks*2);
+	rxd <= '0';
+	icwait(uart_clks*2);
+	rxd <= '1';
+	icwait(uart_clks*2);
+	
+	end process;
+   
+aua1: configuration work.aua_cache
     port map (
 		clk_in => clk,
 		reset_pin => reset_pin,
@@ -74,7 +106,7 @@ begin
 		rxd => rxd
     );
     
-    CLKGEN: process
+CLKGEN: process
     begin
         clk <= '1';
         wait for 10 ns;
@@ -82,7 +114,7 @@ begin
         wait for 10 ns;
     end process CLKGEN;
     
-    TEST: process
+TEST: process
         procedure icwait(cycles : natural) is
     begin
       for i in 1 to cycles loop
@@ -91,14 +123,14 @@ begin
     end;
     begin
         reset_pin <= '0';
-        switch_pins <= x"DEAD";
+        switch_pins <= x"ffff";
         sram_dq <= (others => '0');
-        rxd <= '0';
+        --~ rxd <= '0';
         
         icwait(2);
         reset_pin <= '1';
         
-        icwait(40);
+        icwait(7000);
         
         assert false report "sim finish" SEVERITY failure;
                 

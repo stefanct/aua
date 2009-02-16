@@ -1,12 +1,7 @@
-jmpl/ret konkretisieren/durchdenken und dann implementieren (as only. abi (argument registers, caller/callee saves etc))
-ex fwd nochmal ueberdenken
-COMPARES IMPLEMENTIEREN UND OPCODES VERSCHIEBEN
-synchron reset?
-alu optimieren
+abi (argument registers, caller/callee saves etc)
 ganz tolle neue instructions erfinden
 bootloader
 sc_timer
 i-cache
-branch (und andere?) adressen muessen nur words adressieren... 1 bit mehr aufloesung? as und vhdl changes...
 
 doku (siehe http://en.wikiversity.org/wiki/Computer_Architecture_Lab#Documentation)

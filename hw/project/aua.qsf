@@ -209,7 +209,6 @@ set_global_assignment -name AUTO_SHIFT_REGISTER_RECOGNITION ALWAYS
 set_global_assignment -name CYCLONEII_OPTIMIZATION_TECHNIQUE SPEED
 set_global_assignment -name REMOVE_REDUNDANT_LOGIC_CELLS ON
 set_global_assignment -name ADV_NETLIST_OPT_SYNTH_GATE_RETIME ON
-set_global_assignment -name MISC_FILE aua.dpf
 set_global_assignment -name IGNORE_LCELL_BUFFERS ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_COMBO_LOGIC ON
 set_global_assignment -name PHYSICAL_SYNTHESIS_REGISTER_DUPLICATION ON
