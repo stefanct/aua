@@ -22,16 +22,18 @@ uart_read:
 	!push $10 -- Adresse, wohin das Zeug soll
 	!push $11 -- Anzahl an words zu lesen
 
-	ldiw $21, SC_UART_STATUS
-	ldiw $24, SC_UART_DATA
+	!ldiw $21, SC_UART_STATUS
+	!ldiw $24, SC_UART_DATA
 
   loop_read:
 	ldi $23, 2 -- Konstante 2
-	ld $22, $21 -- UART Status in $2
+	!ld $22, $21 -- UART Status in $2
+	ldiw $22, 2 -- nochmal 2, zum Debuggen ohne UART
 	and $23, $22 -- Bit 0 in Status sagt, ob was zu lesen da
 	brezi $23, loop_read -- nichts zu lesen => warten
 
-	ld $22, $24 -- Daten von UART lesen
+	!ld $22, $24 -- Daten von UART lesen
+	ldiw $22, 7 -- fix ohne UART
 	stb $22, $10 -- Daten in SRAM speichern
 
 	addi $10, 1 -- Adresse zum Speicher +1
