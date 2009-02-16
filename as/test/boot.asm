@@ -17,7 +17,10 @@ ldiw $6, 0
 ld $7, $6
 st $7, $5
 
+ldiw $10, 0 -- UART Datenpointer wieder laden
+
 ld $11, $10 -- jetzt lesen wir soviel, wie das Image lang ist
+ldiw $11, 5 -- zum Testen ohne SRAM
 st $11, $16
 
 call $2
