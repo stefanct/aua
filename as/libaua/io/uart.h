@@ -30,20 +30,28 @@ uart_read:
 
 
 
-switch_loop:
-	ldiw $20, SC_SWITCHES
-	ld $21, $20
-	mov $22, $0
-	addi $22, 1
-	and $22, $21
-	brezi $22, switch_loop
+!switch_loop:
+!	ldiw $20, SC_SWITCHES
+!	ld $21, $20
+!	mov $22, $0
+!	addi $22, 1
+!	and $22, $21
+!	brezi $22, switch_loop
+!
+!switch_loop2:
+!	ld $21, $20
+!	mov $22, $0
+!	addi $22, 2
+!	and $22, $21
+!	brezi $22, switch_loop2
 
-switch_loop2:
+uart_loop:
+	ldiw $20, SC_UART_STATUS
 	ld $21, $20
 	mov $22, $0
 	addi $22, 2
 	and $22, $21
-	brezi $22, switch_loop2
+	brezi $22, uart_loop
 
 
 
