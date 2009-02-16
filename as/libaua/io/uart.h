@@ -37,7 +37,7 @@ uart_read:
 !	addi $22, 1
 !	and $22, $21
 !	brezi $22, switch_loop
-!
+
 !switch_loop2:
 !	ld $21, $20
 !	mov $22, $0
