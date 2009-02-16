@@ -36,3 +36,4 @@ loop:
 #include libaua/stdlib.h
 #include libaua/io/uart.h
 #include libaua/io/digit.h
+#include libaua/io/switches.h

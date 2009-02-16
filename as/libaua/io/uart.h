@@ -25,6 +25,16 @@ uart_read:
 	!ldiw $21, SC_UART_STATUS
 	!ldiw $24, SC_UART_DATA
 
+
+  switch_loop:
+	ldiw $20, SC_SWITCHES
+	ld $21, $20
+	mov $22, $0
+	addi $22, 1
+	and $22, $21
+	brezi $22, switch_loop
+
+
   loop_read:
 	ldi $23, 2 -- Konstante 2
 	!ld $22, $21 -- UART Status in $2
