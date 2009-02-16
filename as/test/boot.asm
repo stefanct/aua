@@ -19,11 +19,13 @@ st $7, $5
 
 ldiw $10, 0 -- UART Datenpointer wieder laden
 
-ld $11, $10 -- jetzt lesen wir soviel, wie das Image lang ist
+!ld $11, $10 -- jetzt lesen wir soviel, wie das Image lang ist
 ldiw $11, 5 -- zum Testen ohne SRAM
 st $11, $16
 
-!call $2
+ldiw $11, 4
+!mov $11, $21
+call $2
 
 
 addi $5, 1
