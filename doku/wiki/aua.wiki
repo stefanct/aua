@@ -970,12 +970,12 @@ See the online help (command "h") for further instructions.
 #include libaua/io/digit.h
 #include libaua/io/uart.h
 
-ldiw $20, SC_DIGITS --(0xff10) memory mapped simcon slave
+ldiw $20, SC_DIGITS -- (0xff10) address of memory mapped simcon slave
 ldiw $21, 0xaa
 st $21, $20
 
 
-ldiw $1, SC_UART -- (0xff20) memory mapped simcon slave
+ldiw $1, SC_UART -- (0xff20) address of memory mapped simcon slave
 mov $2, $1
 addi $2, 1
 
