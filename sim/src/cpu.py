@@ -338,9 +338,22 @@ class Cpu:
                         self.__registers[opa] = to_unsigned(self.__registers[opa], 16)
                     self.__changed_regs += [opa]
                 
-                elif instr <= 0x27:
-                    self.unknown()
-                                    
+		    	elif instr <= 0x24: # mul
+					self.__registers[opa] = to_unsigned(to_signed(self.__registers[opa], 16) * to_signed(self.__registers[opb], 16), 32) & 0xffff
+                    self.__changed_regs += [opa]
+
+				elif instr <= 0x25: # mulu
+					self.__registers[opa] = to_unsigned(self.__registers[opa] * self.__registers[opb], 32) & 0xffff
+                    self.__changed_regs += [opa]
+
+				elif instr <= 0x26: # mulh
+					self.__registers[opa] = to_unsigned(to_signed(self.__registers[opa], 16) * to_signed(self.__registers[opb], 16), 32) >> 0x10
+                    self.__changed_regs += [opa]
+
+				elif instr <= 0x27: # mulhu
+					self.__registers[opa] = to_unsigned(self.__registers[opa] * self.__registers[opb], 32) >> 0x10
+                    self.__changed_regs += [opa]
+
                 elif instr <= 0x28: # or
                     self.__registers[opa] |= self.__registers[opb]
                     self.__changed_regs += [opa]
@@ -349,14 +362,44 @@ class Cpu:
                     self.__registers[opa] &= self.__registers[opb] 
                     self.__changed_regs += [opa]
                 
-                elif instr <= 0x2f:
-                    self.unknown()
-                
+				elif instr <= 0x2a: # xor
+					self.__registers[opa] = to_unsigned(self.__registers[opa] ^ self.__registers[opb], 16)
+                    self.__changed_regs += [opa]
+				
+				elif instr <= 0x2b: # not
+					self.__registers[opa] = to_unsigned(~self.__registers[opb], 16)
+                    self.__changed_regs += [opa]
+				
+				elif instr <= 0x2c: # neg
+					self.__registers[opa] = to_unsigend(0 - self.__registers[opb], 16)
+                    self.__changed_regs += [opa]
+				
+				elif instr <= 0x2d: # asr TODO
+					pass
+
+				elif instr <= 0x2e: # lsl
+					self.__registers[opa] = to_unsigned(self.__registers[opa] << self.__registers[opb], 16)
+                    self.__changed_regs += [opa]
+
+				elif instr <= 0x2f: # lsr
+					self.__registers[opa] = to_unsigned(self.__registers[opa] >> self.__registers[opb], 16)
+                    self.__changed_regs += [opa]
+
                 elif instr <= 0x30: # lsli
                     self.__registers[opa] <<= opb
                     self.__changed_regs += [opa]
                 
-                elif instr <= 0x3b:
+				elif instr <= 0x31: # lsri
+					self.__registers[opa] >>= opb
+                    self.__changed_regs += [opa]
+				
+				elif instr <= 0x32: # scb
+					if opb >= 0x10:
+						self.__registers[opa] |= 1 << (opb & 0xf)
+					else:
+						self.__registers[opa] &= ~(1 << (opb & 0xf))
+
+				elif instr <= 0x3b:
                     self.unknown()
                 
                 elif instr <= 0x3c: # ld
