@@ -985,6 +985,9 @@ See the online help (command "h") for further instructions.
 == Example program ==
 '''Hello World'''<br/>
 <source lang="asm">
+#include libaua/io/digit.h
+#include libaua/io/uart.h
+
 ldiw $20, SC_DIGITS -- (0xff10) address of memory mapped simcon slave
 ldiw $21, 0xaa
 st $21, $20
@@ -1037,12 +1040,6 @@ foo:
 	brezi $6, loop0
 
 	rjmpi loop
-
--- includes are placed exactly where they are written by the assembler.
--- the cpu starts with the instruction at the beginning of the ROM.
--- therefore the library includes have to come last.
-#include libaua/io/digit.h
-#include libaua/io/uart.h
 </source>
 
 [[Category:Computer Architecture]]
