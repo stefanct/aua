@@ -910,6 +910,34 @@ LDI R1, 3F<br/>
 LSLI R1,8<br/>														
 LDI R1, 1A															
 
+
+'''setb - Set Bit'''
+{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd(x) <-- 1||SETB Rd, Imm||Imm is 4 bits long, and indicates bit pos to set 
+|-
+|}
+
+Set the corresponding bit in Rd<br/>
+Implemented as scb where the 4th bit is 1.<br/><br/>
+Example: SETB R10, 0xF pass to SCB R10, 0x1F
+
+
+'''clrb - Clear Bit'''
+{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd(x) <-- 0||CLRB Rd, Imm||Imm is 4 bits long, and indicates bit pos to clear 
+|-
+|}
+
+Clear the corresponding bit in Rd<br/>
+Implemented as scb where the 4th bit is 0.<br/><br/>
+Example: CLRB R10, 0xF pass to SCB R10, 0x0F
+
+
+
 = Build Instructions =
 When the source is available... there will be 3 directories:
 
