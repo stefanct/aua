@@ -791,7 +791,7 @@ Example: brezi $0,Imm
 Test if Rd > Rs<br/>															
 If true write 1 to Rd otherwise 0<br/>															
 Implemented as a cmplte between Rs and Rd<br/><br/>
-Example: CMPGT R1, R2 pass to CMPLTE R2, R1
+Example: CMPGT R1, R2 maps to CMPLTE R2, R1
 
 
 '''Cmpgt – Compare Greater than Unsigned'''
@@ -806,7 +806,7 @@ Example: CMPGT R1, R2 pass to CMPLTE R2, R1
 Test if Rd > Rs<br/>
 If true write 1 to Rd otherwise 0<br/>
 Implemented as a cmplteu between Rs and Rd<br/><br/>
-Example: CMPGTU R1, R2 pass to CMPLTEU R2, R1
+Example: CMPGTU R1, R2 maps to CMPLTEU R2, R1
 
 
 '''Cmpgte – Compare Greater Than Equal'''
@@ -821,7 +821,7 @@ Example: CMPGTU R1, R2 pass to CMPLTEU R2, R1
 Test if Rd >= Rs<br/>
 If true write 1 to Rd otherwise 0<br/>
 Implemented as a cmplt between Rs and Rd<br/><br/>
-Example: CMPGTE R1, R2 pass to CMPLT R2, R1
+Example: CMPGTE R1, R2 maps to CMPLT R2, R1
 
 
 '''Cmpgteu – Compare Greater Than Equal Unsigned'''
@@ -836,7 +836,7 @@ Example: CMPGTE R1, R2 pass to CMPLT R2, R1
 Test if Rd >= Rs<br/>
 If true write 1 to Rd otherwise 0<br/>
 Implemented as a cmpltu between Rs and Rd<br/><br/>
-Example: CMPGTEU R1, R2 pass to CMPLTU R2, R1
+Example: CMPGTEU R1, R2 maps to CMPLTU R2, R1
 
 
 '''Swpb – Swap Bytes'''
@@ -850,7 +850,7 @@ Example: CMPGTEU R1, R2 pass to CMPLTU R2, R1
 
 Change the byte order in the register Rs and write the result to Rd<br/>
 Implemented as a roti in register rd, about 8 bits<br/><br/>
-Example: SWPB R1 pass to ROTI R1,8
+Example: SWPB R1 maps to ROTI R1,8
 
 
 '''Set – Set all bits to 1'''
@@ -864,7 +864,7 @@ Example: SWPB R1 pass to ROTI R1,8
 
 Set all bits in Rd to 1<br/>
 Implemented as a not Rd and zero-register<br/><br/>
-Example: Set R1 pass to NOT R1, R0
+Example: Set R1 maps to NOT R1, R0
 
 
 '''Clr – Clear all bits to 0'''
@@ -878,7 +878,7 @@ Example: Set R1 pass to NOT R1, R0
 
 Set all bits in Rd to 0<br/>
 Implemented as a mov Rd and zero-register<br/><br/>
-Example: CLR R1 pass to MOV R1, R0
+Example: CLR R1 maps to MOV R1, R0
 
 
 '''Inc – Increment without carry'''
@@ -892,7 +892,7 @@ Example: CLR R1 pass to MOV R1, R0
 
 Increment the content of Rd about 1.<br/>
 Implemented as a addi with immediate 1<br/><br/>
-Example: INC R1 pass to ADDI R1, 1
+Example: INC R1 maps to ADDI R1, 1
 
 
 '''Dec – Decrement without carry'''
@@ -906,7 +906,7 @@ Example: INC R1 pass to ADDI R1, 1
 
 Decrement the content of Rd about 1.<br/>
 Implemented as a addi with immediate -1<br/><br/>
-Example: DEC R1 pass to ADDI R1, -1
+Example: DEC R1 maps to ADDI R1, -1
 
 
 '''ldiw – Load Immediate Word'''
@@ -923,7 +923,7 @@ Implemented as:<br/>
 load immediate to register<br/>															
 shift bits in register about 8 digits<br/>															
 load immediate to register<br/><br/>															
-Example: LDIW R1, 0x3F1A pass to<br/>															
+Example: LDIW R1, 0x3F1A maps to<br/>															
 LDI R1, 3F<br/>															
 LSLI R1,8<br/>														
 LDI R1, 1A															
@@ -939,7 +939,7 @@ LDI R1, 1A
 
 Set the corresponding bit in Rd<br/>
 Implemented as scb where the 4th bit is 1.<br/><br/>
-Example: SETB R10, 0xF pass to SCB R10, 0x1F
+Example: SETB R10, 0xF maps to SCB R10, 0x1F
 
 
 '''clrb - Clear Bit'''
@@ -952,7 +952,7 @@ Example: SETB R10, 0xF pass to SCB R10, 0x1F
 
 Clear the corresponding bit in Rd<br/>
 Implemented as scb where the 4th bit is 0.<br/><br/>
-Example: CLRB R10, 0xF pass to SCB R10, 0x0F
+Example: CLRB R10, 0xF maps to SCB R10, 0x0F
 
 
 
