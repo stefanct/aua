@@ -37,7 +37,7 @@ begin
 
 		if (reset='1') then
 			switch_reg <= (others => '0');
-			led_reg <= (others => '1');
+			led_reg <= (others => '0'); -- high active LEDs
 
 		elsif rising_edge(clk) then
 			if rd = '1' then

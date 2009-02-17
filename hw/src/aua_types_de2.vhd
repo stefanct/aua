@@ -36,9 +36,12 @@ package aua_types is
 	constant SC_ADDR_BITS : integer := integer(ceil(log2(real(SC_SLAVE_CNT))));
 	--~ constant SC_ADDR_BITS : integer := integer(reqbits_for_choices(SC_SLAVE_CNT));
 
+	subtype sc_addr_t is std_logic_vector(SC_ADDR_SIZE-1 downto 0);
+	subtype sc_data_t is std_logic_vector(SC_DATA_SIZE-1 downto 0);
+
 	type sc_out_t is record
-		address		: std_logic_vector(SC_ADDR_SIZE-1 downto 0);
-		wr_data		: std_logic_vector(SC_DATA_SIZE-1 downto 0);
+		address		: sc_addr_t;
+		wr_data		: sc_data_t;
 		rd			: std_logic;
 		wr			: std_logic;
 	end record;
@@ -47,13 +50,11 @@ package aua_types is
 	subtype sc_rdy_cnt_t is unsigned(SC_RDY_CNT_SIZE-1 downto 0);
 
 	type sc_in_t is record
-		rd_data		: std_logic_vector(SC_DATA_SIZE-1 downto 0);
+		rd_data		: sc_data_t;
 		rdy_cnt		: sc_rdy_cnt_t;
 	end record;
 	type sc_in_at is array (0 to SC_SLAVE_CNT-1) of sc_in_t;
 
-	subtype sc_addr_t is std_logic_vector(SC_ADDR_SIZE-1 downto 0);
-	subtype sc_data_t is std_logic_vector(SC_DATA_SIZE-1 downto 0);
 
 	function max (L, R: real)
 		return real;
