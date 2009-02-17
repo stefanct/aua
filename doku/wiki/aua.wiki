@@ -34,8 +34,16 @@ to the instruction cache and from/to the load/store unit in the EX stage.
 LD/ST transactions have priority over instruction fetches, so that the pipeline can
 progress normally. IF will schedule a nop if it is blocked because the current instr.
 is not available.
+
 The MMU can access on-board SRAM, on-chip ROM (e.g. for a bootloader) and an unlimited
-number of SimpCon devices. <fixme mag der sack was hinzufuegen? -- weiss auch ned>
+number of SimpCon devices. They all share the same address space, which is divided in parts by the MMU.
+The SimpCon bus is specified as a point-to-point connection, but it is possible to create a shared SimpCon bus
+by connecting every SimpCon slave to an independant 'RD' and 'WR' line.
+In the opposite direction (i.e. from the SC slave to the master) it is necessary to multiplex
+'WR_DATA' and 'RDY_CNT', because there are no tri-state buses in FPGAs
+(see [http://www.altera.com/support/examples/ged/tri_state.html Tri-State Buses in Altera Devices]).
+Both tasks are fullfilled by a multiplexer process in the top entity. It matches the 'ADDRESS' similar
+to IP network masks and selects the corresponding signals.
 
 == Pipeline stages ==
 AUA has three stages (four if you include write-back): IF, ID, EX/MEM.
@@ -55,6 +63,16 @@ EX contains the ALU and a small control curcuit to process LD/ST instructions in
 with the MMU. The result of either the ALU or the MMU is selected and transfered to the register
 file (through the ID unit). If the destination is the zero register, EX enforces a value of
 0 to not alter the register.
+
+== Instruction Cache ==
+It is possible to plug in different instruction cache implementations between the IF stage and the MMU.
+Currently a dummy cache (that caches nothing and just connects the signals between IF and the MMU) and
+a generic direct-mapped cache are provided.
+
+The number of lines cached by the direct-mapped cache can be configured. Currently only on word per cache line
+is working, because there is no prefetching done by the MMU. It is planned to change this soon.
+It is also planned to use on-chip memory instead of dedicated logic registers for the cache.
+
 
 = Instruction Set Architecture =
 The ISA of AUA is typical for a RISC. It was designed with the decoding in mind:
@@ -967,9 +985,6 @@ See the online help (command "h") for further instructions.
 == Example program ==
 '''Hello World'''<br/>
 <source lang="asm">
-#include libaua/io/digit.h
-#include libaua/io/uart.h
-
 ldiw $20, SC_DIGITS -- (0xff10) address of memory mapped simcon slave
 ldiw $21, 0xaa
 st $21, $20
@@ -1022,6 +1037,12 @@ foo:
 	brezi $6, loop0
 
 	rjmpi loop
+
+-- includes are placed exactly where they are written by the assembler.
+-- the cpu starts with the instruction at the beginning of the ROM.
+-- therefore the library includes have to come last.
+#include libaua/io/digit.h
+#include libaua/io/uart.h
 </source>
 
 [[Category:Computer Architecture]]
