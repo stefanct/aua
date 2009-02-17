@@ -1,3 +1,6 @@
+#include libaua/io/digit.h
+#include libaua/io/uart.h
+
 ldiw $20, SC_DIGITS
 ldiw $21, 0xaa
 st $21, $20
@@ -50,8 +53,3 @@ foo:
 	brezi $6, loop0
 
 	rjmpi loop
-
-
-#include libaua/io/digit.h
-#include libaua/io/uart.h
-
