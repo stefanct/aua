@@ -85,7 +85,8 @@ uart: process
 	
 	end process;
    
-aua1: configuration work.aua_cache
+--~ aua1: configuration work.aua_cache
+aua1: aua
     port map (
 		clk_in => clk,
 		reset_pin => reset_pin,
