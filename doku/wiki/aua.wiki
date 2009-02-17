@@ -192,7 +192,7 @@ The ''Imm.'' column indicates how immediates are interpreted (e.g. the values us
 
 rotti stuff...
 
-== Application Binary Interface & Registers ==
+<!--- == Application Binary Interface & Registers == --->
 
 = Assembler =
 Before we wrote our own assembler, we tried to use an assembler generator that takes an architecture definition
@@ -205,7 +205,8 @@ Sounds great? Theoretically, yes, but ArchC needs SystemC and both take quite so
 When we finally got it working, we found some bugs in the generated assembler (e.g. labels were not handled correctly all the time).
 We had spent a few hours digging binutils code, when we decided that it's not worth the trouble and started work on our own tools.
 
-paar allg worte... c++, boost
+The assembler is coded in c++ with help of the boost library. It supports various pseudo instructions (see below), can link/include
+multiple files and is able to write constants (words, strings, arrays of words) into a "data section".
 
 == Instructions ==
 
@@ -1298,6 +1299,32 @@ Example: LDIW R1, 0x3F1A pass to
 LDI R1, 3F															
 LSLI R1,8															
 LDI R1, 1A															
+
+= Build Instructions =
+When the source is available... there will be 3 directories:
+
+== VHDL (hw directory) ==
+In the project folder is an aua.qsf file, that contains all necessary settings
+for Altera's Quartus II. The most important .vhd file is hw/src/aua_types_de2.vhd, which
+holds a bunch of important constants (e.g. CPU and UART frequencies) and defines various
+data types used all over in the source files.
+Another important file, especially if you wanna port AUA to another fpga, is src/aua_top.vhd,
+where the top entity and the configuration reside. In the configuration section one can
+choose between different caches (see above) and two ALUs.
+
+Included are also two Modelsim scripts for RTL and gate level simulation. They can be found in
+hw/sim. They use the testbenches in the same directory.
+
+== Assembler (as) ==
+A makefile is included in the as directory. The assembler links with boost_regex, so be sure
+to have boost installed. To assemble a program and embed the binary into ../hw/mmu/rom.vhd
+execute "as -r <progname>.asm" or to get the binary alone (useable with the simulator or for
+bootstrapping) call "as <progname>.asm <binaryname>".
+
+== High Level Simulator (sim) ==
+The simulator is written in the scripting language python, so no compilation is necessary.
+When called with "pyhton sim.py" (in sim/src), it reads the binary file from ../../as/boot.
+See the online help (command "h") for further instructions.
 
 == Example program ==
 
