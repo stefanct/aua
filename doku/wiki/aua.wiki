@@ -216,12 +216,12 @@ The ''Imm.'' column indicates how immediates are interpreted (e.g. the values us
 Load an 8 bit signed immediate to the Low Byte of Register Rd
 
 
-'''jmpl – Jump Lable'''
+'''jmpl – Jump and Link'''
 
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| Operation||Syntax
+| Operation||Syntax||Operands
 |-
-| PC <-- Addr, R31 <-- PC||JMPL Addr  
+| PC <-- Addr, R31 <-- PC||JMPL Rs||Rs... Register contains the address to jump
 |-
 |}
 
@@ -241,9 +241,11 @@ Jump to the Addr
 '''brez – Branch if Equal Zero'''
 
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| Operation||Syntax||Operands
+| Operation||Syntax
 |-
-| ||BREZ Addr, Rs||...
+| if Rs = 0 then PC <-- Addr||BREZ Addr, Rs
+|-
+| else PC <-- PC + 16||
 |-
 |}
 
@@ -263,9 +265,11 @@ Branch to the Addr if the content of Rs is equal to zero
 '''brnez – Branch if Not Equal Zero'''
 
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| Operation||Syntax||Operands
+| Operation||Syntax
 |-
-| ||BRNEZ Addr,Rs||...
+| if Rs != 0 then PC <-- Addr||BRNEZ Addr, Rs
+|-
+| else PC <-- PC + 16||
 |-
 |}
 
@@ -287,7 +291,9 @@ Branch to the Addr if the content of Rs is not equal to zero
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax||Operands
 |-
-| ||Brezi Addr, Imm||Imm ... 7 bit signed Immediate 
+| if Imm = 0 then PC <-- Addr||Brezi Addr, Imm||Imm ... 7 bit signed Immediate 
+|-
+| else PC <-- PC + 16||||
 |-
 |}
 
@@ -309,8 +315,9 @@ Branch to the Addr if the imm is equal to zero
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax||Operands
 |-
-| ||BRNEZI Addr Imm||Imm...7 bit signed Immediate
+| if Imm != 0 then PC <-- Addr||BRNEZI Addr Imm||Imm...7 bit signed Immediate
 |-
+| else PC <-- PC + 16||||
 |}
 
 
@@ -390,7 +397,7 @@ After execution, Rd holds the low word of the multiplication.
 |-
 |}
 
-Add the content of register Rs to register Rd and write the result back to Rd
+Add the content of register Rs to register Rd and write the result back to Rd<br/>
 Carrybit is set, if an overflow occurred
 
 
@@ -413,7 +420,7 @@ Carrybit is set, if an overflow occurred
 |-
 |}
 
-Add Carrybit and content of Rs to Rd and write the result back to Rd
+Add Carrybit and content of Rs to Rd and write the result back to Rd<br/>
 Carrybit is set if result greater than max. value otherwise cleared.
 
 
@@ -436,7 +443,7 @@ Carrybit is set if result greater than max. value otherwise cleared.
 |-
 |}
 
-Subtract the content of register Rs from register Rd and write the result back to Rd
+Subtract the content of register Rs from register Rd and write the result back to Rd<br/>
 Carrybit is set, if an overflow occurred
 
 
@@ -459,7 +466,7 @@ Carrybit is set, if an overflow occurred
 |-
 |}
 
-Subtract Carrybit and content of Rs from Rd and write the result back to Rd
+Subtract Carrybit and content of Rs from Rd and write the result back to Rd<br/>
 Carrybit is set if result less than min. value, otherwise cleared.
 
 
@@ -482,7 +489,7 @@ Carrybit is set if result less than min. value, otherwise cleared.
 |-
 |}
 
-Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.
+Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.<br/>
 After execution, Rd holds the low word of the multiplication.
 
 
@@ -505,7 +512,7 @@ After execution, Rd holds the low word of the multiplication.
 |-
 |}
 
-Multiply content of Rs and Rd unsigne-interpreted and write the result back to Rd.
+Multiply content of Rs and Rd unsigne-interpreted and write the result back to Rd.<br/>
 After execution, Rd holds the low word of the multiplication.
 
 
@@ -528,7 +535,7 @@ After execution, Rd holds the low word of the multiplication.
 |-
 |}
 
-Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.
+Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.<br/>
 After execution, Rd holds the high word of the multiplication.
 
 
@@ -551,7 +558,7 @@ After execution, Rd holds the high word of the multiplication.
 |-
 |}
 
-Multiply content of Rs and Rd unsigne-interpreted and write the result back to Rd.
+Multiply content of Rs and Rd unsigne-interpreted and write the result back to Rd.<br/>
 After execution, Rd holds the high word of the multiplication.
 
 
@@ -660,7 +667,7 @@ Invert the bits of Rs, and write the result to Rd.
 |-
 |}
 
-Calculate the Two'ers Complement of Rs and write the result to Rd.
+Calculate the Two'ers Complement of Rs and write the result to Rd.<br/>
 For the max. negative value, the result is the max. negative value again
 
 
@@ -683,7 +690,7 @@ For the max. negative value, the result is the max. negative value again
 |-
 |}
 
-Hold MSB and shift all bits in Rd one bit to the right.
+Hold MSB and shift all bits in Rd one bit to the right.<br/>
 LSB is shifted out.
 
 
@@ -750,7 +757,7 @@ Shift all bits in Rd to the right. MSB is cleared, LSB is shifted out.
 |-
 |}
 
-Shift all bits about the given value to the left. MSB is shifted out, LSB is cleared.
+Shift all bits about the given value to the left. MSB is shifted out, LSB is cleared.<br/>
 Immediate is 4 bits long and interpreted as unsigned
 
 
@@ -773,7 +780,7 @@ Immediate is 4 bits long and interpreted as unsigned
 |-
 |}
 
-Shift all bits about the given value to theright. MSB is cleared, LSB is shifted out.
+Shift all bits about the given value to theright. MSB is cleared, LSB is shifted out.<br/>
 Immediate is 4 bits long and interpreted as unsigned
 
 
@@ -800,7 +807,7 @@ Immediate is 4 bits long and interpreted as unsigned
 |-
 |}
 
-Bit 3 to bit 0 of immediate indicates which bit in Rd should be set or cleared
+Bit 3 to bit 0 of immediate indicates which bit in Rd should be set or cleared<br/>
 If bit 4 is 1, bit is set otherwise cleared.
 
 
@@ -827,7 +834,7 @@ If bit 4 is 1, bit is set otherwise cleared.
 |-
 |}
 
-Bit 3 to bit 0 of immediate indicates the length to rotate bits in Rd.
+Bit 3 to bit 0 of immediate indicates the length to rotate bits in Rd.<br/>
 if bit4 is 1, rotate right, otherwise rotate left.
 
 
@@ -849,7 +856,7 @@ if bit4 is 1, rotate right, otherwise rotate left.
 | 1||1||0||1||0||0||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
-Test if Rd < Rs
+Test if Rd < Rs<br/>
 If true write 1 to Rd otherwise 0
 
 
@@ -872,7 +879,7 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-Test if Rd < Rs
+Test if Rd < Rs<br/>
 If true write 1 to Rd otherwise 0
 
 
@@ -895,7 +902,7 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-Test if Rd <= Rs
+Test if Rd <= Rs<br/>
 If true write 1 to Rd otherwise 0
 
 
@@ -918,7 +925,7 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-Test if Rd <= Rs
+Test if Rd <= Rs<br/>
 If true write 1 to Rd otherwise 0
 
 
@@ -941,7 +948,7 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-Test if Rd = Rs
+Test if Rd = Rs<br/>
 If true write 1 to Rd otherwise 0
 
 
@@ -964,7 +971,7 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-Test if Rd = Imm
+Test if Rd = Imm<br/>
 If true write 1 to Rd otherwise 0
 
 
@@ -1104,8 +1111,8 @@ multiple files and is able to write constants (words, strings, arrays of words) 
 |-
 |}
 
-Do nothing															
-Implemented as a ldi 0 to zero-register  															
+Do nothing<br/>														
+Implemented as a ldi 0 to zero-register<br/><br/>  															
 Example: ldi $0, 0
 
 
@@ -1118,7 +1125,7 @@ Example: ldi $0, 0
 |-
 |}
 
-Implemented as a brez between zero-register r0 and cmp-register r31
+Implemented as a brez between zero-register r0 and cmp-register r31<br/><br/>
 Example: brez $0, $31
 
 
@@ -1131,7 +1138,7 @@ Example: brez $0, $31
 |-
 |}
 
-Implemented as a brez between zero-register r0 and
+Implemented as a brez between zero-register r0 and<br/><br/>
 Example: brez $0,Addr
 
 
@@ -1144,7 +1151,7 @@ Example: brez $0,Addr
 |-
 |}
 
-Implemented as a brezi between zero-register r0 and 
+Implemented as a brezi between zero-register r0 and<br/>
 Example: brezi $0,
 
 
@@ -1157,9 +1164,9 @@ Example: brezi $0,
 |-
 |}
 
-Test if Rd > Rs															
-If true write 1 to Rd otherwise 0															
-Implemented as a cmplte between Rs and Rd
+Test if Rd > Rs<br/>															
+If true write 1 to Rd otherwise 0<br/>															
+Implemented as a cmplte between Rs and Rd<br/><br/>
 Example: CMPGT R1, R2 pass to CMPLTE R2, R1
 
 
@@ -1172,9 +1179,9 @@ Example: CMPGT R1, R2 pass to CMPLTE R2, R1
 |-
 |}
 
-Test if Rd > Rs
-If true write 1 to Rd otherwise 0
-Implemented as a cmplteu between Rs and Rd
+Test if Rd > Rs<br/>
+If true write 1 to Rd otherwise 0<br/>
+Implemented as a cmplteu between Rs and Rd<br/><br/>
 Example: CMPGTU R1, R2 pass to CMPLTEU R2, R1
 
 
@@ -1187,9 +1194,9 @@ Example: CMPGTU R1, R2 pass to CMPLTEU R2, R1
 |-
 |}
 
-Test if Rd >= Rs
-If true write 1 to Rd otherwise 0
-Implemented as a cmplt between Rs and Rd
+Test if Rd >= Rs<br/>
+If true write 1 to Rd otherwise 0<br/>
+Implemented as a cmplt between Rs and Rd<br/><br/>
 Example: CMPGTE R1, R2 pass to CMPLT R2, R1
 
 
@@ -1202,9 +1209,9 @@ Example: CMPGTE R1, R2 pass to CMPLT R2, R1
 |-
 |}
 
-Test if Rd >= Rs
-If true write 1 to Rd otherwise 0
-Implemented as a cmpltu between Rs and Rd
+Test if Rd >= Rs<br/>
+If true write 1 to Rd otherwise 0<br/>
+Implemented as a cmpltu between Rs and Rd<br/><br/>
 Example: CMPGTEU R1, R2 pass to CMPLTU R2, R1
 
 
@@ -1217,8 +1224,8 @@ Example: CMPGTEU R1, R2 pass to CMPLTU R2, R1
 |-
 |}
 
-Change the byte order in the register Rs and write the result to Rd
-Implemented as a roti in register rd, about 8 bits
+Change the byte order in the register Rs and write the result to Rd<br/>
+Implemented as a roti in register rd, about 8 bits<br/><br/>
 Example: SWPB R1 pass to ROTI R1,8
 
 
@@ -1231,8 +1238,8 @@ Example: SWPB R1 pass to ROTI R1,8
 |-
 |}
 
-Set all bits in Rd to 1
-Implemented as a not Rd and zero-register
+Set all bits in Rd to 1<br/>
+Implemented as a not Rd and zero-register<br/><br/>
 Example: Set R1 pass to NOT R1, R0
 
 
@@ -1245,8 +1252,8 @@ Example: Set R1 pass to NOT R1, R0
 |-
 |}
 
-Set all bits in Rd to 0
-Implemented as a mov Rd and zero-register
+Set all bits in Rd to 0<br/>
+Implemented as a mov Rd and zero-register<br/><br/>
 Example: CLR R1 pass to MOV R1, R0
 
 
@@ -1259,8 +1266,8 @@ Example: CLR R1 pass to MOV R1, R0
 |-
 |}
 
-Increment the content of Rd about 1.
-Implemented as a addi with immediate 1
+Increment the content of Rd about 1.<br/>
+Implemented as a addi with immediate 1<br/><br/>
 Example: INC R1 pass to ADDI R1, 1
 
 
@@ -1273,8 +1280,8 @@ Example: INC R1 pass to ADDI R1, 1
 |-
 |}
 
-Decrement the content of Rd about 1.
-Implemented as a addi with immediate -1
+Decrement the content of Rd about 1.<br/>
+Implemented as a addi with immediate -1<br/><br/>
 Example: DEC R1 pass to ADDI R1, -1
 
 
@@ -1287,14 +1294,14 @@ Example: DEC R1 pass to ADDI R1, -1
 |-
 |}
 
-Load a word to the Rd
-Implemented as:															
-load immediate to register															
-shift bits in register about 8 digits															
-load immediate to register															
-Example: LDIW R1, 0x3F1A pass to															
-LDI R1, 3F															
-LSLI R1,8															
+Load a word to the Rd<br/>
+Implemented as:<br/>				
+load immediate to register<br/>															
+shift bits in register about 8 digits<br/>															
+load immediate to register<br/><br/>															
+Example: LDIW R1, 0x3F1A pass to<br/>															
+LDI R1, 3F<br/>															
+LSLI R1,8<br/>														
 LDI R1, 1A															
 
 = Build Instructions =
