@@ -203,16 +203,6 @@ The ''Imm.'' column indicates how immediates are interpreted (e.g. the values us
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 0||0||0||i||i||i||i||i||i||i||i||d||d||d||d||d  
-|-
-|}
-
 Load an 8 bit signed immediate to the Low Byte of Register Rd
 
 
@@ -222,16 +212,6 @@ Load an 8 bit signed immediate to the Low Byte of Register Rd
 | Operation||Syntax||Operands
 |-
 | PC <-- Addr, R31 <-- PC||JMPL Rs||Rs... Register contains the address to jump
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 0||0||1||1||0||1||a||a||a||a||a||x||x||x||x||x  
 |-
 |}
 
@@ -247,16 +227,6 @@ Jump to the Addr
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0  
-|- style="text-align:center"
-| 0||0||1||1||1||0||a||a||a||a||a||s||s||s||s||s  
-|-
-|}
-
 Branch to the Addr if the content of Rs is equal to zero
 
 
@@ -266,16 +236,6 @@ Branch to the Addr if the content of Rs is equal to zero
 | Operation||Syntax
 |-
 | if Rs != 0 then PC <-- Addr</br>else PC <-- PC + 16||BRNEZ Addr, Rs
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0  
-|- style="text-align:center"
-| 0||0||1||1||1||1||a||a||a||a||a||s||s||s||s||s  
 |-
 |}
 
@@ -291,16 +251,6 @@ Branch to the Addr if the content of Rs is not equal to zero
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 0||1||0||0||i||i||i||i||i||i||i||s||s||s||s||s  
-|-
-|}
-
 Branch to the Addr if the imm is equal to zero
 
 
@@ -310,16 +260,6 @@ Branch to the Addr if the imm is equal to zero
 | Operation||Syntax||Operands
 |-
 | if Imm != 0 then PC <-- Addr</br>else PC <-- PC + 16||BRNEZI Addr Imm||Imm...7 bit signed Immediate
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 0||1||0||1||i||i||i||i||i||i||i||s||s||s||s||s  
 |-
 |}
 
@@ -335,16 +275,6 @@ Branch to the Addr if the imm is not equal to zero
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 0||1||1||0||i||i||i||i||i||i||i||d||d||d||d||d  
-|-
-|}
-
 Add an 7 bit signed Immediate to Rd and wirite the result back to Rd
 
 
@@ -354,16 +284,6 @@ Add an 7 bit signed Immediate to Rd and wirite the result back to Rd
 | Operation||Syntax||Operands
 |-
 | Rd <-- Rd * Imm||MULI Rd,Imm||Imm ... 7 bit signed Immediate 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 0||1||1||1||i||i||i||i||i||i||i||d||d||d||d||d  
 |-
 |}
 
@@ -380,16 +300,6 @@ After execution, Rd holds the low word of the multiplication.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||0||0||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Add the content of register Rs to register Rd and write the result back to Rd<br/>
 Carrybit is set, if an overflow occurred
 
@@ -400,16 +310,6 @@ Carrybit is set, if an overflow occurred
 | Operation||Syntax||Operands
 |-
 | Rd <-- Rd + Rs + C||ADDC Rd, Rs||Rd, Rs signed interpreted
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||0||0||1||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -426,16 +326,6 @@ Carrybit is set if result greater than max. value otherwise cleared.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||0||1||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Subtract the content of register Rs from register Rd and write the result back to Rd<br/>
 Carrybit is set, if an overflow occurred
 
@@ -446,16 +336,6 @@ Carrybit is set, if an overflow occurred
 | Operation||Syntax||Operands
 |-
 | Rd <-- Rd - Rs - C||SUBC Rd, Rs||Rd, Rs signed interpreted 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||0||1||1||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -472,16 +352,6 @@ Carrybit is set if result less than min. value, otherwise cleared.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||1||0||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.<br/>
 After execution, Rd holds the low word of the multiplication.
 
@@ -492,16 +362,6 @@ After execution, Rd holds the low word of the multiplication.
 | Operation||Syntax||Operands
 |-
 | Rd <-- Rd x Rs||MULU Rd, Rs||Rd, Rs unsigned interpreted
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||1||0||1||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -518,16 +378,6 @@ After execution, Rd holds the low word of the multiplication.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||1||1||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.<br/>
 After execution, Rd holds the high word of the multiplication.
 
@@ -538,16 +388,6 @@ After execution, Rd holds the high word of the multiplication.
 | Operation||Syntax||Operands
 |-
 | Rd <-- Rd x Rs||MULHU Rd, Rs||Rd, Rs unsigned interpreted 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||0||1||1||1||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -564,16 +404,6 @@ After execution, Rd holds the high word of the multiplication.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||0||0||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Bitwise or combination of the two registers content, and write result back to Rd
 
 
@@ -586,15 +416,6 @@ Bitwise or combination of the two registers content, and write result back to Rd
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||0||0||1||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
 Bitwise and combination of the two registers content, and write result back to Rd
 
 
@@ -604,16 +425,6 @@ Bitwise and combination of the two registers content, and write result back to R
 | Operation||Syntax
 |-
 | Rd <-- Rd xor Rs||XOR Rd, Rs
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||0||1||0||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -629,15 +440,6 @@ Bitwise xor combination of the two registers content, and write result back to R
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||0||1||1||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
 Invert the bits of Rs, and write the result to Rd.
 
 
@@ -647,16 +449,6 @@ Invert the bits of Rs, and write the result to Rd.
 | Operation||Syntax 
 |-
 | Rd <-- +/- Rs||NEG Rd, Rs
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||1||0||0||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -673,16 +465,6 @@ For the max. negative value, the result is the max. negative value again
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||1||0||1||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Hold MSB and shift all bits in Rd one bit to the right.<br/>
 LSB is shifted out.
 
@@ -693,16 +475,6 @@ LSB is shifted out.
 | Operation||Syntax
 |-
 | Rd <-- (Rd << 1)||LSL Rd 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||1||1||0||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -718,16 +490,6 @@ Shift all bits in Rd to the left. MSB is shifted out, LSB is cleared.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||0||1||1||1||1||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Shift all bits in Rd to the right. MSB is cleared, LSB is shifted out.
 
 
@@ -737,16 +499,6 @@ Shift all bits in Rd to the right. MSB is cleared, LSB is shifted out.
 | Operation||Syntax||Operands
 |-
 | Rd <-- (Rd << Imm)||LSLI Rd,Imm||Imm is unsigned interpreted 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||0||0||0||x||i||i||i||i||d||d||d||d||d  
 |-
 |}
 
@@ -760,16 +512,6 @@ Immediate is 4 bits long and interpreted as unsigned
 | Operation||Syntax||Operands
 |-
 | Rd <-- (Imm >> Rd)||LSRI Rd,Imm||Imm is unsigned interpreted 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||0||0||1||x||i||i||i||i||d||d||d||d||d  
 |-
 |}
 
@@ -790,16 +532,6 @@ Immediate is 4 bits long and interpreted as unsigned
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||0||1||0||s/c||i||i||i||i||d||d||d||d||d  
-|-
-|}
-
 Bit 3 to bit 0 of immediate indicates which bit in Rd should be set or cleared<br/>
 If bit 4 is 1, bit is set otherwise cleared.
 
@@ -817,16 +549,6 @@ If bit 4 is 1, bit is set otherwise cleared.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||0||1||1||dir||i||i||i||i||d||d||d||d||d  
-|-
-|}
-
 Bit 3 to bit 0 of immediate indicates the length to rotate bits in Rd.<br/>
 if bit4 is 1, rotate right, otherwise rotate left.
 
@@ -840,15 +562,6 @@ if bit4 is 1, rotate right, otherwise rotate left.
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||1||0||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
 Test if Rd < Rs<br/>
 If true write 1 to Rd otherwise 0
 
@@ -859,16 +572,6 @@ If true write 1 to Rd otherwise 0
 | Operation||Syntax||Operands
 |-
 | Rd <-- Rd < Rs <--1/0||CMPLTU Rd, Rs||Rd, Rs unsigned interpreted 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||1||0||1||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -885,16 +588,6 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||1||1||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Test if Rd <= Rs<br/>
 If true write 1 to Rd otherwise 0
 
@@ -905,16 +598,6 @@ If true write 1 to Rd otherwise 0
 | Operation||Syntax||Operands
 |-
 | Rd <-- Rd <= Rs <--1/0||CMPLTEU Rd, Rs||Rd, Rs unsigned interpreted
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||0||1||1||1||s||s||s||s||s||d||d||d||d||d  
 |-
 |}
 
@@ -931,16 +614,6 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||1||0||0||0||s||s||s||s||s||d||d||d||d||d  
-|-
-|}
-
 Test if Rd = Rs<br/>
 If true write 1 to Rd otherwise 0
 
@@ -951,16 +624,6 @@ If true write 1 to Rd otherwise 0
 | Operation||Syntax
 |-
 | Rd <-- Rd = IMM <--1/0||CMPEI Rd, Imm
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||1||0||0||1||a||a||a||a||a||s||s||s||s||s  
 |-
 |}
 
@@ -977,16 +640,6 @@ If true write 1 to Rd otherwise 0
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||1||0||1||1||a||a||a||a||a||s||s||s||s||s  
-|-
-|}
-
 Copy content of Rs to Rd
 
 
@@ -996,16 +649,6 @@ Copy content of Rs to Rd
 | Operation||Syntax
 |-
 | Rd <-- Addr||LD Rd, Addr 
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||1||1||0||0||a||a||a||a||a||s||s||s||s||s  
 |-
 |}
 
@@ -1021,16 +664,6 @@ Load a word from Addr. to Rd
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||1||1||0||1||a||a||a||a||a||s||s||s||s||s  
-|-
-|}
-
 Load a byte from Addr. to the lower byte of Rd
 
 
@@ -1043,16 +676,6 @@ Load a byte from Addr. to the lower byte of Rd
 |-
 |}
 
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||1||1||1||0||a||a||a||a||a||s||s||s||s||s  
-|-
-|}
-
 Store content of Rs to the Addr.
 
 
@@ -1062,16 +685,6 @@ Store content of Rs to the Addr.
 | Operation||Syntax
 |-
 | Addr <-- Rd (byte)||LDB Rd, Addr
-|-
-|}
-
-
-{| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
-|- style="text-align:center"
-| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
-|- style="text-align:center"
-| 1||1||1||1||1||1||a||a||a||a||a||s||s||s||s||s  
 |-
 |}
 
