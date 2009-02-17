@@ -243,9 +243,7 @@ Jump to the Addr
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax
 |-
-| if Rs = 0 then PC <-- Addr||BREZ Addr, Rs
-|-
-| else PC <-- PC + 16||
+| if Rs = 0 then PC <-- Addr</br>else PC <-- PC + 16||BREZ Addr, Rs
 |-
 |}
 
@@ -267,9 +265,7 @@ Branch to the Addr if the content of Rs is equal to zero
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax
 |-
-| if Rs != 0 then PC <-- Addr||BRNEZ Addr, Rs
-|-
-| else PC <-- PC + 16||
+| if Rs != 0 then PC <-- Addr</br>else PC <-- PC + 16||BRNEZ Addr, Rs
 |-
 |}
 
@@ -291,9 +287,7 @@ Branch to the Addr if the content of Rs is not equal to zero
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax||Operands
 |-
-| if Imm = 0 then PC <-- Addr||Brezi Addr, Imm||Imm ... 7 bit signed Immediate 
-|-
-| else PC <-- PC + 16||||
+| if Imm = 0 then PC <-- Addr</br>else PC <-- PC + 16||Brezi Addr, Imm||Imm ... 7 bit signed Immediate 
 |-
 |}
 
@@ -315,9 +309,8 @@ Branch to the Addr if the imm is equal to zero
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax||Operands
 |-
-| if Imm != 0 then PC <-- Addr||BRNEZI Addr Imm||Imm...7 bit signed Immediate
+| if Imm != 0 then PC <-- Addr</br>else PC <-- PC + 16||BRNEZI Addr Imm||Imm...7 bit signed Immediate
 |-
-| else PC <-- PC + 16||||
 |}
 
 
@@ -1121,11 +1114,11 @@ Example: ldi $0, 0
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax||Operands
 |-
-| ...||...||...
+| PC <-- Addr||RET||R31 cointains the addr. to jump to
 |-
 |}
 
-Implemented as a brez between zero-register r0 and cmp-register r31<br/><br/>
+Implemented as a branch to Addr. in R31 if R0 equals zero(always true)<br/><br/>
 Example: brez $0, $31
 
 
@@ -1134,25 +1127,25 @@ Example: brez $0, $31
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
 | Operation||Syntax||Operands
 |-
-| ...||...||...
+| PC <-- Addr||JMP Rs||Rs contains the Addr. to jump to
 |-
 |}
 
-Implemented as a brez between zero-register r0 and<br/><br/>
-Example: brez $0,Addr
+Implemented as a branch to Addr. in Rs if R0 equals zero(always true)<br/><br/>
+Example: brez $0, Rs
 
 
-'''Rjmpi – '''
+'''Rjmpi – Relative Jump Immediate'''
 
 {| border="1" cellspacing="0" cellpadding="2" style="border-collapse:collapse;"ding="2" style="border-collapse:collapse;"
-| Operation||Syntax
+| Operation||Syntax||Operands
 |-
-| ...||...||...
+| PC <-- Imm||RJMPI Imm||Imm represents Addr. to jump to
 |-
 |}
 
-Implemented as a brezi between zero-register r0 and<br/>
-Example: brezi $0,
+Implemented as a branch to Addr represented by Imm if R0 equals zero(always true)<br/>
+Example: brezi $0,Imm
 
 
 '''Cmpgt – Compare Greater Than'''
