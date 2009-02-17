@@ -226,1147 +226,1062 @@ table + beschreibung
 == Example program ==
 
 
-<!--- rotti's latex:
-\textbf{ldi - Load Immediate (signed)}
-
-Description:
-
-Load an 8 bit immediate to the register at bit 7 to 0
-
-Immediate is 8 bits long and interpreted as signed
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Imm & LDI \ Rd, Imm &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-0 & 0 & 0 & i & i & i & i & i & i & i & i & d & d & d & d & d \\ \hline
-\end{tabular}
-
-\bigskip
-
-jmpl - Jump and Link
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-PC $\longleftarrow $ Addr & JMPL \ \ Addr &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{x}
-& \multicolumn{1}{|l|}{x} & \multicolumn{1}{|l|}{x} & \multicolumn{1}{|l|}{x}
-& \multicolumn{1}{|l|}{x} \\ \hline
-\end{tabular}
-
-\bigskip
-
-brez - Branch if Equal Zero
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-&  &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} \\ \hline
-\end{tabular}
-
-\bigskip
-
-brnez - Branch if Not Equal Zero
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-&  &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} \\ \hline
-\end{tabular}
-
-\bigskip
-
-brezi - Branch if Equal Zero with Immediate
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-&  &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} \\ \hline
-\end{tabular}
-
-\bigskip
-
-brnezi - Branch if Not Equal Zero with Immediate
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-&  &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{addi - Add Immediate}
-
-Description:
-
-Add an immediate to Rd and write the result back to Rd.
-
-Immediate is 7 bit long and interpreted as signed.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd + Imm & ADDI \ \ Rd, Imm &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{muli - Multiply Immediate}
-
-Description:
-
-Multiply an immediate with Rd and write the result back to Rd
-
-Immediate is 7 bit long and interpreted as signed.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd x Imm & MULI \ \ Rd, Imm &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{add - Add without carry}
-
-Description:
-
-Add two registers and write the result back to Rd
-
-Carrybit is set, if an overflow occurrd
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd + Rs & ADD \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{addc - Add with Carry}
-
-Description:
-
-Add two registers and the Carrybit and write the result back to Rd
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd + Rs + C & ADDC \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{sub - Sub without carry}
-
-Description:
-
-Subtract two registers.and write the result back to Rd.
-
-Carrybit is set, if an Underrun occurrd.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd - Rs & SUB \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{subc - Sub with Carry}
-
-Description:
-
-Subtract tow regsiters and the carrybit and write the result back to Rd.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd - Rs - C & SUB \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{mul - Multiply low word signed}
-
-Description:
-
-Multiply two registers and write the result back to Rd.
-
-Registervalues are signed interpreted.
-
-Result contains the low-word of the multiplication
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd x Rs & MUL \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{mulu - Multiply low word Unsigned}
-
-Description:
-
-Multiply two registers and write the result back to Rd.
-
-Registervalues are unsigned interpreted.
-
-Result contains the low-word of the multiplication
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd x Rs & MULU \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{mulh - Multiply High word signed}
-
-Description:
-
-Multiply two registers and write the result back to Rd.
-
-Registervalues are signed interpreted.
-
-Result contains the high-word of the multiplication.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd x Rs & MULH \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{mulhu - Multiply High word Unsigned}
-
-Description:
-
-Multiply two registers and write the result back to Rd.
-
-Registervalues are unsigned interpreted.
-
-Result contains the high-word of the multiplication
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd x Rs & MULHU \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{or - Logical Or}
-
-Description:
-
-Bitwise or combination of the two registers.
-
-Result write back to Rd
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd $\vee $ Rs & OR \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{and - Logical And}
-
-Description:
-
-Bitwise and combination of the two registers.
-
-Result write back to Rd.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd $\wedge $ Rs & AND\ \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{xor - Logical xor}
-
-Description:
-
-Bitwise xor combination of the two registers.
-
-Result write back to Rd.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd $\oplus $ Rs & XOR \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{not - Invert }
-
-Description:
-
-Invert the bits of register Rd, and write the result back to Rd.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ not Rd & NOT \ \ Rd &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{neg - Negate}
-
-Description:
-
-Calculate the 2'es complement of Rd and write the result back to Rd.
-
-Max value 0xFFFF left unchanged.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow \pm $ Rd & NEG \ \ Rd &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{asr - Aritmethic Shift Right}
-
-Description:
-
-Hold MSB and shift all bits in Rd one bit to the right
-
+'''ldi – Load Immediate (signed, byte)'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Imm(byte)||LDI Rd, Imm||Imm ... 8bit signed Immediate
+|-
+| ||||Rd ... Destinationregister
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 0||0||0||i||i||i||i||i||i||i||i||d||d||d||d||d  
+|-
+|}
+
+Load an 8 bit signed immediate to the Low Byte of Register Rd
+
+
+'''jmpl – Jump Lable'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| ||||JMPL Addr||... 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 0||0||1||1||0||1||a||a||a||a||a||x||x||x||x||x  
+|-
+|}
+
+Jump to the Addr
+
+
+'''brez – Branch if Equal Zero'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| ||||BREZ Addr, Rs||...
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0  
+|-
+| 0||0||1||1||1||0||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Branch to the Addr if the content of Rs is equal to zero
+
+
+'''brnez – Branch if Not Equal Zero'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| ||||BRNEZ Addr,Rs||... 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0  
+|-
+| 0||0||1||1||1||1||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Branch to the Addr if the content of Rs is not equal to zero
+
+
+'''brezi – Branch if Equal Zero Immediate'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| ||Brezi Addr, Imm||Imm ... 7 bit signed Immediate 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 0||1||0||0||i||i||i||i||i||i||i||s||s||s||s||s  
+|-
+|}
+
+Branch to the Addr if the imm is equal to zero
+
+
+'''brnezi – Branch if Not Equal Zero Immediate'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| ||BRNEZI Addr Imm||Imm...7 bit signed Immediate
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 0||1||0||1||i||i||i||i||i||i||i||s||s||s||s||s  
+|-
+|}
+
+Branch to the Addr if the imm is not equal to zero
+
+
+'''Addi – Add Immediate'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd + Imm||ADDI Rd, Imm||Imm ... 7 bit signed Immediate 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 0||1||1||0||i||i||i||i||i||i||i||d||d||d||d||d  
+|-
+|}
+
+Add an 7 bit signed Immediate to Rd and wirite the result back to Rd
+
+
+'''Muli – Multiply Immediate'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd * Imm||MULI Rd,Imm||Imm ... 7 bit signed Immediate 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 0||1||1||1||i||i||i||i||i||i||i||d||d||d||d||d  
+|-
+|}
+
+Multiply an 7 bit signed Immediate with Rd and wirite the result back to Rd
+After execution, Rd holds the low word of the multiplication.
+
+
+'''Add – Add without carry'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd + Rs||ADD Rd, Rs||Rd, Rs signed interpreted
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||0||0||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Add the content of register Rs to register Rd and write the result back to Rd
+Carrybit is set, if an overflow occurred
+
+
+'''Addc – Add with Carry'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd + Rs + C||ADDC Rd, Rs||Rd, Rs signed interpreted|| 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||0||0||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Add Carrybit and content of Rs to Rd and write the result back to Rd
+Carrybit is set if result greater than max. value otherwise cleared.
+
+
+'''Sub – Sub without carry'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd - Rs||SUB  Rd, Rs||Rd, Rs signed interpreted
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||0||1||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Subtract the content of register Rs from register Rd and write the result back to Rd
+Carrybit is set, if an overflow occurred
+
+
+'''Subc – Sub with Carry'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd - Rs - C||SUBC Rd, Rs||Rd, Rs signed interpreted 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||0||1||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Subtract Carrybit and content of Rs from Rd and write the result back to Rd
+Carrybit is set if result less than min. value, otherwise cleared.
+
+
+'''Mul – Multiply low word signed'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd x Rs||MUL Rd, Rs||Rd, Rs signed interpreted 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||1||0||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.
+After execution, Rd holds the low word of the multiplication.
+
+
+'''Mulu – Multiply low word Unsigned'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd x Rs||MULU Rd, Rs||Rd, Rs unsigned interpreted
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||1||0||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Multiply content of Rs and Rd unsigne-interpreted and write the result back to Rd.
+After execution, Rd holds the low word of the multiplication.
+
+
+'''Mulh – Multiply High word signed'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd x Rs||MULH Rd, Rs||Rd, Rs signed interpreted 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||1||1||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Multiply the content of Rs and Rd signe-interpreted and write the result back to Rd.
+After execution, Rd holds the high word of the multiplication.
+
+
+'''Mulhu – Multiply High word Unsigned'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd x Rs||MULHU Rd, Rs||Rd, Rs unsigned interpreted 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||0||1||1||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Multiply content of Rs and Rd unsigne-interpreted and write the result back to Rd.
+After execution, Rd holds the high word of the multiplication.
+
+
+'''Or – Logical Or'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Rd or Rs||OR Rd, Rs
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||0||0||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Bitwise or combination of the two registers content, and write result back to Rd
+
+
+'''And – Logical And'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax 
+|-
+| Rd <-- Rd and Rs|| ||AND Rd, Rs 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||0||0||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+Bitwise and combination of the two registers content, and write result back to Rd
+
+
+'''Xor – Logical Xor'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Rd xor Rs|| ||XOR Rd, Rs
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||0||1||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Bitwise xor combination of the two registers content, and write result back to Rd
+
+
+'''Not – Invert register'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax 
+|-
+| Rd <-- not Rs||NOT Rd, Rs 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||0||1||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+Invert the bits of Rs, and write the result to Rd.
+
+
+'''Neg – Negate (2er-Complement)'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax 
+|-
+| Rd <-- +/- Rs||NEG Rd, Rs
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||1||0||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Calculate the Two'ers Complement of Rs and write the result to Rd.
+For the max. negative value, the result is the max. negative value again
+
+
+'''Asr – Aritmethic Shift Right'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- (b15),(1>>Rs)||ASR Rd
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||1||0||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Hold MSB and shift all bits in Rd one bit to the right.
 LSB is shifted out.
 
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd(b15,b15,...,b1) $\leftarrow $ (b15,...,b0) & ASR \ \ Rd &  &  \\ \hline
-\end{tabular}
 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
+'''Lsl – Logical Shift Left'''
 
-\bigskip
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- (Rd << 1)||LSL Rd 
+|-
+|}
 
-\textbf{lsl - Logical Shift Left}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||1||1||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
 
-Description:
+Shift all bits in Rd to the left. MSB is shifted out, LSB is cleared.
 
-Shift all bits in Rd to the left
 
-MSB is shifted out, LSB is cleared.
+'''Lsr – Logical Shift Right'''
 
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd(b14,...,b0,0) $\leftarrow $ (b15,...,b0) & LSL\ \ \ Rd &  &  \\ \hline
-\end{tabular}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- (1 >> Rd)||LSR Rd 
+|-
+|}
 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||0||1||1||1||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
 
-\bigskip
+Shift all bits in Rd to the right. MSB is cleared, LSB is shifted out.
 
-\textbf{lsr - Logical Shift Right}
 
-Description:
+'''Lsli – Logical ShiftLeft Immediate'''
 
-Shift all bits in Rd to the right
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- (Rd << Imm)||LSLI Rd,Imm||Imm is unsigned interpreted 
+|-
+|}
 
-MSB\ is cleared, LSB is shifted out.
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||0||0||0||x||i||i||i||i||d||d||d||d||d  
+|-
+|}
 
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd(0,b15,...,b1) $\leftarrow $ (b15,...,b0) & LSR \ \ Rd &  &  \\ \hline
-\end{tabular}
+Shift all bits about the given value to the left. MSB is shifted out, LSB is cleared.
+Immediate is 4 bits long and interpreted as unsigned
 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
 
-\bigskip
+'''Lsri – Logical Shift Right Immediate'''
 
-\textbf{lsli - Logical Shift Left Immediate}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- (Imm >> Rd)||LSRI Rd,Imm||Imm is unsigned interpreted 
+|-
+|}
 
-Description:
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||0||0||1||x||i||i||i||i||d||d||d||d||d  
+|-
+|}
 
-Shift all bits about the given value to the left.
+Shift all bits about the given value to theright. MSB is cleared, LSB is shifted out.
+Immediate is 4 bits long and interpreted as unsigned
 
-MSB is shifted out, LSB is cleared.
 
-Immediate is 4 bits long and interpreted as unsigned.
+'''Scb – Set/Clear Bit'''
 
-Immediate can be in range 0 <= imm <16.
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd(bitx)<--1/0||SCB Rd,Imm||Imm is unsigned interpreted 
+|-
+| ||Bit(4) = 1 = set, Bit(4) = 0 = clear|| 
+|-
+| ||Bit(3to0) = position|| 
+|-
+|}
 
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $(Rd \guillemotleft\ 0, um i stellen) & LSLI \ \ Rd, Imm &  & 
-\\ \hline
-\end{tabular}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||0||1||0||s/c||i||i||i||i||d||d||d||d||d  
+|-
+|}
 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{x} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
+Bit 3 to bit 0 of immediate indicates which bit in Rd should be set or cleared
+If bit 4 is 1, bit is set otherwise cleared.
 
-\bigskip
 
-\textbf{lsri - Logical Shift Right Immediate}
+'''Roti – Rotate right/left about an Immediate'''
 
-Description:
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation 
+|-
+| Rd(b14..b0,b15) <--Rd(b15...b0) if dir = 0 
+|-
+| Rd(b0..b15,b1) <--Rd(b15...b0) if dir = 0
+|-
+|}
 
-Shift all bits about the given value to the right.
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Syntax||Operands
+|-
+| ROTI Rd, Imm||Imm is unsigned interpreted
+|-
+| ||Bit(4) = 1 = right, Bit(4) = 0 = left 
+|-
+| ||Bit(3to0) = digits to move
+|-
+|}
 
-MSB is cleared, LSB is shifted out.
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||0||1||1||dir||i||i||i||i||d||d||d||d||d  
+|-
+|}
 
-Immediate 4 bits long and interpreted as unsigned.
+Bit 3 to bit 0 of immediate indicates the length to rotate bits in Rd.
+if bit4 is 1, rotate right, otherwise rotate left.
 
-Immediate value can be in range 0 <= imm <16.
 
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ (0,um i stellen \guillemotright\ Rd) & LSRI \ \ Rd, Imm & 
-&  \\ \hline
-\end{tabular}
+'''Cmplt – Compare Less Than'''
 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{x} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands 
+|-
+| Rd <-- Rd < Rs <--1/0||CMPLT Rd, Rs||Rd, Rs signed interpreted 
+|-
+|}
 
-\bigskip
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||1||0||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+Test if Rd < Rs
+If true write 1 to Rd otherwise 0
 
-\textbf{scb - Set Clear Bit}
 
-Description:
+'''Cmpltu – Compare Less Than Unsigned'''
 
-Immediate is 5 bits long and interpreted as unsigned.
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd < Rs <--1/0||CMPLTU Rd, Rs||Rd, Rs unsigned interpreted 
+|-
+|}
 
-Bit3 to bit0 of immediate gives the position which bit in Rd should be set
-or cleared.
-
-If bit4 in Imm is 1, bit in Rd is set.
-
-If bit4 in Imm is 0, bit in Rd is cleared.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd(bx) $\leftarrow $ 1/0 &  & SCB \ \ Rd, Imm &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{pos} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{
-i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & 
-\multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{roti - Rotate right left Immediate}
-
-Description:
-
-Immediate is 5 bits long and interpreted as unsigned.
-
-Bit3 to bit0 of immediate gives to length to rotate the bits in Rd.
-
-If bit4 in Imm is 1 rotation direction is right.
-
-if bit4 in Imm is 0 rotation direction is left
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-\begin{tabular}{l}
-Rd(b14,...,b0,b15) $\leftarrow $ Rd(b15,...,b0) if dir =\ 0 \\ 
-Rd(b0,b15,...,b1) $\leftarrow $ Rd(b15,...,b0) if dir =\ 1%
-\end{tabular}
-& ROTI \ \ Rd, Imm &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{dir} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{
-i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & 
-\multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{cmplt - Compare Less Than}
-
-Description:
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||1||0||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
 
 Test if Rd < Rs
+If true write 1 to Rd otherwise 0
 
-If true write 1 to Rd otherwise 0.
 
-Both registers are signed interpreted.
+'''Cmplte – Compare Less Than Equal'''
 
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd \guilsinglleft\ Rs $\leftarrow $ (1/0) & CMPLT \ \ Rd, RS
-&  &  \\ \hline
-\end{tabular}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd <= Rs <--1/0||CMPLTE Rd, Rs|| Rd, Rs signed interpreted
+|-
+|}
 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{cmpltu - Compare Less Than Unsigned}
-
-Description:
-
-Test if Rd < Rs
-
-If true write 1 to Rd otherwise 0.
-
-Both registers are unsigned interpreted.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd \guilsinglleft\ Rs $\leftarrow $ (1/0) & CMPLTU \ \ Rd,
-Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{cmplte - Compare Less Than Equal}
-
-Description:
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||1||1||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
 
 Test if Rd <= Rs
+If true write 1 to Rd otherwise 0
 
-If true write 1 to Rd otherwise 0.
 
-Both registers are signed interpreted.
+'''Cmplteu – Compare Less Than Equal Unsigned'''
 
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd $\leqq $ Rs $\leftarrow $ (1/0) & CMPLTE \ \ Rd, Rs &  & 
-\\ \hline
-\end{tabular}
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd <= Rs <--1/0||CMPLTEU Rd, Rs|| || Rd, Rs unsigned interpreted
+|-
+|}
 
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{cmplteu - Compare Less Than Equal Unsigned}
-
-Description:
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||0||1||1||1||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
 
 Test if Rd <= Rs
-
-If true write 1 to Rd otherwise 0.
-
-Both registers are unsigned interpreted.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd $\leqq $ Rs $\leftarrow $ (1/0) & CMPLTEU \ \ Rd, Rs & 
-&  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{cmpe - Compare Equal}
-
-Description:
-
-Test if Rd =\ Rs
-
-If true write 1 to Rd, otherwise 0.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd $=$ Rs $\leftarrow $ (1/0) & CMP \ \ Rd, Rs &  &  \\ 
-\hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{cmpei - Compare Equal Immediate}
-
-Description:
-
-Test if Rd =\ Imm
-
-If true Write 1 to Rd, otherwise 0.
-
-Register and immediate are signed interpreted
-
-Immediate is 5 bits long
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rd =\ Imm $\leftarrow $ (1/0) & CMPEI \ \ Rd, Imm &  &  \\ 
-\hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i}
-& \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{i} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-\textbf{mov - Copy Registercontent}
-
-Description:
-
-Copy the content of Rs to Rd.
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Rs & MOV \ \ Rd, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-ld - Load
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Addr & LD \ \ Rd, Addr &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-ldb - Load Byte
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Rd $\leftarrow $ Addr (byte) & LDB \ \ Rd, Adrr &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d} & \multicolumn{1}{|l|}{d}
-& \multicolumn{1}{|l|}{d} \\ \hline
-\end{tabular}
-
-\bigskip
-
-st - Store
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Addr $\leftarrow $ Rs & ST \ \ Addr, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{0}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} \\ \hline
-\end{tabular}
-
-\bigskip
-
-stb - Store Byte
-
-Description:
-
-\begin{tabular}{|l|l|l|l|}
-\hline
-Operation & Syntax & Operands & Program Counter \\ \hline
-Addr $\leftarrow $ Rs (byte) & STB \ \ Addr, Rs &  &  \\ \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
-\hline
-\multicolumn{6}{|l|}{Opcode} & \multicolumn{5}{|l|}{} & \multicolumn{5}{|l|}{
-} \\ \hline
-15 & 14 & 13 & 12 & 11 & 10 & 9 & 8 & 7 & 6 & 5 & 4 & 3 & 2 & 1 & 0 \\ \hline
-\multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1} & \multicolumn{1}{|l|}{1}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a}
-& \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{a} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s} & \multicolumn{1}{|l|}{s}
-& \multicolumn{1}{|l|}{s} \\ \hline
-\end{tabular}
-
---->
+If true write 1 to Rd otherwise 0
 
 
+'''Cmpe – Compare Equal'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Rd = Rs <--1/0||CMPE Rd, Rs 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||1||0||0||0||s||s||s||s||s||d||d||d||d||d  
+|-
+|}
+
+Test if Rd = Rs
+If true write 1 to Rd otherwise 0
 
 
+'''Cmpei – Compare Equal Immediate'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Rd = IMM <--1/0||CMPEI Rd, Imm
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||1||0||0||1||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Test if Rd = Imm
+If true write 1 to Rd otherwise 0
 
 
+'''Mov – Copy Registercontent'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Rs||MOV Rd, Rs 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||1||0||1||1||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Copy content of Rs to Rd
 
 
+'''Ld – Load word'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Addr||LD Rd, Addr 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||1||1||0||0||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Load a word from Addr. to Rd
 
 
+'''Ldb – Load Byte'''
 
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Addr (byte)||LDB Rd, Addr
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||1||1||0||1||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Load a byte from Addr. to the lower byte of Rd
+
+
+'''St – Store word'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Addr <-- Rs||ST Addr, Rs 
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||1||1||1||0||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Store content of Rs to the Addr.
+
+
+'''Stb – Store Byte'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Addr <-- Rd (byte)||LDB Rd, Addr
+|-
+|}
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| colspan="6" align="center"| Opcode||colspan="5" align="center"| Src. Reg.||colspan="5" align="center"| Dest. Reg 
+|-
+| 15||14||13||12||11||10||9||8||7||6||5||4||3||2||1||0
+|-
+| 1||1||1||1||1||1||a||a||a||a||a||s||s||s||s||s  
+|-
+|}
+
+Store the lower byte of Rs to the Addr.
+
+
+'''Nop – No Operation'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Nop||NOP
+|-
+|}
+
+Do nothing															
+Implemented as a ldi 0 to zero-register  															
+Example: ldi $0, 0
+
+
+'''ret – Return'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| ...||...||...
+|-
+|}
+
+Implemented as a brez between zero-register r0 and cmp-register r31
+Example: brez $0, $31
+
+
+'''Jmp – Jump'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| ...||...||...
+|-
+|}
+
+Implemented as a brez between zero-register r0 and
+Example: brez $0,Addr
+
+
+'''Rjmpi – '''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| ...||...||...
+|-
+|}
+
+Implemented as a brezi between zero-register r0 and 
+Example: brezi $0,
+
+
+'''Cmpgt – Compare Greater Than'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd > Rs||CMPGT Rd, Rs||Rd, Rs signed interpreted
+|-
+|}
+
+Test if Rd > Rs															
+If true write 1 to Rd otherwise 0															
+Implemented as a cmplte between Rs and Rd
+Example: CMPGT R1, R2 pass to CMPLTE R2, R1
+
+
+'''Cmpgt – Compare Greater than Unsigned'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd > Rs||CMPGTU Rd,Rs||Rd, Rs unsigned interpreted 
+|-
+|}
+
+Test if Rd > Rs
+If true write 1 to Rd otherwise 0
+Implemented as a cmplteu between Rs and Rd
+Example: CMPGTU R1, R2 pass to CMPLTEU R2, R1
+
+
+'''Cmpgte – Compare Greater Than Equal'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd >= Rs||CMPGTE Rd,Rs||Rd, Rs signed interpreted
+|-
+|}
+
+Test if Rd >= Rs
+If true write 1 to Rd otherwise 0
+Implemented as a cmplt between Rs and Rd
+Example: CMPGTE R1, R2 pass to CMPLT R2, R1
+
+
+'''Cmpgteu – Compare Greater Than Equal Unsigned'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd >= Rs||CMPGTEU Rd,Rs||Rd, Rs unsigned interpreted
+|-
+|}
+
+Test if Rd >= Rs
+If true write 1 to Rd otherwise 0
+Implemented as a cmpltu between Rs and Rd
+Example: CMPGTEU R1, R2 pass to CMPLTU R2, R1
+
+
+'''Swpb – Swap Bytes'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd (byte0,byte1) <-- Rd(byte1,byte0)||SWPB Rd, Rs
+|-
+|}
+
+Change the byte order in the register Rs and write the result to Rd
+Implemented as a roti in register rd, about 8 bits
+Example: SWPB R1 pass to ROTI R1,8
+
+
+'''Set – Set all bits to 1'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- 0xFFFF||SET Rd 
+|-
+|}
+
+Set all bits in Rd to 1
+Implemented as a not Rd and zero-register
+Example: Set R1 pass to NOT R1, R0
+
+
+'''Clr – Clear all bits to 0'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- 0x0000||CLR Rd 
+|-
+|}
+
+Set all bits in Rd to 0
+Implemented as a mov Rd and zero-register
+Example: CLR R1 pass to MOV R1, R0
+
+
+'''Inc – Increment without carry'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd + 1||INC Rd||Rd signed interpreted 
+|-
+|}
+
+Increment the content of Rd about 1.
+Implemented as a addi with immediate 1
+Example: INC R1 pass to ADDI R1, 1
+
+
+'''Dec – Decrement without carry'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax||Operands
+|-
+| Rd <-- Rd - 1||DEC Rd||Rd signed interpreted
+|-
+|}
+
+Decrement the content of Rd about 1.
+Implemented as a addi with immediate -1
+Example: DEC R1 pass to ADDI R1, -1
+
+
+'''ldiw – Load Immediate Word'''
+
+{| border="1" cellspacing="0" cellpadding="10" style="border-collapse:collapse;"
+| Operation||Syntax
+|-
+| Rd <-- Imm (word)||LDIW Rd, Imm 
+|-
+|}
+
+Load a word to the Rd
+Implemented as:															
+load immediate to register															
+shift bits in register about 8 digits															
+load immediate to register															
+Example: LDIW R1, 0x3F1A pass to															
+LDI R1, 3F															
+LSLI R1,8															
+LDI R1, 1A															
 
 [[Category:Computer Architecture]]
