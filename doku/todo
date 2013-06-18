@@ -1,8 +1,10 @@
 mmu ordentlich machen :) inkl sram controller, rom in ram
-jmpl/ret konkretisieren/durchdenken und dann implementieren
+jmpl/ret konkretisieren/durchdenken und dann implementieren (as only. abi (argument registers, caller/callee saves etc))
 ex fwd nochmal ueberdenken
-uart blocking io
+(uart blocking io - fuer unnoetig befunden)
 alu optimieren
 ganz tolle neue instructions erfinden
 bootloader
 i-cache
+
+doku (siehe http://en.wikiversity.org/wiki/Computer_Architecture_Lab#Documentation)
