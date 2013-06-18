@@ -113,7 +113,8 @@ total number of instructions is limited to `2^6 - (2^3-1) - 4*(2^2-1) = 45`.
 ## Instructions
 
 The following table lists all instructions currently implemented in hardware
-(see the [pseudo instruction section](#pseudo-instructions) below for the rest). There
+(see the [pseudo instruction section](#pseudo-instructions) below for the rest).
+It is based on the data in the [ISA spreadsheet](doku/isa.ods). There
 are still some white spots, which are reserved for later use. Cells filled
 with a **s** form an encoded source register. **d**, **i** likewise for
 destination registers and immediates. **a** denotes that the memory address
