@@ -50,6 +50,7 @@ begin
 
 	
 	rd_data(31 downto 0) <= (others => '0');
+	rdy_cnt <= "00";	-- no wait states
 
 	digit0_pins <= digit0;
 	digit1_pins <= digit1;
@@ -66,7 +67,6 @@ begin
 		digit3_nxt <= digit3; 	    	
 		digit4_nxt <= digit4; 	    	
 		digit5_nxt <= digit5; 	    	
-		rdy_cnt <= "00";	-- no wait states
 		if wr = '1' and address(15 downto 4) = sc_base_addr(15 downto 4) then -- Block /12
 			case address(3 downto 0) is
 			    when x"0" => digit0_nxt <= wr_data(6 downto 0); 

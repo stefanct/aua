@@ -37,11 +37,11 @@ begin
 
 	rd_data <= sc_out;
 
-nxt: process(reset, state, cycle_cnt, reg, wr_data, address, wr, rd, ready)
+nxt: process(reset, state, cycle_cnt, reg, wr_data, address, wr, rd, ready, sc_out)
 begin
 	cycle_cnt_nxt <= cycle_cnt;
 	reg_nxt <= reg;
-	sc_out_nxt <= (others => '0');
+	sc_out_nxt <= sc_out;
 	rdy_cnt <= (others => '0');
 	ready_nxt <= ready;
 	state_nxt <= st_done;
@@ -52,7 +52,9 @@ begin
 				if(wr='1') then
 					cycle_cnt_nxt <= unsigned(wr_data(3 downto 0));
 				end if;
-				sc_out_nxt <= (sc_out_nxt'length-1 downto cycle_cnt'length => '0')&std_logic_vector(cycle_cnt);
+				if rd='1' then
+					sc_out_nxt <= (sc_out_nxt'length-1 downto cycle_cnt'length => '0')&std_logic_vector(cycle_cnt);
+				end if;
 			when sc_addr_t(unsigned(sc_base_addr)+1) =>
 				if(wr='1') then
 					reg_nxt <= wr_data;
@@ -64,12 +66,12 @@ begin
 					state_nxt <= st_wait;
 					ready_nxt <= cycle_cnt;
 				end if;
-				null;
 			when others =>
 				null;
 		end case;
 	else
 		ready_nxt <= ready-1;
+		sc_out_nxt <= reg;
 		if ready > 3 then
 			rdy_cnt <= "11";
 		else
