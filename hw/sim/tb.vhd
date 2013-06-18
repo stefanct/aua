@@ -87,10 +87,13 @@ begin
     end;
     begin
         reset_pin <= '1';
-        icwait(10);
+        switch_pins <= (others => '0');
+        sram_dq <= (others => '0');
+        
+        icwait(2);
         reset_pin <= '0';
         
-        icwait(400);
+        icwait(25);
         
         assert false report "sim finish" SEVERITY failure;
                 

@@ -1,0 +1,2 @@
+loop:
+	rjmpi loop

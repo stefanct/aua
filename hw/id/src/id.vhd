@@ -57,53 +57,60 @@ architecture sat1 of id is
 	signal dest_nxt		: reg_t;
 	signal opa_nxt		: word_t;
 	signal opb_nxt		: word_t;
-	signal pc_nxt		: word_t;
-	signal branch_nxt	: std_logic;
 	signal vala			: word_t;
 	signal valb			: word_t;
 	
 	signal regb_done	: word_t;
 	signal opb_override	: std_logic;
+	signal opa_override	: std_logic;
 	signal opb_branch	: word_t;
 
 begin
 	cmp_reg : reg
 		port map(clk, reset, async_rega, async_regb, regr, valr, vala, valb);
 
-	pc_nxt <= std_logic_vector(unsigned(pc) + unsigned(opb_nxt));
+	opb_branch <= pc;
+	pc_out <= std_logic_vector(TO_INTEGER(unsigned(pc)) + signed(opb_nxt));
 
-
-	-- branch?
-	branch: process (opcode,opa_nxt,pc,dest)
+	branch: process (opcode, opa_nxt, pc, dest, opb_nxt)
 		variable inv : std_ulogic;
 		variable brinstr : std_ulogic;
 	begin
 		inv := '0';
 		brinstr := '0';
 
-		opcode_nxt <= opcode;
-		dest_nxt <= dest;
-		opb_branch <= pc;
+		opa_override <= '0';
 		opb_override <= '0';
-		
+
 		if opcode(5 downto 3)="010" then
 			inv := opcode(2);
 			brinstr := '1';
+			-- schedule nop
+			opcode_nxt <= (others => '0');
+			opa_override <= '1';
+			dest_nxt <= (others => '0');
 		elsif opcode(5 downto 1) ="00111" then
 			inv := opcode(0);
 			brinstr := '1';
+			-- schedule nop
+			opcode_nxt <= (others => '0');
+			opa_override <= '1';
+			dest_nxt <= (others => '0');
 		elsif opcode = "001101" then
 			inv := '0'; -- jmpl, schedule mov r31, pc!
-				opcode_nxt <= "111011";
-				opb_override <= '1';
-				dest_nxt <= "11111";
+			opcode_nxt <= "111011";
+			opb_override <= '1';
+			dest_nxt <= "11111";
 			brinstr := '1';
+		else
+			opcode_nxt <= opcode;
+			dest_nxt <= dest;
 		end if;
 		
 		if ((std_logic_vector(to_unsigned(0, 16)))=opa_nxt xor inv='1') and brinstr='1' then
-			branch_nxt <= '1';
+			branch_out <= '1';
 		else
-			branch_nxt <= '0';
+			branch_out <= '0';
 		end if;
 	end process;
 
@@ -126,9 +133,9 @@ begin
 	end process;
 	
 	-- hide r0 changes
-	r0readonly: process (rega, regb, vala, valb)
+	r0readonly: process (rega, regb, vala, valb, opa_override)
 	begin
-		if rega=(4 downto 0=>'0') then
+		if rega="00000" or opa_override = '1' then
 			opa_nxt <= (others => '0');
 		else
 			opa_nxt <= vala;
@@ -145,13 +152,15 @@ begin
 	sync: process (clk, reset)
 	begin
 		if reset = '1' then
+			opcode_out <= (others => '0');
+			dest_out <= (others => '0');
+			opa_out <= (others => '0');
+			opb_out <= (others => '0');
 		elsif rising_edge(clk) then
 			opcode_out <= opcode_nxt;
 			dest_out <= dest_nxt;
 			opa_out <= opa_nxt;
 			opb_out <= opb_nxt;
-			pc_out <= pc_nxt;
-			branch_out <= branch_nxt;
 		end if;
 	end process;
 end sat1;

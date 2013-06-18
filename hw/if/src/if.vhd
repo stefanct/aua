@@ -44,30 +44,38 @@ architecture sat1 of ent_if is
 	signal pc_nxt	: word_t;
 begin
 
-	opcode_nxt <= instr_data(15 downto 10);
-	dest_nxt <= instr_data(4 downto 0);
-	rega_nxt <= instr_data(4 downto 0);
-	regb_nxt <= instr_data(9 downto 5);
-	imm_nxt <= instr_data(12 downto 5);
+	instr_dec: process(reset, instr_data, branch, instr_valid)
+	begin
+		if branch = '0' and instr_valid = '1' then
+			opcode_nxt <= instr_data(15 downto 10);
+			dest_nxt <= instr_data(4 downto 0);
+			rega_nxt <= instr_data(4 downto 0);
+			regb_nxt <= instr_data(9 downto 5);
+			imm_nxt <= instr_data(12 downto 5);
+		else -- schedule nop, we wait for a (re)fetch
+			opcode_nxt <= (others => '0');
+			dest_nxt <= (others => '0');
+			rega_nxt <= (others => '0');
+			regb_nxt <= (others => '0');
+			imm_nxt <= (others => '0');
+		end if;
+	end process;
 	async_rega <= rega_nxt;
 	async_regb <= regb_nxt;
 	
 	instr_addr <= pc;
-	pc_out <= pc;
 
-	process(reset, pc, pc_in, branch, instr_valid)
+	calc_pc_nxt: process(reset, pc, pc_in, branch, instr_valid)
 	begin
 		if reset = '1' then
-			--pc_nxt <= (others => '0');
-			pc_nxt <= x"8000"; -- direkt in ROM
+			pc_nxt <= (others => '0');
+			--~ pc_nxt <= x"8000"; -- direkt in ROM
+		elsif branch='1' then
+			pc_nxt <= pc_in;
 		elsif instr_valid /= '1' then
 			pc_nxt <= pc;
 		else
-			if branch='1' then
-				pc_nxt <= pc_in;
-			else
-				pc_nxt <= std_logic_vector(unsigned(pc) + 2);
-			end if;
+			pc_nxt <= std_logic_vector(unsigned(pc) + 2);
 		end if;
 	end process;
 
@@ -79,7 +87,12 @@ begin
 			rega <= (others => '0');
 			regb <= (others => '0');
 			imm <= (others => '0');
-			pc <= (others => '0');
+			--~ pc <= (others => '0');
+			pc <= x"8000";
+			--~ pc <= x"7FFE";
+			--~ pc <= pc_nxt;
+			--~ instr_addr <= (others => '0');
+			pc_out <= (others => '0');
 		elsif rising_edge(clk) then
 			opcode <= opcode_nxt;
 			dest <= dest_nxt;
@@ -87,6 +100,7 @@ begin
 			regb <= regb_nxt;
 			imm <= imm_nxt;
 			pc <= pc_nxt;
+			pc_out <= pc;
 		end if;
 	end process;
 end sat1;

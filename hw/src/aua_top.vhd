@@ -136,9 +136,9 @@ architecture sat1 of aua is
 	end component;
 
 	component mmu is
-		--~ generic (
-			--~ irq_cnt	: natural
-		--~ );
+		generic (
+			irq_cnt	: natural
+		);
 		port (
 			clk     : in std_logic;
 			reset	: in std_logic;
@@ -316,13 +316,13 @@ cmp_ex: ex
 cmp_icache: instr_cache
 	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
-	--~ generic map(irq_cnt)
+	generic map(1)
 	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt,
 		sram_addr, sram_dq, sram_we, sram_oe, sram_ub, sram_lb, sram_ce);
 		--mmu_sram_addr, mmu_sram_dq, mmu_sram_we, mmu_sram_oe, mmu_sram_ub, mmu_sram_lb, mmu_sram_ce);
 	
-sync: process(clk, reset)
+locks: process(clk, reset, ifid_opcode_in, ifid_dest_in, ifid_pc_in, ifid_rega_in, ifid_regb_in, ifid_async_rega_in, ifid_async_regb_in, ifid_imm_in, idif_pc_in, idif_branch_in, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, exid_dest_in, exid_result_in)
 	begin
 		if reset = '1' then
 			ifid_opcode_out <= (others => '0');
@@ -341,25 +341,26 @@ sync: process(clk, reset)
 			idex_opb_out <= (others => '0');
 			exid_dest_out <= (others => '0');
 			exid_result_out <= (others => '0');
-		elsif rising_edge(clk) then
-			if ex_locks = '1' then
-				ifid_opcode_out <= ifid_opcode_out;
-				ifid_dest_out <= ifid_dest_out;
-				ifid_pc_out <= ifid_pc_out;
-				ifid_rega_out <= ifid_rega_out;
-				ifid_regb_out <= ifid_regb_out;
-				ifid_async_rega_out <= ifid_async_rega_out;
-				ifid_async_regb_out <= ifid_async_regb_out;
-				ifid_imm_out <= ifid_imm_out;
-				idif_pc_out <= idif_pc_out;
-				idif_branch_out <= idif_branch_out;
-				idex_opcode_out <= idex_opcode_out;
-				idex_dest_out <= idex_dest_out;
-				idex_opa_out <= idex_opa_out;
-				idex_opb_out <= idex_opb_out;
-				exid_dest_out <= exid_dest_out;
-				exid_result_out <= exid_result_out;
-			else
+		else
+		--~ elsif rising_edge(clk) then
+			--~ if ex_locks = '1' then
+				--~ ifid_opcode_out <= ifid_opcode_out;
+				--~ ifid_dest_out <= ifid_dest_out;
+				--~ ifid_pc_out <= ifid_pc_out;
+				--~ ifid_rega_out <= ifid_rega_out;
+				--~ ifid_regb_out <= ifid_regb_out;
+				--~ ifid_async_rega_out <= ifid_async_rega_out;
+				--~ ifid_async_regb_out <= ifid_async_regb_out;
+				--~ ifid_imm_out <= ifid_imm_out;
+				--~ idif_pc_out <= idif_pc_out;
+				--~ idif_branch_out <= idif_branch_out;
+				--~ idex_opcode_out <= idex_opcode_out;
+				--~ idex_dest_out <= idex_dest_out;
+				--~ idex_opa_out <= idex_opa_out;
+				--~ idex_opb_out <= idex_opb_out;
+				--~ exid_dest_out <= exid_dest_out;
+				--~ exid_result_out <= exid_result_out;
+			--~ else
 				ifid_opcode_out <= ifid_opcode_in;
 				ifid_dest_out <= ifid_dest_in;
 				ifid_pc_out <= ifid_pc_in;
@@ -376,7 +377,7 @@ sync: process(clk, reset)
 				idex_opb_out <= idex_opb_in;
 				exid_dest_out <= exid_dest_in;
 				exid_result_out <= exid_result_in;
-			end if;
+			--~ end if;
 		end if;
 	end process;
 

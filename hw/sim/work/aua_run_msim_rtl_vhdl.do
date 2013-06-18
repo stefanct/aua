@@ -1,13 +1,14 @@
+restart -f
 transcript on
 if ![file isdirectory vhdl_libs] {
 	file mkdir vhdl_libs
 }
 
 
-set path_to_quartus d:/quartus
+#set path_to_quartus d:/quartus
 
 # where is the "AUA" dir?
-set path_to_calu_svn H:/Documents/uni/calu/svn
+#set path_to_calu_svn H:/Documents/uni/calu/svn
 
 
 
@@ -63,13 +64,47 @@ vcom -93 -work work $path_to_calu_svn/AUA/hw/project/../sim/tb.vhd
 
 vsim -t 1ps -L lpm -L altera -L altera_mf -L sgate -L cycloneii -L rtl_work -L work -voptargs="+acc" aua_tb
 
-add wave sim:/aua_tb/clk sim:/aua_tb/reset_pin sim:/aua_tb/switch_pins sim:/aua_tb/led_pins sim:/aua_tb/digit0_pins sim:/aua_tb/digit1_pins sim:/aua_tb/digit2_pins sim:/aua_tb/digit3_pins sim:/aua_tb/digit4_pins sim:/aua_tb/digit5_pins
-add wave -hex sim:/aua_tb/sram_addr sim:/aua_tb/sram_dq 
-add wave sim:/aua_tb/sram_we sim:/aua_tb/sram_oe sim:/aua_tb/sram_ub sim:/aua_tb/sram_lb sim:/aua_tb/sram_ce
+add wave /aua_tb/clk /aua_tb/reset_pin 
+#add wave -divider UI
+#add wave /aua_tb/switch_pins /aua_tb/led_pins /aua_tb/digit0_pins /aua_tb/digit1_pins /aua_tb/digit2_pins /aua_tb/digit3_pins /aua_tb/digit4_pins /aua_tb/digit5_pins
+#add wave -divider SRAM
+#add wave -hex /aua_tb/sram_addr /aua_tb/sram_dq 
+#add wave /aua_tb/sram_we /aua_tb/sram_oe /aua_tb/sram_ub /aua_tb/sram_lb /aua_tb/sram_ce
+
+add wave -divider IF
+add wave -hex /aua_tb/aua1/cmp_if/pc
+add wave -hex /aua_tb/aua1/cmp_if/pc_in
+add wave /aua_tb/aua1/cmp_if/branch
+add wave -hex /aua_tb/aua1/cmp_if/pc_nxt
+
+
 add wave -divider IF/MMU
-add wave -hex {sim:/aua_tb/aua1/cmp_mmu/instr_addr }
-add wave -hex {sim:/aua_tb/aua1/cmp_mmu/instr_data } 
-add wave {sim:/aua_tb/aua1/cmp_mmu/instr_valid }
+add wave -hex /aua_tb/aua1/cmp_mmu/instr_addr
+add wave -hex /aua_tb/aua1/cmp_mmu/instr_data
+add wave -hex /aua_tb/aua1/cmp_mmu/cmp_rom/q
+add wave /aua_tb/aua1/cmp_mmu/instr_valid
+
+add wave -divider ID
+add wave -hex /aua_tb/aua1/cmp_id/opcode
+add wave -hex /aua_tb/aua1/cmp_id/pc
+add wave -dec /aua_tb/aua1/cmp_id/rega
+add wave -dec /aua_tb/aua1/cmp_id/regb
+add wave -dec /aua_tb/aua1/cmp_id/imm
+
+add wave -divider EX
+add wave -hex /aua_tb/aua1/cmp_ex/opcode
+add wave -hex /aua_tb/aua1/cmp_ex/opa
+add wave -hex /aua_tb/aua1/cmp_ex/opb
+add wave -dec /aua_tb/aua1/cmp_ex/dest
+
+
+add wave -divider REG-file
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_a
+#add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_a/altsyncram_component/memory/m_mem_data_b # always X?
+add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_b/altsyncram_component/memory/m_mem_data_a
+#add wave -hex /aua_tb/aua1/cmp_id/cmp_reg/cmp_ram_b/altsyncram_component/memory/m_mem_data_b # always X?
+
+
 view structure
 view signals
 run -all

@@ -6,7 +6,7 @@ use work.aua_types.all;
 
 entity mmu is
 	generic (
-		irq_cnt	: natural
+		irq_cnt	: natural := 0
 	);
 	port (
 		clk     : in std_logic;

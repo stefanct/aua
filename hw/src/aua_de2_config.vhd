@@ -28,9 +28,14 @@ configuration aua_cache of aua is
 		for cmp_icache : instr_cache
 			use entity work.instr_cache(cache_null);
 	    end for;
-	    for cmp_mmu: mmu
-	    	use entity work.mmu(sat1) generic map(1); -- irq_cnt
-		end for;
+	    -- does not work... why?
+	    --~ for cmp_mmu: mmu
+	    	--~ use entity work.mmu(sat1)
+	    		--~ generic map(1) -- irq_cnt
+	    		--~ port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
+					--~ mmuio_address, mmuio_wr_data, mmuio_rd, mmuio_wr, mmuio_rd_data, mmuio_rdy_cnt,
+					--~ sram_addr, sram_dq, sram_we, sram_oe, sram_ub, sram_lb, sram_ce);
+		--~ end for;
 
     end for;
 end aua_cache;
