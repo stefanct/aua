@@ -24,24 +24,21 @@ end sc_test_slave;
 
 architecture rtl of sc_test_slave is
 
-	signal xyz	: sc_data_t;
+	--~ signal xyz	: sc_data_t;
 
 begin
 
 	rdy_cnt <= "00";	-- no wait states
+	--~ rd_data <= xyz;
 
 process(clk, reset)
 begin
 	if (reset='1') then
 		rd_data <= (others => '0');
-		xyz <= (others => '0');
 	elsif rising_edge(clk) then
 		if address = sc_addr then
-			if rd='1' then
-				rd_data <= xyz;
-			end if;
 			if wr='1' then
-				xyz <= wr_data;
+				rd_data <= wr_data;
 			end if;
 		end if;
 	end if;

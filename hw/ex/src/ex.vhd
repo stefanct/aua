@@ -25,10 +25,11 @@ entity ex is
 		mmu_st_data		: out word_t;
 		mmu_enable		: out std_logic;
 		mmu_opcode		: out std_logic_vector(1 downto 0);
-		mmu_valid		: in std_logic;
+		mmu_done		: in std_logic;
 		
 		-- pipeline interlock
-		ex_locks	: out std_ulogic
+		ex_locks		: out std_ulogic;
+		ex_locks_async	: out std_ulogic
 	);
 end ex;
 
@@ -48,17 +49,15 @@ architecture sat1 of ex is
 	signal dest_nxt		: reg_t;
 	signal result_nxt	: word_t;
 	signal alu_result	: word_t;
-
-	-- forwarding
-	--~ signal dest_old		: reg_t;
-	--~ signal result_old	: word_t;
-	--~ signal dest			: reg_t;
-	--~ signal result		: word_t;
+	signal ex_locks_nxt	: std_logic;
 begin
+	
+	ex_locks_async <= ex_locks_nxt;
+
 	cmp_alu: alu
 		port map(clk, reset, opcode, opa, opb, alu_result);
 
-ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_valid, alu_result)
+ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_done, alu_result)
 	begin
 		mmu_address <= opb;
 		mmu_st_data <= opa;
@@ -67,16 +66,15 @@ ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_valid, alu_result
 
 		if opcode(5 downto 2) = "1111" then
 			mmu_enable <= '1';
-			ex_locks <= not mmu_valid;
+			ex_locks_nxt <= not mmu_done;
 			result_out <= mmu_result;
-
-			-- stores should not alter registers
-			if opcode(1) = '1' then
+			-- stores and incomplete mmu ops should not alter registers
+			if opcode(1) = '1' or mmu_done /= '1' then
 				dest_out <= (others => '0');
 			end if;
 		else
 			mmu_enable <= '0';
-			ex_locks <= '0';
+			ex_locks_nxt <= '0';
 			result_out <= alu_result;
 		end if;
 
@@ -85,47 +83,13 @@ ldst_n_mux: process(opcode, opa, opb, dest_in, mmu_result, mmu_valid, alu_result
 			result_out <= (others => '0');
 		end if;
 	end process;
-
---~ output: process(reset, dest_nxt, result_nxt)
-	--~ begin
-		--~ if reset = '1' then
-			--~ dest_out <= (others => '0');
-			--~ result_out <= (others => '0');
-			--~ dest <= (others => '0');
-			--~ result <= (others => '0');
-		--~ else
-			--~ dest <= dest_nxt;
-			--~ result <= result_nxt;
-			--~ dest_out <= dest_nxt;
-			--~ result_out <= result_nxt;
-		--~ end if;
-	--~ end process;	
-
---~ forward: process(dest_old, result_old, dest_in)
-	--~ begin
-		--~ if dest_in = '1' then
-			--~ dest_out <= (others => '0');
-			--~ result_out <= (others => '0');
-			--~ dest <= (others => '0');
-			--~ result <= (others => '0');
-		--~ else
-			--~ dest <= dest_nxt;
-			--~ result <= result_nxt;
-			--~ dest_out <= dest_nxt;
-			--~ result_out <= result_nxt;
-		--~ end if;
-	--~ end process;	
-
-
---~ sync: process (clk, reset)
-	--~ begin
-		--~ if reset = '1' then
-			--~ dest_old <= (others => '0');
-			--~ result_old <= (others => '0');
-		--~ elsif rising_edge(clk) then
-			--~ dest_old <= dest;
-			--~ result_old <= result;
-		--~ end if;
-	--~ end process;
-
+	
+sync: process (clk, reset)
+	begin
+		if reset = '1' then
+			ex_locks <= '0';
+		elsif rising_edge(clk) then
+			ex_locks <= ex_locks_nxt;
+		end if;
+	end process;
 end sat1;

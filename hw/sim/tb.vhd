@@ -19,13 +19,9 @@ architecture aua_test of aua_tb is
 			digit3_pins	: out std_logic_vector(6 downto 0);
 			digit4_pins	: out std_logic_vector(6 downto 0);
 			digit5_pins	: out std_logic_vector(6 downto 0);
-			sram_addr	: out std_logic_vector(17 downto 0);
+			sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
 			sram_dq		: inout word_t;
-			sram_we		: out std_logic;
-			sram_oe		: out std_logic;
-			sram_ub		: out std_logic;
-			sram_lb		: out std_logic;
-			sram_ce		: out std_logic
+			sram_we		: out std_logic
 		);
     end component;
     
@@ -39,14 +35,9 @@ architecture aua_test of aua_tb is
 	signal digit3_pins	: std_logic_vector(6 downto 0);
 	signal digit4_pins	: std_logic_vector(6 downto 0);
 	signal digit5_pins	: std_logic_vector(6 downto 0);
-	signal sram_addr	: std_logic_vector(17 downto 0);
+	signal sram_addr	: std_logic_vector(RAM_ADDR_SIZE-1 downto 0);
 	signal sram_dq		: word_t;
 	signal sram_we		: std_logic;
-	signal sram_oe		: std_logic;
-	signal sram_ub		: std_logic;
-	signal sram_lb		: std_logic;
-	signal sram_ce		: std_logic;
-    
 begin
     
     aua1: aua
@@ -63,11 +54,7 @@ begin
 		digit5_pins => digit5_pins,
 		sram_addr => sram_addr,
 		sram_dq => sram_dq,
-		sram_we => sram_we,
-		sram_oe => sram_oe,
-		sram_ub => sram_ub,
-		sram_lb => sram_lb,
-		sram_ce => sram_ce
+		sram_we => sram_we
     );
     
     CLKGEN: process
@@ -93,7 +80,7 @@ begin
         icwait(2);
         reset_pin <= '1';
         
-        icwait(50);
+        icwait(20);
         
         assert false report "sim finish" SEVERITY failure;
                 

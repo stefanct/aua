@@ -86,12 +86,12 @@ begin
 		rega_nxt <= rega_in;
 		regb_nxt <= regb_in;
 
-		opcode_out <= opcode;
-		dest_out <= dest;
-		opa_out <= opa;
-		opb_out <= opb;
+		--~ opcode_out <= opcode;
+		--~ dest_out <= dest;
+		--~ opa_out <= opa;
+		--~ opb_out <= opb;
 
-	branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
+branch: process (opcode_in, pc_in, opa_nxt, dest_in, opb_nxt)
 		variable inv : std_ulogic;
 		variable brinstr : std_ulogic; -- set if op changes PC
 	begin
@@ -138,7 +138,7 @@ begin
 	end process;
 
 	-- hide r0 changes
-	r0readonly: process (rega_in, regb_in, vala, valb, opa_to_nop)
+r0readonly: process (rega_in, regb_in, vala, valb, opa_to_nop)
 	begin
 		if rega_in="00000" or opa_to_nop = '1' then
 			opa_nxt <= (others => '0');
@@ -154,7 +154,7 @@ begin
 	end process;
 
 	-- sign extend, expand and mux with regb
-	extend: process (opcode_in, imm_in,regb_done, jmpl_op, pc_in)
+extend: process (opcode_in, imm_in,regb_done, jmpl_op, pc_in)
 	begin
 		if opcode_in(5 downto 3)="000" then
 			opb_nxt <= (15 downto 8 => '0') & imm_in(7 downto 0);
@@ -171,33 +171,29 @@ begin
 		end if;
 	end process;	
 	
-	sync: process (clk, reset)
+sync: process (clk, reset)
 	begin
 		if reset = '1' then
-			opcode <= (others => '0');
-			dest <= (others => '0');
-			opa <= (others => '0');
-			opb <= (others => '0');
+			opcode_out <= (others => '0');
+			dest_out <= (others => '0');
+			opa_out <= (others => '0');
+			opb_out <= (others => '0');
 
 			rega_out <= (others => '0');
 			regb_out <= (others => '0');
 		elsif rising_edge(clk) then
-			if lock='1' then
-				opcode <= opcode_nxt;
-				dest <= dest_nxt;
-				opa <= opa_nxt;
-				opb <= opb_nxt;
-
-				rega_out <= rega_nxt;
-				regb_out <= regb_nxt;
-			else
-				opcode <= opcode_nxt;
-				dest <= dest_nxt;
-				opa <= opa_nxt;
-				opb <= opb_nxt;
-
-				rega_out <= rega_nxt;
-				regb_out <= regb_nxt;
+			if lock/='1' then
+				opcode_out <= opcode_nxt;
+				dest_out <= dest_nxt;
+				opa_out <= opa_nxt;
+				opb_out <= opb_nxt;
+			--~ else
+				--~ opcode <= opcode;
+				--~ dest <= dest;
+				--~ opa <= opa;
+				--~ opb <= opb;
+			rega_out <= rega_nxt;
+			regb_out <= regb_nxt;
 			end if;
 		end if;
 	end process;

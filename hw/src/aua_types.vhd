@@ -12,9 +12,10 @@ package aua_types is
 	subtype opcode_t is std_logic_vector(5 downto 0);
 	subtype reg_t is std_logic_vector(4 downto 0);
 
+	constant RAM_ADDR_SIZE : integer := 14;
 
-	constant SC_ADDR_SIZE : integer := 16;--word_t'length;
-	constant SC_DATA_SIZE : integer := 32;--word_t'length;
+	constant SC_ADDR_SIZE : integer := 16;
+	constant SC_DATA_SIZE : integer := 32;
 	constant RDY_CNT_SIZE : integer := 2;
 	constant SLAVE_CNT : integer := 3;
 	-- number of bits needed to address all slaves (2**SC_ADDR_BITS >= SLAVE_CNT)

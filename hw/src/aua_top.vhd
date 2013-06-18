@@ -17,13 +17,13 @@ port (
 	digit3_pins	: out std_logic_vector(6 downto 0);
 	digit4_pins	: out std_logic_vector(6 downto 0);
 	digit5_pins	: out std_logic_vector(6 downto 0);
-	sram_addr	: out std_logic_vector(17 downto 0);
+	sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1  downto 0);
 	sram_dq		: inout word_t;
-	sram_we		: out std_logic;
-	sram_oe		: out std_logic;
-	sram_ub		: out std_logic;
-	sram_lb		: out std_logic;
-	sram_ce		: out std_logic
+	sram_we		: out std_logic
+--	sram_oe		: out std_logic;
+--	sram_ub		: out std_logic;
+--	sram_lb		: out std_logic;
+--	sram_ce		: out std_logic
 );
 end aua;
 
@@ -120,10 +120,11 @@ architecture sat1 of aua is
 			mmu_st_data		: out word_t;
 			mmu_enable		: out std_logic;
 			mmu_opcode		: out std_logic_vector(1 downto 0);
-			mmu_valid		: in std_logic;
+			mmu_done		: in std_logic;
 			
 			-- pipeline interlock
-			ex_locks	: out std_ulogic
+			ex_locks		: out std_ulogic;
+			ex_locks_async	: out std_ulogic
 			);
 	end component;
 
@@ -162,20 +163,20 @@ architecture sat1 of aua is
 			ex_wr_data	: in word_t;
 			ex_enable	: in std_logic;
 			ex_opcode	: in std_logic_vector(1 downto 0);
-			ex_valid	: out std_logic;
+			ex_done		: out std_logic;
 
 			-- SimpCon interface to IO devices
 			sc_io_in		: in sc_in_t;
 			sc_io_out		: out sc_out_t;
 			
 			-- interface to SRAM
-			sram_addr	: out std_logic_vector(17 downto 0);
+			sram_addr	: out std_logic_vector(RAM_ADDR_SIZE-1  downto 0);
 			sram_dq		: inout word_t;
-			sram_we		: out std_logic; -- write enable, low active, 0=enable, 1=disable
-			sram_oe		: out std_logic; -- output enable, low active
-			sram_ub		: out std_logic; -- upper byte, low active
-			sram_lb		: out std_logic; -- lower byte, low active
-			sram_ce		: out std_logic -- chip enable, low active
+			sram_we		: out std_logic -- write enable, low active, 0=enable, 1=disable
+--			sram_oe		: out std_logic; -- output enable, low active
+--			sram_ub		: out std_logic; -- upper byte, low active
+--			sram_lb		: out std_logic; -- lower byte, low active
+--			sram_ce		: out std_logic -- chip enable, low active
 		);
 	end component;
 
@@ -330,9 +331,10 @@ architecture sat1 of aua is
 	signal exid_dest			: reg_t;
 	signal exid_result			: word_t;
 	--interlocks
-	signal ex_locks	: std_logic;
-	signal lock_if	: std_logic;
-	signal lock_id	: std_logic;
+	signal ex_locks			: std_logic;
+	signal ex_locks_async	: std_logic;
+	signal lock_if			: std_logic;
+	signal lock_id			: std_logic;
 
 
 begin
@@ -341,7 +343,7 @@ cmp_if: ent_if
 cmp_id: id
 	port map(clk, reset, ifid_opcode_out, ifid_dest_out, ifid_pc_out, ifid_rega_out, ifid_regb_out, ifid_imm_out, ifid_async_rega_out, ifid_async_regb_out, exid_dest_out, exid_result_out, idex_opcode_in, idex_dest_in, idex_opa_in, idex_opb_in, id_rega_in, id_regb_in, idif_pc_in, idif_branch_in, lock_id);
 cmp_ex: ex
-	port map(clk, reset, idex_opcode_out, idex_dest_out, idex_opa_out, idex_opb_out, exid_dest_in, exid_result_in, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid, ex_locks);
+	port map(clk, reset, idex_opcode_out, idex_dest_out, idex_opa_out, idex_opb_out, exid_dest_in, exid_result_in, exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid, ex_locks, ex_locks_async);
 cmp_icache: instr_cache
 	port map(clk, reset, ifcache_addr, ifcache_valid, ifcache_data, cachemmu_addr, cachemmu_valid, cachemmu_data);
 cmp_mmu: mmu
@@ -349,7 +351,7 @@ cmp_mmu: mmu
 	port map(clk, reset, cachemmu_addr, cachemmu_data, cachemmu_valid,
 		exmmu_address, exmmu_result_mmu, exmmu_wr_data, exmmu_enable, exmmu_mmu_opcode, exmmu_valid,
 		mmuio_in, mmuio_out,
-		sram_addr, sram_dq, sram_we, sram_oe, sram_ub, sram_lb, sram_ce);
+		sram_addr, sram_dq, sram_we);
 
 	reset <= not reset_pin; -- in case we need to invert... should be "calculated" with help of a constant
 
@@ -368,17 +370,18 @@ cmp_mmu: mmu
 	exid_dest_out <= exid_dest_in;
 	exid_result_out <= exid_result_in;
 	
-	lock_if <= ex_locks;
-	lock_id <= ex_locks;
+	lock_if <= ex_locks_async;
+	lock_id <= ex_locks_async;
 
-ex_fw: process(id_rega_in, id_regb_in, exid_dest, exid_result, idex_opa_in, idex_opb_in)
+ex_fw: process(id_rega_in, id_regb_in, exid_dest, exid_result, idex_opa_in, idex_opb_in, ex_locks)
 	begin
-		if id_rega_in = exid_dest then
+		if id_rega_in = exid_dest and ex_locks = '0' then
 			idex_opa_out <= exid_result;
 		else
 			idex_opa_out <= idex_opa_in;
 		end if;
-		if id_regb_in = exid_dest then
+		
+		if id_regb_in = exid_dest and ex_locks = '0' then
 			idex_opb_out <= exid_result;
 		else
 			idex_opb_out <= idex_opb_in;
@@ -407,9 +410,9 @@ sc_sync: process(clk, reset)
 
 sc_mux: process (mmuio_ina, sc_sel_reg)
 	begin
-		if sc_sel_reg /= 0 then
-			mmuio_in.rd_data <= mmuio_ina(sc_sel_reg-1).rd_data;
-			mmuio_in.rdy_cnt <= mmuio_ina(sc_sel_reg-1).rdy_cnt;
+		if sc_sel_reg /= SLAVE_CNT then
+			mmuio_in.rd_data <= mmuio_ina(sc_sel_reg).rd_data;
+			mmuio_in.rdy_cnt <= mmuio_ina(sc_sel_reg).rdy_cnt;
 		else
 			mmuio_in.rd_data <= (others => '0');
 			mmuio_in.rdy_cnt <= (others => '0');
@@ -426,12 +429,14 @@ sc_mux: process (mmuio_ina, sc_sel_reg)
 sc_addr <= mmuio_out.address;
 sc_sc_selector: process (mmuio_out, sc_addr)
 	begin
-		if((sc_addr and x"FF00") = x"FF00") then
+		if((sc_addr and x"FFF0") = x"FF00") then
 			sc_sel <= 0;
-		elsif((sc_addr and x"FF10") = x"FF10") then
+		elsif((sc_addr and x"FFF0") = x"FF10") then
 			sc_sel <= 1;
-		else
+		elsif((sc_addr and x"FFFF") = x"FFFF") then
 			sc_sel <= 2;
+		else
+			sc_sel <= SLAVE_CNT;
 		end if;
 	end process;
 

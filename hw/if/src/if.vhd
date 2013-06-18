@@ -51,7 +51,15 @@ architecture sat1 of ent_if is
 	signal pc	: word_t;
 begin
 
-	instr_dec: process(reset, instr_data, branch, instr_valid)
+	instr_addr <= pc;
+
+	opcode_out <= opcode;
+	dest_out <= dest;
+	rega_out <= rega;
+	regb_out <= regb;
+	imm_out <= imm;
+
+instr_dec: process(reset, instr_data, branch, instr_valid)
 	begin
 		if branch = '0' and instr_valid = '1' then
 			opcode_nxt <= instr_data(15 downto 10);
@@ -67,18 +75,8 @@ begin
 			imm_nxt <= (others => '0');
 		end if;
 	end process;
-	async_rega <= rega_nxt;
-	async_regb <= regb_nxt;
 	
-	instr_addr <= pc;
-
-	opcode_out <= opcode;
-	dest_out <= dest;
-	rega_out <= rega;
-	regb_out <= regb;
-	imm_out <= imm;
-
-	calc_pc_nxt: process(reset, pc, pc_in, branch, instr_valid)
+calc_pc_nxt: process(reset, pc, pc_in, branch, instr_valid)
 	begin
 		if reset = '1' then
 			pc_nxt <= (others => '0');
@@ -92,7 +90,18 @@ begin
 		end if;
 	end process;
 
-	process(clk, reset)
+reg_async_when_locked: process (lock, rega_nxt, regb_nxt, rega, regb)
+		begin
+			if lock = '1' then
+				async_rega <= rega;
+				async_regb <= regb;
+			else
+				async_rega <= rega_nxt;
+				async_regb <= regb_nxt;
+			end if;
+	end process;
+
+sync: process(clk, reset)
 	begin
 		if reset = '1' then
 			opcode <= (others => '0');
