@@ -1,9 +1,3 @@
-restart -f
-transcript on
-if ![file isdirectory vhdl_libs] {
-	file mkdir vhdl_libs
-}
-
 #set path_to_quartus d:/quartus
 #set path_to_quartus C:/Programme/altera/80sp1/quartus
 
@@ -11,7 +5,11 @@ if ![file isdirectory vhdl_libs] {
 #set path_to_calu_svn H:/Documents/uni/calu/svn
 #set path_to_calu_svn H:/uni/calu
 
-
+restart -f
+transcript on
+if ![file isdirectory vhdl_libs] {
+	file mkdir vhdl_libs
+}
 
 vlib vhdl_libs/lpm
 vmap lpm vhdl_libs/lpm
@@ -82,7 +80,6 @@ add wave -hex /aua_tb/aua1/cmp_if/pc_nxt
 add wave -divider IF/MMU
 add wave -hex /aua_tb/aua1/cmp_mmu/instr_addr
 add wave -hex /aua_tb/aua1/cmp_mmu/instr_data
-add wave -hex /aua_tb/aua1/cmp_mmu/cmp_rom/q
 add wave /aua_tb/aua1/cmp_mmu/instr_valid
 
 add wave -divider ID

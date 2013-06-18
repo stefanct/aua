@@ -188,3 +188,4 @@ set_global_assignment -name QIP_FILE ../reg/src/ram.qip
 set_global_assignment -name VHDL_FILE ../src/aua_top.vhd
 set_global_assignment -name VHDL_FILE ../src/aua_de2_config.vhd
 set_global_assignment -name CDF_FILE aua.cdf
+set_global_assignment -name EDA_NETLIST_WRITER_OUTPUT_DIR ../sim/work -section_id eda_simulation
